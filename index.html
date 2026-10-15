@@ -1,0 +1,840 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="data:,">
+<title>StudyLens</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:wght@500;600;700&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f4f6f8; --surface:#ffffff; --surface2:#edf1f4; --line:#d8dfe6;
+  --ink:#16222e; --mut:#5a6b7a; --acc:#0d6e5f; --acc-hover:#0a5c50; --acc-ink:#ffffff;
+  --good:#2c8a5f; --warn:#b97f0e; --bad:#c2403c;
+  --good-bg:#e2f2e9; --warn-bg:#f7ecd2; --bad-bg:#f9e3e2;
+  --shadow:0 1px 3px rgba(18,32,46,.08), 0 6px 18px rgba(18,32,46,.05);
+  --radius:14px;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#0e141b; --surface:#17222e; --surface2:#1f2e3d; --line:#2d3e50;
+    --ink:#e9eff5; --mut:#9db1c2; --acc:#45c2a6; --acc-hover:#5ad0b6; --acc-ink:#06231c;
+    --good:#4cc38a; --warn:#e8b23f; --bad:#f0766e;
+    --good-bg:#173527; --warn-bg:#3a2f12; --bad-bg:#3d1d1b;
+    --shadow:0 1px 3px rgba(0,0,0,.4), 0 6px 18px rgba(0,0,0,.3);
+  }
+}
+*{box-sizing:border-box}
+[hidden]{display:none !important}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif;font-size:16px;line-height:1.55}
+h1,h2,h3{font-family:"Spectral",Georgia,serif;line-height:1.2;margin:0}
+button{font-family:inherit}
+:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+
+/* ---------- layout ---------- */
+.app{display:flex;min-height:100vh}
+.rail{flex:0 0 208px;background:var(--surface);border-right:1px solid var(--line);padding:18px 12px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:4px}
+.rail .rail-note{margin-top:auto;font-size:12px;color:var(--mut);line-height:1.5;padding:8px 6px 0}
+.navbtn{display:flex;align-items:center;gap:11px;width:100%;background:none;border:0;border-radius:10px;padding:11px 10px;color:var(--mut);font-size:15px;font-weight:600;cursor:pointer;text-align:left}
+.navbtn svg{flex:0 0 20px}
+.navbtn:hover{background:var(--surface2);color:var(--ink)}
+.navbtn.on{background:var(--surface2);color:var(--acc);box-shadow:inset 3px 0 0 var(--acc)}
+main{flex:1;min-width:0;max-width:920px;margin:0 auto;padding:26px 22px 60px;width:100%}
+.tab{display:none}
+.tab.active{display:block}
+.tabhead{margin-bottom:18px}
+.tabhead h2{font-size:28px;font-weight:700}
+.tabhead p{color:var(--mut);margin:6px 0 0;max-width:64ch}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px;margin-bottom:14px;box-shadow:var(--shadow)}
+.card h3{font-size:19px;margin-bottom:6px}
+.mut{color:var(--mut);font-size:14px;line-height:1.55}
+.small{font-size:12.5px;color:var(--mut);line-height:1.55}
+textarea,input[type=text],input[type=url]{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--ink);padding:11px 12px;font-size:15px;font-family:inherit}
+textarea{min-height:140px;resize:vertical;line-height:1.55}
+textarea:focus,input:focus{border-color:var(--acc);outline:none;box-shadow:0 0 0 3px color-mix(in srgb, var(--acc) 22%, transparent)}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
+.btn{display:inline-flex;align-items:center;gap:7px;background:var(--acc);color:var(--acc-ink);border:1px solid var(--acc);border-radius:10px;padding:10px 16px;font-weight:700;font-size:14.5px;cursor:pointer}
+.btn:hover{background:var(--acc-hover);border-color:var(--acc-hover)}
+.btn.ghost{background:transparent;color:var(--acc);border:1px solid var(--acc)}
+.btn.ghost:hover{background:var(--surface2)}
+.btn.plain{background:transparent;color:var(--mut);border:1px solid var(--line)}
+.btn.plain:hover{color:var(--ink);background:var(--surface2)}
+.btn.small{padding:7px 12px;font-size:13px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.filelabel{cursor:pointer}
+.pill{display:inline-block;background:var(--surface2);border:1px solid var(--line);border-radius:999px;padding:4px 11px;font-size:13px;margin:3px 3px 0 0}
+.list{list-style:none;margin:0;padding:0}
+.list li{padding:9px 2px;border-bottom:1px solid var(--line);font-size:15px;line-height:1.55}
+.list li:last-child{border-bottom:0}
+.notice{border-radius:10px;padding:11px 13px;font-size:14px;line-height:1.5;margin-top:12px;display:none}
+.notice.show{display:block}
+.notice.err{background:var(--bad-bg);border:1px solid var(--bad);color:var(--ink)}
+.notice.ok{background:var(--good-bg);border:1px solid var(--good);color:var(--ink)}
+details{margin-top:12px}
+details summary{cursor:pointer;color:var(--acc);font-size:13.5px;font-weight:600}
+details .inner{margin-top:8px}
+
+/* flashcards */
+.flash{border:1px solid var(--line);border-radius:var(--radius);padding:30px 20px;text-align:center;min-height:190px;display:flex;flex-direction:column;justify-content:center;cursor:pointer;background:var(--surface2);user-select:none}
+.flash .q{font-size:19px;font-weight:600;line-height:1.5}
+.flash .a{font-size:15.5px;color:var(--acc);margin-top:14px;line-height:1.55}
+.flash .hint{font-size:12px;color:var(--mut);margin-top:14px}
+
+/* quiz */
+.opt{display:block;width:100%;text-align:left;background:var(--surface2);border:1px solid var(--line);border-radius:10px;padding:12px;margin:7px 0;color:var(--ink);font-size:14.5px;cursor:pointer;line-height:1.5}
+.opt:hover{border-color:var(--acc)}
+.opt.correct{border-color:var(--good);background:var(--good-bg)}
+.opt.wrong{border-color:var(--bad);background:var(--bad-bg)}
+.opt:disabled{cursor:default;opacity:.85}
+
+/* detector */
+.det-flex{display:flex;gap:22px;flex-wrap:wrap;align-items:flex-start}
+.gauge-wrap{flex:0 0 190px;text-align:center}
+.gauge{position:relative;width:180px;height:180px;margin:0 auto}
+.gauge svg{display:block}
+.gauge-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none}
+.gauge-verdict{font-family:"Spectral",Georgia,serif;font-size:27px;font-weight:700;letter-spacing:.5px}
+.gauge-sub{font-size:11.5px;color:var(--mut);margin-top:2px}
+.legend{margin-top:10px;font-size:13px;line-height:1.7}
+.legend .dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px}
+.det-text{font-size:15.5px;line-height:1.8}
+.det-sent{border-radius:4px;padding:1px 3px;cursor:pointer;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+.det-sent:hover{filter:brightness(1.08)}
+.det-sent.sel{outline:2px solid var(--ink);outline-offset:0}
+.seg-human{background:var(--good-bg)}
+.seg-mixed{background:var(--warn-bg)}
+.seg-ai{background:var(--bad-bg)}
+.reason-box{border:1px solid var(--line);border-radius:10px;padding:11px 13px;margin-top:12px;background:var(--surface2);font-size:14px;line-height:1.6}
+.flagbox{background:var(--bad-bg);border:1px solid var(--bad);border-radius:10px;padding:11px 13px;font-size:14px;line-height:1.55}
+
+/* chat */
+.chat{max-height:380px;overflow-y:auto;display:flex;flex-direction:column;gap:9px;margin-bottom:12px;padding-right:2px}
+.msg{padding:11px 13px;border-radius:14px;font-size:14.5px;line-height:1.6;max-width:92%;white-space:pre-wrap}
+.msg.me{background:var(--acc);color:var(--acc-ink);align-self:flex-end;border-bottom-right-radius:4px}
+.msg.ai{background:var(--surface2);align-self:flex-start;border-bottom-left-radius:4px}
+.chatrow{display:flex;gap:8px}
+.chatrow input{flex:1}
+
+/* screen */
+video.cap,img.cap{width:100%;border-radius:12px;border:1px solid var(--line);background:#000;max-height:340px;object-fit:contain}
+
+@media (max-width:760px){
+  .app{flex-direction:column}
+  .rail{position:fixed;top:auto;bottom:0;left:0;right:0;height:auto;flex-direction:row;justify-content:space-around;padding:6px 4px calc(6px + env(safe-area-inset-bottom));border-right:0;border-top:1px solid var(--line);z-index:20}
+  .rail .rail-note{display:none}
+  .navbtn{flex-direction:column;gap:3px;font-size:10.5px;padding:7px 2px;flex:1;align-items:center;text-align:center}
+  .navbtn.on{box-shadow:inset 0 3px 0 var(--acc)}
+  main{padding:20px 15px 110px}
+  .tabhead h2{font-size:24px}
+  .gauge-wrap{flex:1 1 100%}
+}
+@media (prefers-reduced-motion: reduce){
+  html{scroll-behavior:auto}
+  *{transition:none !important}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <nav class="rail" aria-label="StudyLens sections">
+    <button class="navbtn on" data-tab="study">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+      Study
+    </button>
+    <button class="navbtn" data-tab="cards">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="15" height="14" rx="2"/><path d="M7 5V4a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2h-1"/></svg>
+      Cards
+    </button>
+    <button class="navbtn" data-tab="quiz">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      Quiz
+    </button>
+    <button class="navbtn" data-tab="detect">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      Detect
+    </button>
+    <button class="navbtn" data-tab="tutor">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      Tutor
+    </button>
+    <button class="navbtn" data-tab="screen">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+      Screen
+    </button>
+    <p class="rail-note">Everything runs in this tab — your text is never uploaded by StudyLens. Optional scans you start yourself (GPTZero, Ollama) go only to the service you picked.</p>
+  </nav>
+
+  <main>
+    <!-- ============ STUDY ============ -->
+    <section class="tab active" id="tab-study">
+      <div class="tabhead">
+        <h2>Study pack</h2>
+        <p>Paste notes, a chapter, or a lecture transcript. StudyLens builds a summary, key terms, flashcards, and a quiz from your own material — TurboLearn-style, right here on the page.</p>
+      </div>
+      <div class="card">
+        <h3>Your material</h3>
+        <textarea id="material" placeholder="Paste your study material here — a paragraph or more works best…"></textarea>
+        <div class="row">
+          <label class="btn ghost small filelabel" for="fileInput">Upload .txt / .md</label>
+          <input type="file" id="fileInput" accept=".txt,.md,.csv" hidden>
+          <button class="btn" id="genBtn">Generate study pack</button>
+          <button class="btn plain small" id="sampleBtn">Load sample notes</button>
+          <button class="btn plain small" id="clearBtn">Clear</button>
+        </div>
+        <div class="notice" id="studyNotice" role="status"></div>
+      </div>
+      <div class="card" id="summaryCard" hidden>
+        <h3>Summary</h3>
+        <ul class="list" id="summaryList"></ul>
+        <h3 style="margin-top:14px">Key terms</h3>
+        <div id="termsBox"></div>
+        <p class="small" style="margin-top:10px">Your flashcards and quiz are ready on the Cards and Quiz tabs.</p>
+      </div>
+    </section>
+
+    <!-- ============ CARDS ============ -->
+    <section class="tab" id="tab-cards">
+      <div class="tabhead">
+        <h2>Flashcards</h2>
+        <p id="cardsHint">Generate a study pack first, then flip through cards here. Tap a card to reveal the answer.</p>
+      </div>
+      <div class="card">
+        <div class="flash" id="flashBox" hidden role="button" tabindex="0" aria-label="Flashcard — activate to flip">
+          <div class="q" id="flashQ"></div>
+          <div class="a" id="flashA" hidden></div>
+          <div class="hint" id="flashHint">Tap to reveal the answer</div>
+        </div>
+        <div class="row" id="flashControls" hidden style="justify-content:center">
+          <button class="btn ghost small" id="prevCardBtn">← Prev</button>
+          <span class="pill" id="flashPos"></span>
+          <button class="btn ghost small" id="nextCardBtn">Next →</button>
+          <button class="btn plain small" id="shuffleBtn">Shuffle</button>
+        </div>
+        <p class="mut" id="cardsEmpty">No cards yet — paste material on the Study tab and hit Generate.</p>
+      </div>
+    </section>
+
+    <!-- ============ QUIZ ============ -->
+    <section class="tab" id="tab-quiz">
+      <div class="tabhead">
+        <h2>Quiz</h2>
+        <p id="quizHint">Generate a study pack first. Every question is built from your own material.</p>
+      </div>
+      <div id="quizBox"></div>
+      <div class="card" id="quizScoreCard" hidden>
+        <h3 id="quizScore"></h3>
+        <p class="mut" id="quizScoreNote"></p>
+      </div>
+    </section>
+
+    <!-- ============ DETECT ============ -->
+    <section class="tab" id="tab-detect">
+      <div class="tabhead">
+        <h2>AI detector</h2>
+        <p>Paste <strong>your own writing</strong>. Every sentence is scored — Human, Mixed, or AI — and the circle shows the split. Tap any sentence to see exactly why it scored that way.</p>
+      </div>
+      <div class="card">
+        <h3>Your writing</h3>
+        <textarea id="detectInput" placeholder="Paste your essay, paragraph, or discussion post here (40+ words works best)…"></textarea>
+        <div class="row">
+          <button class="btn" id="detectBtn">Check my writing</button>
+          <button class="btn ghost" id="gzBtn">Run real GPTZero scan</button>
+          <button class="btn plain small" id="detSampleBtn">Try sample writing</button>
+        </div>
+        <p class="small" style="margin-top:8px">Two engines: the <strong>on-device check</strong> is instant and free — a style-based estimate (phrase patterns, sentence rhythm, predictability, personal voice, specifics). It is <em>not</em> GPTZero. The <strong>GPTZero scan</strong> runs GPTZero's real model using your own free API key. Neither score proves authorship — use them to strengthen your own voice.</p>
+        <details>
+          <summary>GPTZero API key (optional)</summary>
+          <div class="inner">
+            <p class="small">Get a free key at gptzero.me (free tier: 10,000 words/month). The key is held in this tab's memory only — it disappears when you close the page — and is sent only to GPTZero's API, only when you run a scan.</p>
+            <div class="row">
+              <input type="text" id="gzKey" placeholder="Paste your GPTZero API key…" autocomplete="off" style="flex:1;min-width:220px">
+              <button class="btn ghost small" id="gzSaveBtn">Use key</button>
+            </div>
+            <p class="small" id="gzKeyStatus"></p>
+          </div>
+        </details>
+        <div id="detectOut" style="margin-top:14px"></div>
+      </div>
+    </section>
+
+    <!-- ============ TUTOR ============ -->
+    <section class="tab" id="tab-tutor">
+      <div class="tabhead">
+        <h2>Tutor</h2>
+        <p>Ask about your study material. The tutor explains, quizzes you, and walks through problems step by step — Socratically. It won't write your assignments or hand over quiz answers.</p>
+      </div>
+      <div class="card">
+        <div class="chat" id="chatBox">
+          <div class="msg ai">Hey! Paste study material on the Study tab, then ask me anything about it — or ask me to quiz you. Try: “quiz me on the key terms” or “explain this in simple words.”</div>
+        </div>
+        <div class="chatrow">
+          <input type="text" id="chatInput" placeholder="Ask about your material…">
+          <button class="btn" id="chatSendBtn">Send</button>
+        </div>
+        <details>
+          <summary>Optional: connect real AI (Ollama on your PC)</summary>
+          <div class="inner">
+            <p class="small">If you run Ollama on your PC (for example llama3.1), the tutor can use it for real AI chat. The address is kept in this tab's memory only. Leave it blank to use the built-in tutor.</p>
+            <div class="row">
+              <input type="url" id="ollamaUrl" placeholder="http://localhost:11434" style="flex:1;min-width:220px">
+              <button class="btn ghost small" id="ollamaSaveBtn">Use address</button>
+            </div>
+            <p class="small" id="ollamaStatus"></p>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <!-- ============ SCREEN ============ -->
+    <section class="tab" id="tab-screen">
+      <div class="tabhead">
+        <h2>Screen See</h2>
+        <p>Share a window or tab on PC, or snap a photo of your notes on iPhone. StudyLens captures it, reads the text on-device, and can turn it into study material.</p>
+      </div>
+      <div class="card">
+        <p class="small"><strong>PC:</strong> Share Screen works in Chrome/Edge. <strong>iPhone:</strong> iOS doesn't let web pages see other apps, so use the camera button to photograph your notes or screen instead. Captures are processed on this page and never uploaded.</p>
+        <div class="row">
+          <button class="btn" id="shareBtn">Share screen (PC)</button>
+          <label class="btn ghost filelabel" for="camInput">Camera / photo</label>
+          <input type="file" id="camInput" accept="image/*" capture="environment" hidden>
+          <button class="btn plain small" id="stopBtn" hidden>Stop sharing</button>
+        </div>
+        <div class="notice" id="screenNotice" role="status"></div>
+        <div style="margin-top:12px"><video class="cap" id="screenVideo" autoplay playsinline muted hidden></video></div>
+        <img class="cap" id="capImg" hidden alt="Captured screen or photo">
+        <div class="row">
+          <button class="btn" id="capBtn" hidden>Capture frame</button>
+          <button class="btn ghost" id="ocrBtn" hidden>Read text (OCR)</button>
+          <button class="btn plain" id="useBtn" hidden>Send text to study material</button>
+        </div>
+      </div>
+      <div class="card" id="ocrCard" hidden>
+        <h3>Text found in capture</h3>
+        <p class="small" id="ocrStatus"></p>
+        <textarea id="ocrText" style="min-height:110px"></textarea>
+      </div>
+    </section>
+  </main>
+</div>
+<script>
+'use strict';
+/* ================= state (in-memory only — nothing is stored or uploaded) ================= */
+var S = { material:'', sentences:[], terms:[], cards:[], cardIdx:0, cardFlipped:false, quiz:[], quizAnswered:{}, stream:null };
+var GZ_KEY = '';
+var OLLAMA = '';
+
+function $(id){ return document.getElementById(id); }
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function showNotice(el, msg, kind){
+  el.textContent = msg;
+  el.className = 'notice show ' + (kind || 'ok');
+}
+function hideNotice(el){ el.className = 'notice'; el.textContent=''; }
+
+var STOP = new Set(('a an the and or but of to in on for with at by from as is are was were be been being have has had do does did will would can could should may might must this that these those it its he she they we you his her their our your my me him them us what when where which who whom how why not no yes if then than so such into over under between through after before about above below out up down off again once here there all any both each few more most other some own same too very just also only now').split(' '));
+
+/* ================= tabs ================= */
+function showTab(id){
+  document.querySelectorAll('.tab').forEach(function(t){ t.classList.toggle('active', t.id === 'tab-' + id); });
+  document.querySelectorAll('.navbtn').forEach(function(b){ b.classList.toggle('on', b.getAttribute('data-tab') === id); });
+  window.scrollTo(0, 0);
+}
+document.querySelectorAll('.navbtn').forEach(function(b){
+  b.addEventListener('click', function(){ showTab(b.getAttribute('data-tab')); });
+});
+
+/* ================= study pack ================= */
+function getSentences(text){
+  return text.replace(/\s+/g,' ').split(/(?<=[.!?])\s+/).map(function(s){ return s.trim(); }).filter(function(s){ return s.length > 25 && s.split(' ').length >= 4; });
+}
+function wordFreq(text){
+  var f = {};
+  text.toLowerCase().replace(/[^a-z0-9' -]/g,' ').split(/\s+/).forEach(function(w){
+    w = w.replace(/^'+|'+$/g,'');
+    if(w.length > 3 && !STOP.has(w)) f[w] = (f[w] || 0) + 1;
+  });
+  return f;
+}
+function extractTerms(text, sentences){
+  var f = wordFreq(text), terms = [], seen = {};
+  sentences.forEach(function(s){
+    var m = s.match(/\b([A-Z][a-z]+(?:\s+[A-Z][a-z]+)+)\b/g);
+    (m || []).forEach(function(p){ if(!/^(The|A|An|In|On|It)\b/.test(p)) seen[p] = (seen[p] || 0) + 1; });
+  });
+  Object.keys(seen).forEach(function(p){ terms.push({ t: p, s: seen[p] * 3 }); });
+  Object.keys(f).forEach(function(w){ if(f[w] >= 2) terms.push({ t: w, s: f[w] }); });
+  terms.sort(function(a,b){ return b.s - a.s; });
+  var out = [], used = {};
+  terms.forEach(function(x){ var k = x.t.toLowerCase(); if(!used[k] && out.length < 14){ used[k] = 1; out.push(x.t); } });
+  return out;
+}
+function generateStudy(){
+  var text = $('material').value.trim();
+  if(text.length < 120){ showNotice($('studyNotice'), 'Paste a bit more material first — a paragraph or more works best.', 'err'); return; }
+  hideNotice($('studyNotice'));
+  S.material = text;
+  S.sentences = getSentences(text);
+  var f = wordFreq(text);
+  var scored = S.sentences.map(function(s, i){
+    var w = 0;
+    s.toLowerCase().split(/\s+/).forEach(function(x){ if(f[x]) w += f[x]; });
+    var len = s.split(' ').length; if(len > 8 && len < 38) w *= 1.2;
+    return { s: s, w: w, i: i };
+  }).sort(function(a,b){ return b.w - a.w; }).slice(0, 6).sort(function(a,b){ return a.i - b.i; });
+  $('summaryList').innerHTML = scored.map(function(x){ return '<li>' + esc(x.s) + '</li>'; }).join('');
+  S.terms = extractTerms(text, S.sentences);
+  $('termsBox').innerHTML = S.terms.map(function(t){ return '<span class="pill">' + esc(t) + '</span>'; }).join('') || '<span class="mut">No clear key terms found — try more material.</span>';
+  $('summaryCard').hidden = false;
+  buildCards(); buildQuiz();
+  $('cardsHint').textContent = S.cards.length + ' flashcards ready. Tap a card to reveal the answer.';
+  $('quizHint').textContent = S.quiz.length + ' quiz questions ready — built from your material.';
+  showTab('cards');
+}
+$('genBtn').addEventListener('click', generateStudy);
+$('clearBtn').addEventListener('click', function(){
+  $('material').value = ''; S.material = ''; hideNotice($('studyNotice'));
+});
+$('fileInput').addEventListener('change', function(e){
+  var file = e.target.files[0]; if(!file) return;
+  var r = new FileReader();
+  r.onload = function(){ $('material').value = r.result; hideNotice($('studyNotice')); };
+  r.readAsText(file);
+});
+var SAMPLE_NOTES = 'Photosynthesis is the process by which green plants convert sunlight, water, and carbon dioxide into glucose and oxygen. The light-dependent reactions take place in the thylakoid membranes of chloroplasts, where chlorophyll absorbs light energy and splits water molecules. This stage produces ATP and NADPH, two energy carriers the cell can spend later. The Calvin cycle then runs in the stroma and uses that ATP and NADPH to fix carbon dioxide into sugar. Temperature, light intensity, and carbon dioxide concentration all limit the rate of photosynthesis. When light is scarce, the light-dependent reactions slow down and the whole process stalls. Most oxygen in Earth\'s atmosphere originally came from photosynthetic organisms, especially ancient cyanobacteria. Farmers and greenhouse growers raise carbon dioxide levels to push the rate higher and increase crop yield.';
+$('sampleBtn').addEventListener('click', function(){
+  $('material').value = SAMPLE_NOTES;
+  showNotice($('studyNotice'), 'Sample notes loaded (photosynthesis). Hit “Generate study pack” to see what StudyLens builds from them.', 'ok');
+});
+
+/* ================= flashcards ================= */
+function buildCards(){
+  S.cards = []; S.cardIdx = 0; S.cardFlipped = false;
+  var used = {};
+  S.terms.forEach(function(term){
+    var sent = S.sentences.find(function(s){ return s.toLowerCase().indexOf(term.toLowerCase()) !== -1 && !used[s]; });
+    if(sent){
+      used[sent] = 1;
+      var blank = sent.replace(new RegExp(term.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'), 'i'), '_____');
+      S.cards.push({ q: blank, a: term + ' — ' + sent });
+    }
+  });
+  S.sentences.forEach(function(s){
+    var m = s.match(/^([A-Z][A-Za-z0-9' -]{2,40}?)\s+(is|are|refers to|means)\b/i);
+    if(m && S.cards.length < 20) S.cards.push({ q: 'What is ' + m[1] + '?', a: s });
+  });
+  if(!S.cards.length && S.sentences.length){
+    S.sentences.slice(0, 8).forEach(function(s){ S.cards.push({ q: 'Explain this in your own words:', a: s }); });
+  }
+  renderCard();
+}
+function renderCard(){
+  var has = S.cards.length > 0;
+  $('flashBox').hidden = !has;
+  $('flashControls').hidden = !has;
+  $('cardsEmpty').hidden = has;
+  if(!has) return;
+  var c = S.cards[S.cardIdx];
+  $('flashQ').textContent = c.q;
+  $('flashA').textContent = c.a;
+  $('flashA').hidden = !S.cardFlipped;
+  $('flashHint').textContent = S.cardFlipped ? 'Tap to hide the answer' : 'Tap to reveal the answer';
+  $('flashPos').textContent = (S.cardIdx + 1) + ' / ' + S.cards.length;
+}
+function flipCard(){ if(!S.cards.length) return; S.cardFlipped = !S.cardFlipped; renderCard(); }
+$('flashBox').addEventListener('click', flipCard);
+$('flashBox').addEventListener('keydown', function(e){ if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); flipCard(); } });
+$('nextCardBtn').addEventListener('click', function(){ if(!S.cards.length) return; S.cardIdx = (S.cardIdx + 1) % S.cards.length; S.cardFlipped = false; renderCard(); });
+$('prevCardBtn').addEventListener('click', function(){ if(!S.cards.length) return; S.cardIdx = (S.cardIdx - 1 + S.cards.length) % S.cards.length; S.cardFlipped = false; renderCard(); });
+$('shuffleBtn').addEventListener('click', function(){
+  for(var i = S.cards.length - 1; i > 0; i--){ var j = Math.floor(Math.random() * (i + 1)); var t = S.cards[i]; S.cards[i] = S.cards[j]; S.cards[j] = t; }
+  S.cardIdx = 0; S.cardFlipped = false; renderCard();
+});
+
+/* ================= quiz ================= */
+function buildQuiz(){
+  S.quiz = []; S.quizAnswered = {};
+  var used = {}, pool = S.sentences.slice();
+  for(var i = 0; i < S.terms.length && S.quiz.length < 8; i++){
+    var term = S.terms[i];
+    var correct = pool.find(function(s){ return s.toLowerCase().indexOf(term.toLowerCase()) !== -1 && !used[s]; });
+    if(!correct) continue;
+    used[correct] = 1;
+    var others = pool.filter(function(s){ return s !== correct && !used[s]; });
+    if(others.length < 3) continue;
+    var opts = [correct], picked = {};
+    for(var k = 0; k < 3; k++){
+      var cand = others[Math.floor(Math.random() * others.length)];
+      var guard = 0;
+      while(picked[cand] && guard++ < 20) cand = others[Math.floor(Math.random() * others.length)];
+      picked[cand] = 1; opts.push(cand);
+    }
+    for(var a = opts.length - 1; a > 0; a--){ var b = Math.floor(Math.random() * (a + 1)); var t2 = opts[a]; opts[a] = opts[b]; opts[b] = t2; }
+    S.quiz.push({ q: 'Which statement from your material relates to “' + term + '”?', opts: opts, answer: correct });
+  }
+  renderQuiz();
+}
+function renderQuiz(){
+  var box = $('quizBox');
+  $('quizScoreCard').hidden = true;
+  if(!S.quiz.length){
+    box.innerHTML = '<div class="card"><p class="mut">Not enough material to build a quiz yet — paste more text with several distinct ideas, then generate.</p></div>';
+    return;
+  }
+  box.innerHTML = S.quiz.map(function(q, qi){
+    return '<div class="card"><h3 style="font-size:16px">' + (qi + 1) + '. ' + esc(q.q) + '</h3>' +
+      q.opts.map(function(o, oi){ return '<button class="opt" data-q="' + qi + '" data-o="' + oi + '">' + esc(o) + '</button>'; }).join('') +
+      '<div class="small" id="qfb' + qi + '"></div></div>';
+  }).join('');
+  box.querySelectorAll('.opt').forEach(function(btn){
+    btn.addEventListener('click', function(){ answerQuiz(parseInt(btn.getAttribute('data-q'), 10), parseInt(btn.getAttribute('data-o'), 10), btn); });
+  });
+}
+function answerQuiz(qi, oi, el){
+  if(S.quizAnswered[qi] !== undefined) return;
+  S.quizAnswered[qi] = oi;
+  var q = S.quiz[qi], correct = q.opts[oi] === q.answer;
+  el.classList.add(correct ? 'correct' : 'wrong');
+  el.parentElement.querySelectorAll('.opt').forEach(function(b){ b.disabled = true; });
+  $('qfb' + qi).textContent = correct ? 'Correct.' : 'Not quite — the matching statement is: ' + q.answer;
+  var done = Object.keys(S.quizAnswered).length;
+  var right = S.quiz.filter(function(x, i){ return S.quizAnswered[i] !== undefined && x.opts[S.quizAnswered[i]] === x.answer; }).length;
+  if(done === S.quiz.length){
+    $('quizScoreCard').hidden = false;
+    $('quizScore').textContent = 'Score: ' + right + ' / ' + S.quiz.length;
+    $('quizScoreNote').textContent = right === S.quiz.length ? 'Perfect run. Re-read the summary once more tomorrow and it will stick.' : 'Review the ones you missed, re-read the summary, then regenerate the pack to try a fresh quiz.';
+  }
+}
+</script>
+<script>
+'use strict';
+/* ================= AI Detector: per-sentence scoring + circle gauge + optional real GPTZero ================= */
+var AI_PHRASES = ['delve into','it is important to note','in conclusion','furthermore','moreover','in today\'s fast-paced world','tapestry','rich tapestry','landscape','crucial','pivotal','paramount','underscore','underscores','testament to','a testament to','delving','embark','navigate','navigating','foster','fostering','leverage','leveraging','in the realm of','a myriad of','it\'s worth noting','as an ai','in summary','plays a vital role','serves as a','in essence','significantly','notably','additionally','consequently','it is evident','it is clear that'];
+var AI_OPENERS = ['in conclusion','furthermore','moreover','additionally','it is important','it\'s important','in summary','overall,','in essence','consequently','as such','it is evident'];
+var COMMON = new Set('the of and a to in is you that it he was for on are as with his they i at be this have from or one had by word but not what all were we when your can said there use an each which she do how their if will up other about out many then them these so some her would make like him into time has look two more write go see number no way could people my than first water been call who oil its now find long down day did get come made may part over new sound take only little work know place year live me back give most very after thing our just name good sentence man think say great where help through much before line right too mean old any same tell boy follow came want show also around form three small set put end does another well large must big even such because turn here why ask went men read need land different home us move try kind hand picture again change off play spell air away animal house point page letter mother answer found study still learn should world high every near add food between own below country plant last school father keep tree never start city earth eye light thought head under story saw left few while along might close something seem next hard open example begin life always those both paper together got group often run'.split(' '));
+var DET = { sents: [], scores: [] };
+
+function sentenceScore(s, docAvg, docSd){
+  var low = s.toLowerCase();
+  var words = low.replace(/[^a-z0-9' ]/g,' ').split(/\s+/).filter(Boolean);
+  var n = words.length || 1;
+  var reasons = [], score = 30;
+  AI_PHRASES.forEach(function(p){ if(low.indexOf(p) !== -1){ score += 16; reasons.push('generic AI phrase: “' + p + '”'); } });
+  AI_OPENERS.forEach(function(p){ if(low.indexOf(p) === 0){ score += 10; reasons.push('generic AI-style opener'); } });
+  var dev = Math.abs(n - docAvg) / (docSd || 1);
+  if(dev < 0.35){ score += 8; reasons.push('sentence length matches the document average — flat, metronome-like rhythm'); }
+  if(n > 32){ score += 6; reasons.push('very long sentence'); }
+  var common = words.filter(function(w){ return COMMON.has(w); }).length / n;
+  if(common > 0.62){ score += 10; reasons.push('mostly ultra-common words — very predictable phrasing'); }
+  else if(common < 0.4){ score -= 8; reasons.push('uncommon word mix — less predictable'); }
+  var personal = (low.match(/\b(i|we|my|our|me|us|i'm|we're)\b/g) || []).length;
+  if(personal > 0){ score -= 14; reasons.push('personal voice (' + personal + ' first-person marker' + (personal > 1 ? 's' : '') + ')'); }
+  if(/(\bdon't\b|\bcan't\b|\bwon't\b|\bit's\b|\bthat's\b|\bdidn't\b|\bwasn't\b|\bisn't\b|\baren't\b)/.test(low)){ score -= 8; reasons.push('contraction — conversational'); }
+  var specifics = (s.match(/\b\d+(\.\d+)?\b/g) || []).length + (s.match(/\b[A-Z][a-z]+\s[A-Z][a-z]+\b/g) || []).length;
+  if(specifics > 0){ score -= 10; reasons.push('concrete specifics (numbers / names)'); }
+  if(/[!?]/.test(s)){ score -= 6; reasons.push('expressive punctuation'); }
+  if(words.length < 6){ score -= 6; reasons.push('short fragment — humans write these'); }
+  score = Math.max(2, Math.min(98, Math.round(score)));
+  return { score: score, reasons: reasons.slice(0, 3) };
+}
+function splitSents(text){
+  var t = text.replace(/\s+/g, ' ');
+  ['Dr','Mr','Mrs','Ms','St','vs','etc','e.g','i.e','U.S','U.K'].forEach(function(a){ t = t.split(a + '.').join(a + '\u0001'); });
+  return t.split(/(?<=[.!?])\s+/).map(function(x){ return x.trim().replace(/\u0001/g, '.'); }).filter(Boolean);
+}
+function bucket(score){ return score < 38 ? 'human' : score > 62 ? 'ai' : 'mixed'; }
+
+function gaugeHTML(pct, verdict){
+  var C = 2 * Math.PI * 62;
+  function arc(frac, offset, color){
+    if(frac <= 0) return '';
+    return '<circle cx="90" cy="90" r="62" fill="none" stroke="' + color + '" stroke-width="17" stroke-dasharray="' + (frac * C) + ' ' + C + '" stroke-dashoffset="' + (-offset * C) + '" transform="rotate(-90 90 90)"/>';
+  }
+  var h = pct.human / 100, m = pct.mixed / 100, a = pct.ai / 100;
+  return '<svg width="180" height="180" viewBox="0 0 180 180" role="img" aria-label="Verdict ' + verdict + ': ' + pct.human + '% human, ' + pct.mixed + '% mixed, ' + pct.ai + '% AI">' +
+    '<circle cx="90" cy="90" r="62" fill="none" stroke="var(--surface2)" stroke-width="17"/>' +
+    arc(h, 0, 'var(--good)') + arc(m, h, 'var(--warn)') + arc(a, h + m, 'var(--bad)') + '</svg>' +
+    '<div class="gauge-center"><div class="gauge-verdict">' + verdict + '</div><div class="gauge-sub">overall verdict</div></div>';
+}
+function renderDetectorResults(title, pct, verdict, sents, scores, explain){
+  var html = '<h3 style="margin-bottom:10px">' + esc(title) + '</h3>' +
+    '<div class="det-flex">' +
+      '<div class="gauge-wrap"><div class="gauge">' + gaugeHTML(pct, verdict) + '</div>' +
+        '<div class="legend">' +
+          '<span><span class="dot" style="background:var(--good)"></span>Human ' + pct.human + '%</span><br>' +
+          '<span><span class="dot" style="background:var(--warn)"></span>Mixed ' + pct.mixed + '%</span><br>' +
+          '<span><span class="dot" style="background:var(--bad)"></span>AI ' + pct.ai + '%</span>' +
+        '</div></div>' +
+      '<div style="flex:1;min-width:240px">' +
+        '<p class="small">Tap any sentence to see why it scored that way. Green reads human, yellow is mixed, red reads AI.</p>' +
+        '<div class="det-text" style="margin-top:8px">' +
+          sents.map(function(s, i){
+            return '<span class="det-sent seg-' + bucket(scores[i]) + '" data-i="' + i + '" title="Tap for reasons">' + esc(s) + '</span> ';
+          }).join('') +
+        '</div>' +
+        '<div class="reason-box" id="detReason">Tap a sentence above to see its score breakdown.</div>' +
+        '<div id="detTips" style="margin-top:12px"></div>' +
+        '<p class="small" style="margin-top:10px">' + explain + '</p>' +
+      '</div>' +
+    '</div>';
+  $('detectOut').innerHTML = html;
+  $('detectOut').querySelectorAll('.det-sent').forEach(function(el){
+    el.addEventListener('click', function(){ showSentReason(parseInt(el.getAttribute('data-i'), 10)); });
+  });
+}
+function showSentReason(i){
+  var r = DET.scores[i]; if(!r) return;
+  document.querySelectorAll('.det-sent').forEach(function(el){ el.classList.toggle('sel', parseInt(el.getAttribute('data-i'), 10) === i); });
+  var b = bucket(r.score);
+  var label = b === 'human' ? 'reads HUMAN' : b === 'ai' ? 'reads AI' : 'MIXED';
+  var color = b === 'human' ? 'var(--good)' : b === 'ai' ? 'var(--bad)' : 'var(--warn)';
+  $('detReason').innerHTML = '<strong style="color:' + color + '">Sentence ' + (i + 1) + ' — AI-score ' + r.score + '/100 (' + label + ')</strong><br>' +
+    (r.reasons.length ? r.reasons.map(function(x){ return '• ' + esc(x); }).join('<br>') : '• No strong signals either way.');
+}
+function detectorTips(sents, scores){
+  var tips = [];
+  var aiCount = scores.filter(function(s){ return bucket(s.score) === 'ai'; }).length;
+  var phraseHeavy = scores.filter(function(s){ return s.reasons.some(function(r){ return r.indexOf('generic AI phrase') === 0; }); }).length;
+  var noVoice = scores.every(function(s){ return !s.reasons.some(function(r){ return r.indexOf('personal voice') === 0; }); });
+  var noSpecifics = scores.every(function(s){ return !s.reasons.some(function(r){ return r.indexOf('concrete specifics') === 0; }); });
+  var lens = sents.map(function(s){ return s.split(/\s+/).length; });
+  var avg = lens.reduce(function(x, y){ return x + y; }, 0) / lens.length;
+  var sd = Math.sqrt(lens.reduce(function(x, l){ return x + Math.pow(l - avg, 2); }, 0) / lens.length);
+  if(phraseHeavy) tips.push('Cut the generic AI phrases (' + phraseHeavy + ' sentence' + (phraseHeavy > 1 ? 's' : '') + ' flagged) — say the thing directly instead.');
+  if(sd < 8) tips.push('Vary your sentence length — mix short, punchy sentences with longer ones. AI text is often metronome-steady.');
+  if(noVoice) tips.push('Add your own voice: what YOU observed, decided, or found surprising, in your own words.');
+  if(noSpecifics) tips.push('Add specifics: names, dates, numbers, quotes, examples from class. Generic claims are what read as AI.');
+  if(aiCount === 0 && !tips.length) tips.push('This reads naturally. Keep the specifics and the varied rhythm — that is what makes writing sound like yours.');
+  return tips;
+}
+function runDetector(){
+  var text = $('detectInput').value.trim();
+  var out = $('detectOut');
+  if(text.split(/\s+/).length < 40){
+    out.innerHTML = '<div class="flagbox">Paste at least ~40 words for a meaningful check. Short snippets can\'t be judged fairly — even by real detectors.</div>';
+    return;
+  }
+  var sents = splitSents(text);
+  var lens = sents.map(function(s){ return s.split(/\s+/).length; });
+  var avg = lens.reduce(function(x, y){ return x + y; }, 0) / lens.length;
+  var sd = Math.sqrt(lens.reduce(function(x, l){ return x + Math.pow(l - avg, 2); }, 0) / lens.length);
+  var scores = sents.map(function(s){ return sentenceScore(s, avg, sd); });
+  DET.sents = sents; DET.scores = scores;
+  var counts = { human: 0, mixed: 0, ai: 0 };
+  scores.forEach(function(s){ counts[bucket(s.score)]++; });
+  var n = sents.length;
+  var pct = { human: Math.round(counts.human / n * 100), mixed: 0, ai: Math.round(counts.ai / n * 100) };
+  pct.mixed = Math.max(0, 100 - pct.human - pct.ai);
+  var verdict = pct.ai >= 50 ? 'AI' : pct.human >= 50 ? 'HUMAN' : 'MIXED';
+  renderDetectorResults('On-device check', pct, verdict, sents, scores.map(function(s){ return s.score; }),
+    'On-device estimate: style signals only — phrase patterns, rhythm, predictability, personal voice, and specifics. It is NOT GPTZero and cannot match a trained model. For the real model, use the GPTZero scan.');
+  $('detTips').innerHTML = '<h3 style="font-size:16px;margin-bottom:4px">How to strengthen your voice</h3><ul class="list">' +
+    detectorTips(sents, scores).map(function(t){ return '<li>' + esc(t) + '</li>'; }).join('') + '</ul>';
+  showSentReason(0);
+}
+$('detectBtn').addEventListener('click', runDetector);
+$('detSampleBtn').addEventListener('click', function(){
+  $('detectInput').value = 'I ran the 200 in 23.4 at practice on Tuesday and honestly the last 50 meters felt awful, like my legs just quit on me. Furthermore, it is important to note that sprint mechanics play a crucial role in overall performance outcomes. My coach told me my arm swing crosses my body near the finish, so we drilled high knees for twenty minutes until it clicked. In conclusion, leveraging proper technique and fostering consistent training habits will significantly enhance athletic performance in a myriad of ways. Next meet is Saturday at 11 AM and I\'m aiming for 22.9, which would be a personal best by half a second.';
+  runDetector();
+});
+
+/* ---- real GPTZero (user's own API key, held in memory only) ---- */
+$('gzSaveBtn').addEventListener('click', function(){
+  GZ_KEY = $('gzKey').value.trim();
+  $('gzKeyStatus').textContent = GZ_KEY ? 'Key ready — it stays in this tab\'s memory and is sent only to GPTZero when you run a scan.' : 'Key cleared.';
+});
+async function runGPTZero(){
+  var text = $('detectInput').value.trim();
+  var out = $('detectOut');
+  if(!GZ_KEY){ GZ_KEY = $('gzKey').value.trim(); }
+  if(!GZ_KEY){
+    out.innerHTML = '<div class="flagbox">Add your GPTZero API key first (open “GPTZero API key” above — free at gptzero.me, free tier covers 10,000 words/month), then run the scan.</div>';
+    return;
+  }
+  if(text.length < 250){
+    out.innerHTML = '<div class="flagbox">GPTZero needs at least ~250 characters (about 40+ words). Paste more text first.</div>';
+    return;
+  }
+  out.innerHTML = '<p class="mut">Sending to GPTZero for a real model scan… Your text goes to GPTZero\'s API only.</p>';
+  try{
+    var r = await fetch('https://api.gptzero.me/v2/predict/text', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-api-key': GZ_KEY },
+      body: JSON.stringify({ document: text.slice(0, 50000) })
+    });
+    var d = await r.json();
+    if(!r.ok) throw new Error((d && (d.detail || d.message)) || ('GPTZero returned HTTP ' + r.status));
+    var doc = (d.documents && d.documents[0]) || {};
+    var probs = doc.class_probabilities || {};
+    var ai = Math.round((probs.ai || 0) * 100), human = Math.round((probs.human || 0) * 100), mixed = Math.max(0, 100 - ai - human);
+    var cls = doc.document_classification || '';
+    var verdict = cls === 'AI_ONLY' ? 'AI' : cls === 'HUMAN_ONLY' ? 'HUMAN' : 'MIXED';
+    var gzSents = doc.sentences || [];
+    var sents = splitSents(text);
+    var scores = sents.map(function(s, i){
+      var gp = gzSents[i] ? Math.round((gzSents[i].generated_prob || 0) * 100) : null;
+      return { score: gp === null ? 50 : gp, reasons: gp === null ? ['GPTZero did not return a per-sentence score for this sentence.'] : ['GPTZero generated_prob: ' + gp + '%'] };
+    });
+    DET.sents = sents; DET.scores = scores;
+    renderDetectorResults('Real GPTZero scan — ' + cls + (doc.confidence_category ? ' (' + doc.confidence_category + ' confidence)' : ''),
+      { human: human, mixed: mixed, ai: ai }, verdict, sents, scores.map(function(s){ return s.score; }),
+      'This is GPTZero\'s own model result, not the on-device estimate. Even GPTZero can be wrong — it has documented bias against non-native English writing and dense technical prose. A flag is a signal to review, never proof.');
+    $('detTips').innerHTML = '<p class="small">Tip: rewrite the red sentences with your own specifics, examples, and varied rhythm, then re-scan.</p>';
+    showSentReason(0);
+  }catch(e){
+    out.innerHTML = '<div class="flagbox">GPTZero scan failed: ' + esc(e.message) + '<br><span class="small">Check that your key is right and you still have free-tier quota left.</span></div>';
+  }
+}
+$('gzBtn').addEventListener('click', runGPTZero);
+</script>
+<script>
+'use strict';
+/* ================= Tutor (Socratic; built-in coach + optional Ollama) ================= */
+function chatAdd(text, who){
+  var box = $('chatBox');
+  var d = document.createElement('div');
+  d.className = 'msg ' + who;
+  d.textContent = text;
+  box.appendChild(d);
+  box.scrollTop = box.scrollHeight;
+}
+function plainWords(s){
+  return s.replace(/utilize/gi, 'use').replace(/facilitate/gi, 'help').replace(/demonstrate/gi, 'show').replace(/approximately/gi, 'about').replace(/subsequently/gi, 'then');
+}
+function localTutor(q){
+  var low = q.toLowerCase();
+  if(/write (my|the|an?) (essay|paper|assignment|homework|lab)/.test(low) || /do my (homework|assignment|essay|paper)/.test(low) || /give me the answer/.test(low))
+    return 'I can\'t write that for you — but I can help you write it yourself. Tell me your thesis or your first point, and I\'ll help you build the argument, spot the gaps, and check your draft.';
+  if(/quiz|test me|flashcard/.test(low)){
+    if(!S.cards.length) return 'Paste study material on the Study tab and generate a pack first, then ask me to quiz you.';
+    var c = S.cards[Math.floor(Math.random() * S.cards.length)];
+    return 'Quick quiz — ' + c.q + ' (Answer here, or flip the card on the Cards tab to check yourself.)';
+  }
+  if(/explain|simple|eli5|what does|what is|mean/.test(low)){
+    var words = low.replace(/[^a-z0-9 ]/g, ' ').split(/\s+/).filter(function(w){ return w.length > 4 && !STOP.has(w); });
+    for(var i = 0; i < words.length; i++){
+      var hit = S.sentences.find(function(s){ return s.toLowerCase().indexOf(words[i]) !== -1; });
+      if(hit) return 'From your material: ' + hit + '\n\nIn plainer words: ' + plainWords(hit) + '\n\nWant me to quiz you on it?';
+    }
+    return 'I don\'t see that in your pasted material yet. Paste the chapter or notes on the Study tab and ask again — or tell me the topic and I\'ll walk through how to approach it.';
+  }
+  if(/summar|main idea|key point/.test(low)){
+    if(!S.sentences.length) return 'Paste your material on the Study tab and I\'ll pull the main ideas out of it.';
+    return 'Key ideas in your material: ' + (S.terms.slice(0, 6).join(', ') || '— generate the study pack first for the full list') + '. Want a one-paragraph summary, or flashcards on these?';
+  }
+  if(/how (do|should|can) i (study|learn|memorize|remember)/.test(low))
+    return 'Best routine: 1) read the summary, 2) flip the flashcards until you get each one right twice in a row, 3) take the quiz, 4) re-explain every missed idea out loud in your own words. Short daily reps beat one long cram.';
+  return 'Good question. Let\'s break it down: what part do you already understand, and where exactly do you get stuck? If it\'s in your pasted material, quote a line and I\'ll walk through it with you — I won\'t just hand you the answer.';
+}
+async function sendChat(){
+  var inp = $('chatInput'), q = inp.value.trim();
+  if(!q) return;
+  inp.value = '';
+  chatAdd(q, 'me');
+  if(OLLAMA){
+    try{
+      var r = await fetch(OLLAMA + '/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ model: 'llama3.1', stream: false, messages: [
+          { role: 'system', content: 'You are StudyLens, a Socratic study tutor. Explain, quiz, and guide. NEVER write essays, assignments, homework, or exam answers for the student. If asked to complete coursework, refuse that part and offer to help them do it themselves. Keep answers short and clear. Study material:\n' + (S.material || '(none pasted yet)') },
+          { role: 'user', content: q }
+        ] }) });
+      if(r.ok){ var d = await r.json(); chatAdd((d.message && d.message.content) || 'Got it — try rephrasing that.', 'ai'); return; }
+    }catch(e){ /* fall through to built-in tutor */ }
+  }
+  setTimeout(function(){ chatAdd(localTutor(q), 'ai'); }, 150);
+}
+$('chatSendBtn').addEventListener('click', sendChat);
+$('chatInput').addEventListener('keydown', function(e){ if(e.key === 'Enter') sendChat(); });
+$('ollamaSaveBtn').addEventListener('click', function(){
+  OLLAMA = $('ollamaUrl').value.trim().replace(/\/+$/, '');
+  $('ollamaStatus').textContent = OLLAMA ? 'Set — the tutor will try Ollama at ' + OLLAMA + ' first, and fall back to the built-in tutor if it doesn\'t answer.' : 'Cleared — using the built-in tutor.';
+});
+
+/* ================= Screen See + OCR ================= */
+async function startScreen(){
+  hideNotice($('screenNotice'));
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia){
+    showNotice($('screenNotice'), 'Screen sharing isn\'t available in this browser. On PC use Chrome or Edge; on iPhone, use the Camera / photo button instead.', 'err');
+    return;
+  }
+  try{
+    var stream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: false });
+    S.stream = stream;
+    var v = $('screenVideo');
+    v.srcObject = stream; v.hidden = false;
+    $('capBtn').hidden = false;
+    $('stopBtn').hidden = false;
+    stream.getVideoTracks()[0].addEventListener('ended', stopScreen);
+  }catch(e){
+    showNotice($('screenNotice'), 'Screen sharing was cancelled, or this browser blocked it. On PC use Chrome/Edge; on iPhone use the Camera / photo button instead.', 'err');
+  }
+}
+function stopScreen(){
+  if(S.stream){ S.stream.getTracks().forEach(function(t){ t.stop(); }); S.stream = null; }
+  var v = $('screenVideo');
+  v.srcObject = null; v.hidden = true;
+  $('capBtn').hidden = true;
+  $('stopBtn').hidden = true;
+}
+function showCapture(dataUrl){
+  var img = $('capImg');
+  img.src = dataUrl; img.hidden = false;
+  $('ocrBtn').hidden = false;
+  $('ocrCard').hidden = true;
+  $('useBtn').hidden = true;
+}
+$('shareBtn').addEventListener('click', startScreen);
+$('stopBtn').addEventListener('click', stopScreen);
+$('capBtn').addEventListener('click', function(){
+  var v = $('screenVideo');
+  if(v && v.videoWidth){
+    var c = document.createElement('canvas');
+    c.width = v.videoWidth; c.height = v.videoHeight;
+    c.getContext('2d').drawImage(v, 0, 0);
+    showCapture(c.toDataURL('image/png'));
+  }
+});
+$('camInput').addEventListener('change', function(e){
+  var f = e.target.files[0]; if(!f) return;
+  var r = new FileReader();
+  r.onload = function(){ showCapture(r.result); };
+  r.readAsDataURL(f);
+});
+$('ocrBtn').addEventListener('click', async function(){
+  var status = $('ocrStatus');
+  $('ocrCard').hidden = false;
+  status.textContent = 'Loading the text reader (first use needs internet)…';
+  try{
+    if(!window.Tesseract){
+      await new Promise(function(res, rej){
+        var s = document.createElement('script');
+        s.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';
+        s.onload = res; s.onerror = rej;
+        document.head.appendChild(s);
+      });
+    }
+    status.textContent = 'Reading text from the image…';
+    var result = await Tesseract.recognize($('capImg').src, 'eng');
+    var found = (result.data.text || '').trim();
+    $('ocrText').value = found;
+    status.textContent = found ? 'Done — review the text, fix anything misread, then send it to your study material.' : 'No clear text found in this capture. Try a closer, well-lit shot.';
+    $('useBtn').hidden = false;
+  }catch(e){
+    status.textContent = 'Could not load the text reader (it needs internet on first use). You can still view the capture and type out the key points manually.';
+  }
+});
+$('useBtn').addEventListener('click', function(){
+  var t = $('ocrText').value.trim();
+  if(!t){ showNotice($('screenNotice'), 'No OCR text to send yet — run “Read text (OCR)” first.', 'err'); return; }
+  var m = $('material');
+  m.value = (m.value ? m.value + '\n\n' : '') + t;
+  showTab('study');
+  showNotice($('studyNotice'), 'Capture text added to your study material. Hit “Generate study pack” to build cards and a quiz from it.', 'ok');
+});
+</script>
+</body>
+</html>
