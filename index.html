@@ -11,20 +11,22 @@
 <link href="https://fonts.googleapis.com/css2?family=Spectral:wght@500;600;700&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#f4f6f8; --surface:#ffffff; --surface2:#edf1f4; --line:#d8dfe6;
-  --ink:#16222e; --mut:#5a6b7a; --acc:#0d6e5f; --acc-hover:#0a5c50; --acc-ink:#ffffff;
+  --bg:#edf1ec; --surface:#ffffff; --surface2:#e3eae2; --line:#ccd8cc;
+  --ink:#15211a; --mut:#55655a; --acc:#0b6b47; --acc-hover:#085239; --acc-ink:#ffffff;
+  --acc-tint:#dcefe2; --acc2:#a85e00; --acc2-bg:#fceed3;
   --good:#2c8a5f; --warn:#b97f0e; --bad:#c2403c;
   --good-bg:#e2f2e9; --warn-bg:#f7ecd2; --bad-bg:#f9e3e2;
-  --shadow:0 1px 3px rgba(18,32,46,.08), 0 6px 18px rgba(18,32,46,.05);
-  --radius:14px;
+  --shadow:0 1px 2px rgba(16,34,24,.07), 0 8px 22px rgba(16,34,24,.07);
+  --radius:16px;
 }
 @media (prefers-color-scheme: dark){
   :root{
-    --bg:#0e141b; --surface:#17222e; --surface2:#1f2e3d; --line:#2d3e50;
-    --ink:#e9eff5; --mut:#9db1c2; --acc:#45c2a6; --acc-hover:#5ad0b6; --acc-ink:#06231c;
+    --bg:#0c130f; --surface:#15201a; --surface2:#1e2d24; --line:#2b4034;
+    --ink:#e9f1ea; --mut:#9db3a4; --acc:#43c48c; --acc-hover:#5bd09e; --acc-ink:#052216;
+    --acc-tint:#173527; --acc2:#e8a83e; --acc2-bg:#3a2c10;
     --good:#4cc38a; --warn:#e8b23f; --bad:#f0766e;
     --good-bg:#173527; --warn-bg:#3a2f12; --bad-bg:#3d1d1b;
-    --shadow:0 1px 3px rgba(0,0,0,.4), 0 6px 18px rgba(0,0,0,.3);
+    --shadow:0 1px 3px rgba(0,0,0,.4), 0 8px 22px rgba(0,0,0,.3);
   }
 }
 *{box-sizing:border-box}
@@ -42,7 +44,23 @@ button{font-family:inherit}
 .navbtn{display:flex;align-items:center;gap:11px;width:100%;background:none;border:0;border-radius:10px;padding:11px 10px;color:var(--mut);font-size:15px;font-weight:600;cursor:pointer;text-align:left}
 .navbtn svg{flex:0 0 20px}
 .navbtn:hover{background:var(--surface2);color:var(--ink)}
-.navbtn.on{background:var(--surface2);color:var(--acc);box-shadow:inset 3px 0 0 var(--acc)}
+.navbtn.on{background:var(--acc-tint);color:var(--acc);box-shadow:inset 3px 0 0 var(--acc)}
+.rail-ver{padding:2px 10px 6px;font-size:12.5px;color:var(--mut)}
+.rail-ver b{color:var(--ink)}
+
+/* version + what's new + update banner */
+.ver-chip{display:inline-block;background:var(--acc2-bg);color:var(--acc2);border:1px solid color-mix(in srgb, var(--acc2) 45%, transparent);border-radius:999px;padding:2px 10px;font-size:12.5px;font-weight:700;white-space:nowrap}
+.update-banner{display:flex;flex-wrap:wrap;gap:10px;align-items:center;background:var(--acc);color:var(--acc-ink);border-radius:var(--radius);padding:14px 16px;margin-bottom:16px;box-shadow:var(--shadow)}
+.update-banner .ub-text{flex:1;min-width:210px;font-size:14.5px;line-height:1.5}
+.update-banner .btn{background:var(--surface);color:var(--acc);border-color:transparent}
+.update-banner .btn:hover{background:var(--surface2)}
+.update-banner .btn.ub-later{background:transparent;color:inherit;border:1px solid currentColor}
+.news-item{padding:11px 0;border-bottom:1px solid var(--line)}
+.news-item:last-child{border-bottom:0;padding-bottom:2px}
+.news-head{display:flex;flex-wrap:wrap;gap:8px;align-items:baseline}
+.news-ver{font-weight:700;font-size:15px}
+.news-date{font-size:12.5px;color:var(--mut)}
+.news-item ul{margin:5px 0 0;padding-left:18px;font-size:14px;line-height:1.6}
 main{flex:1;min-width:0;max-width:920px;margin:0 auto;padding:26px 22px 60px;width:100%}
 .tab{display:none}
 .tab.active{display:block}
@@ -143,6 +161,7 @@ video.cap,img.cap{width:100%;border-radius:12px;border:1px solid var(--line);bac
   .app{flex-direction:column}
   .rail{position:fixed;top:auto;bottom:0;left:0;right:0;height:auto;flex-direction:row;justify-content:space-around;padding:6px 4px calc(6px + env(safe-area-inset-bottom));border-right:0;border-top:1px solid var(--line);z-index:20}
   .rail .rail-note{display:none}
+  .rail .rail-ver{display:none}
   .navbtn{flex-direction:column;gap:3px;font-size:10.5px;padding:7px 2px;flex:1;align-items:center;text-align:center}
   .navbtn.on{box-shadow:inset 0 3px 0 var(--acc)}
   main{padding:20px 15px 110px}
@@ -182,15 +201,37 @@ video.cap,img.cap{width:100%;border-radius:12px;border:1px solid var(--line);bac
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
       Screen
     </button>
-    <p class="rail-note">Everything runs in this tab — your text is never uploaded by StudyLens. Optional scans you start yourself (GPTZero, Ollama) go only to the service you picked.</p>
+    <div class="rail-ver">Version <b id="railVer">v2.4.0</b></div>
+    <p class="rail-note">Everything runs in this tab — your text is never uploaded by StudyLens. Optional scans you start yourself (GPTZero, Hugging Face, Ollama) go only to the service you picked.</p>
   </nav>
 
   <main>
+    <div class="update-banner" id="updateBanner" hidden>
+      <div class="ub-text"><strong id="ubTitle">A new version of StudyLens is available.</strong><br><span id="ubText">Tap Update now to load the latest version — this tab will refresh.</span></div>
+      <button class="btn" id="updateNowBtn">Update now</button>
+      <button class="btn ub-later" id="updateLaterBtn">Later</button>
+    </div>
+
     <!-- ============ STUDY ============ -->
     <section class="tab active" id="tab-study">
       <div class="tabhead">
         <h2>Study pack</h2>
         <p>Paste notes, a chapter, or a lecture transcript. StudyLens builds a summary, key terms, flashcards, and a quiz from your own material — TurboLearn-style, right here on the page.</p>
+      </div>
+      <div class="card" id="newsCard">
+        <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between">
+          <h3 style="margin:0">What's new</h3>
+          <span class="ver-chip" id="verChip">Version 2.4.0</span>
+        </div>
+        <div id="newsLatest"></div>
+        <div class="row">
+          <button class="btn ghost small" id="checkUpdateBtn">Check for updates</button>
+          <span class="small" id="updateStatus" role="status"></span>
+        </div>
+        <details>
+          <summary>All updates</summary>
+          <div class="inner" id="newsAll"></div>
+        </details>
       </div>
       <div class="card">
         <h3>Your material</h3>
@@ -260,18 +301,26 @@ video.cap,img.cap{width:100%;border-radius:12px;border:1px solid var(--line);bac
         <div class="row">
           <button class="btn" id="detectBtn">Check my writing</button>
           <button class="btn ghost" id="gzBtn">Run real GPTZero scan</button>
+          <button class="btn ghost" id="hfBtn">Run Hugging Face scan</button>
           <button class="btn plain small" id="detSampleBtn">Try sample writing</button>
         </div>
-        <p class="small" style="margin-top:8px">Two engines: the <strong>on-device check</strong> is instant and free — a style-based estimate (phrase patterns, sentence rhythm, predictability, personal voice, specifics). It is <em>not</em> GPTZero. The <strong>GPTZero scan</strong> runs GPTZero's real model using your own free API key. Neither score proves authorship — use them to strengthen your own voice.</p>
+        <p class="small" style="margin-top:8px">Three ways to check: the <strong>on-device check</strong> is instant, free, and needs no key — it scores the whole document the way real detectors do (burstiness / rhythm, voice, AI-favored vocabulary, stock phrases). The <strong>GPTZero scan</strong> and <strong>Hugging Face scan</strong> run real trained models using your own free keys (below). No score proves authorship — use them to strengthen your own voice.</p>
         <details>
-          <summary>GPTZero API key (optional)</summary>
+          <summary>Free API keys (optional) — which ones work here</summary>
           <div class="inner">
-            <p class="small">Get a free key at gptzero.me (free tier: 10,000 words/month). The key is held in this tab's memory only — it disappears when you close the page — and is sent only to GPTZero's API, only when you run a scan.</p>
+            <p class="small"><strong>There is no single key that unlocks every detector</strong> — each service issues its own. The two free keys that work in StudyLens are <strong>GPTZero</strong> and <strong>Hugging Face</strong>; either one is enough for a real model scan, and both are free. Keys are held in this tab's memory only — they disappear when you close the page — and each is sent only to its own service, only when you run its scan.</p>
+            <p class="small" style="margin-top:8px"><strong>GPTZero key</strong> — free at gptzero.me (free tier: 10,000 words/month):</p>
             <div class="row">
               <input type="text" id="gzKey" placeholder="Paste your GPTZero API key…" autocomplete="off" style="flex:1;min-width:220px">
               <button class="btn ghost small" id="gzSaveBtn">Use key</button>
             </div>
             <p class="small" id="gzKeyStatus"></p>
+            <p class="small" style="margin-top:8px"><strong>Hugging Face token</strong> — free at huggingface.co → Settings → Access Tokens → create token (the free “read” role is enough). It runs an open ChatGPT-detector model:</p>
+            <div class="row">
+              <input type="text" id="hfKey" placeholder="Paste your Hugging Face token (starts with hf_)…" autocomplete="off" style="flex:1;min-width:220px">
+              <button class="btn ghost small" id="hfSaveBtn">Use token</button>
+            </div>
+            <p class="small" id="hfKeyStatus"></p>
           </div>
         </details>
         <div id="detectOut" style="margin-top:14px"></div>
@@ -549,40 +598,110 @@ function answerQuiz(qi, oi, el){
 <script>
 'use strict';
 /* ================= AI Detector: per-sentence scoring + circle gauge + optional real GPTZero ================= */
-var AI_PHRASES = ['delve into','it is important to note','in conclusion','furthermore','moreover','in today\'s fast-paced world','tapestry','rich tapestry','landscape','crucial','pivotal','paramount','underscore','underscores','testament to','a testament to','delving','embark','navigate','navigating','foster','fostering','leverage','leveraging','in the realm of','a myriad of','it\'s worth noting','as an ai','in summary','plays a vital role','serves as a','in essence','significantly','notably','additionally','consequently','it is evident','it is clear that'];
-var AI_OPENERS = ['in conclusion','furthermore','moreover','additionally','it is important','it\'s important','in summary','overall,','in essence','consequently','as such','it is evident'];
+var AI_PHRASES = ['delve into','delves into','it is important to note','it is worth noting','in conclusion','in summary','in essence','furthermore','moreover','additionally','consequently','in today\'s fast-paced world','in today\'s digital age','in today\'s world','in the realm of','in the world of','tapestry','rich tapestry','landscape of','a myriad of','myriad of','plays a vital role','plays a crucial role','plays a significant role','plays an important role','serves as a','stands as a','a testament to','testament to','it is evident that','it is clear that','when it comes to','not only','but also','as an ai','in the ever-evolving','ever-evolving','fast-paced world','it goes without saying','needless to say','in light of','due to the fact that','a wide range of','a variety of','wide variety','on one hand','on the other hand','studies have shown','studies have linked','studies show that','research has shown','research suggests','experts agree','it is widely','widely recognized','has become increasingly','increasingly important','in recent years','the importance of','cannot be overstated','it is essential to','it is crucial to'];
+var AI_OPENERS = ['in conclusion','furthermore','moreover','additionally','it is important','it\'s important','in summary','overall,','in essence','consequently','as such','it is evident','ultimately,','in today\'s','the world of'];
+var AI_WORDS = new Set(('delve delves delving crucial crucially pivotal paramount significant significantly additionally furthermore moreover consequently ultimately notably particularly specifically effectively efficiently rapidly seamlessly intricate multifaceted nuanced robust innovative transformative profound landscape realm tapestry underscore underscores highlighted highlights demonstrate demonstrates illustrated illustrate foster fostering leverage leveraging enhance enhances enhanced comprehensive numerous various diverse dynamic complex ensure ensures ensuring contribute contributes contributed potential challenges challenge opportunities opportunity strategies strategy approaches approach perspectives perspective outcomes outcome impacts impact benefits benefit essential vital key valuable powerful lasting emerge emerges emerged reshape reshaped transforming revolutionize facilitate facilitates promote promotes promoting engage engages engagement individuals communities society technology technologies digital modern traditional critical important role roles aspect aspects factor factors range variety myriad wealth plethora due fact light').split(' '));
+var TRANSITIONS = ['however','therefore','thus','hence','meanwhile','simultaneously','nevertheless','nonetheless','accordingly','subsequently','conversely','similarly','likewise','instead','indeed','overall','finally','firstly','secondly','in addition','as a result','on the other hand','in contrast','for example','for instance','in particular','in fact'];
+var INFORMAL = ['honestly','kinda','sorta','gonna','wanna','stuff','yeah','yep','nope','lol','omg','btw','anyway','anyways','guess','hmm','ugh','wow','oops','dunno','lot of','tons of','a bunch'];
 var COMMON = new Set('the of and a to in is you that it he was for on are as with his they i at be this have from or one had by word but not what all were we when your can said there use an each which she do how their if will up other about out many then them these so some her would make like him into time has look two more write go see number no way could people my than first water been call who oil its now find long down day did get come made may part over new sound take only little work know place year live me back give most very after thing our just name good sentence man think say great where help through much before line right too mean old any same tell boy follow came want show also around form three small set put end does another well large must big even such because turn here why ask went men read need land different home us move try kind hand picture again change off play spell air away animal house point page letter mother answer found study still learn should world high every near add food between own below country plant last school father keep tree never start city earth eye light thought head under story saw left few while along might close something seem next hard open example begin life always those both paper together got group often run'.split(' '));
+var DET_STOP = new Set(('a an the and or but of to in on for with at by from as is are was were be been being have has had do does did will would can could should may might must this that these those it its he she they we you his her their our your my me him them us what when where which who whom how why not no yes if then than so such into over under between through after before about above below out up down off again once here there all any both each few more most other some own same too very just also only now').split(' '));
 var DET = { sents: [], scores: [] };
+var HF_KEY = '';
 
-function sentenceScore(s, docAvg, docSd){
+function sentWords(s){ return s.toLowerCase().replace(/[^a-z0-9' ]/g,' ').split(/\s+/).filter(Boolean); }
+
+/* Document-level features. Real detectors (GPTZero included) lean heavily on
+   whole-document signals — burstiness (how much sentence length varies) and
+   voice — because AI text is uniform across the WHOLE piece, not just inside
+   one sentence. v1 scored sentences in isolation and even rewarded two things
+   AI essays are full of (names/dates, elevated vocabulary), which is why a
+   pasted ChatGPT essay came back 0% AI. */
+function docFeatures(sents){
+  var lens = sents.map(function(s){ return sentWords(s).length; });
+  var avg = lens.reduce(function(x, y){ return x + y; }, 0) / lens.length;
+  var sd = Math.sqrt(lens.reduce(function(x, l){ return x + Math.pow(l - avg, 2); }, 0) / lens.length);
+  var cv = avg ? sd / avg : 0;
+  var allText = sents.join(' ').toLowerCase();
+  var totalWords = allText.split(/\s+/).length;
+  var contractions = (allText.match(/\b\w+'(t|s|re|ve|ll|d|m)\b/g) || []).length;
+  var firstPerson = (allText.match(/\b(i|me|my|mine|we|us|our|ours|i'm|i've|i'd|i'll|we're|we've)\b/g) || []).length;
+  var informalCount = INFORMAL.filter(function(w){ return allText.indexOf(w) !== -1; }).length;
+  var rhythm = 0, rhythmReason = '';
+  if(cv < 0.25){ rhythm = 13; rhythmReason = 'document rhythm: sentence lengths barely vary (very low burstiness — a top AI tell)'; }
+  else if(cv < 0.35){ rhythm = 10; rhythmReason = 'document rhythm: sentence lengths are unusually uniform'; }
+  else if(cv < 0.45){ rhythm = 6; rhythmReason = 'document rhythm: sentence lengths are fairly uniform'; }
+  else if(cv > 0.75){ rhythm = -8; rhythmReason = 'document rhythm: sentence lengths swing a lot — bursty, human-like'; }
+  else if(cv > 0.62){ rhythm = -4; rhythmReason = 'document rhythm: good length variety'; }
+  var voiceDelta = 0, voiceReason = '';
+  if(firstPerson === 0 && sents.length >= 4){ voiceDelta = 4; voiceReason = 'no first-person voice anywhere in the document'; }
+  if(contractions === 0 && totalWords > 120){ voiceDelta += 3; if(!voiceReason) voiceReason = 'zero contractions in the whole document — very formal register'; }
+  if(firstPerson === 0 && contractions === 0 && informalCount === 0 && sents.length >= 6){
+    voiceDelta += 6;
+    voiceReason = 'the whole document is voiceless — no first person, no contractions, no informal words anywhere';
+  }
+  /* A document with a real human voice earns an offset — and when the voice is
+     strong, uniform rhythm alone stops being damning. */
+  var voiceOffset = -Math.min(12, contractions * 2 + Math.floor(firstPerson * 1.2) + informalCount * 3);
+  if(voiceOffset < 0 && (firstPerson >= 2 || informalCount >= 2) && rhythm > 0) rhythm = Math.round(rhythm / 2);
+  voiceDelta += voiceOffset;
+  return { avg: avg, sd: sd, cv: cv, rhythm: rhythm, rhythmReason: rhythmReason, voiceDelta: voiceDelta, voiceReason: voiceReason };
+}
+
+function sentenceScore(s, ctx, seenContent){
   var low = s.toLowerCase();
-  var words = low.replace(/[^a-z0-9' ]/g,' ').split(/\s+/).filter(Boolean);
+  var words = sentWords(s);
   var n = words.length || 1;
-  var reasons = [], score = 30;
-  AI_PHRASES.forEach(function(p){ if(low.indexOf(p) !== -1){ score += 16; reasons.push('generic AI phrase: “' + p + '”'); } });
-  AI_OPENERS.forEach(function(p){ if(low.indexOf(p) === 0){ score += 10; reasons.push('generic AI-style opener'); } });
-  var dev = Math.abs(n - docAvg) / (docSd || 1);
-  if(dev < 0.35){ score += 8; reasons.push('sentence length matches the document average — flat, metronome-like rhythm'); }
-  if(n > 32){ score += 6; reasons.push('very long sentence'); }
+  var reasons = [], score = 32;
+  var phraseHits = 0;
+  AI_PHRASES.forEach(function(p){ if(low.indexOf(p) !== -1 && phraseHits < 2){ score += 13; phraseHits++; reasons.push('generic AI phrase: “' + p + '”'); } });
+  AI_OPENERS.forEach(function(p){ if(low.indexOf(p) === 0){ score += 8; reasons.push('generic AI-style opener'); } });
+  var aiw = [], aiSeen = {};
+  words.forEach(function(w){ if(AI_WORDS.has(w) && !aiSeen[w]){ aiSeen[w] = 1; aiw.push(w); } });
+  if(aiw.length >= 3){ score += 15; reasons.push('several words AI reaches for: ' + aiw.slice(0, 4).join(', ')); }
+  else if(aiw.length === 2){ score += 10; reasons.push('words AI reaches for: ' + aiw.join(', ')); }
+  else if(aiw.length === 1){ score += 5; reasons.push('word AI reaches for: ' + aiw[0]); }
+  var tr = 0;
+  TRANSITIONS.forEach(function(t){ if(low.indexOf(t) !== -1) tr++; });
+  if(tr >= 2){ score += 6; reasons.push('multiple formal transition words'); }
+  else if(tr === 1){ score += 3; }
   var common = words.filter(function(w){ return COMMON.has(w); }).length / n;
-  if(common > 0.62){ score += 10; reasons.push('mostly ultra-common words — very predictable phrasing'); }
-  else if(common < 0.4){ score -= 8; reasons.push('uncommon word mix — less predictable'); }
-  var personal = (low.match(/\b(i|we|my|our|me|us|i'm|we're)\b/g) || []).length;
+  if(common > 0.60){ score += 8; reasons.push('mostly ultra-common words — very predictable phrasing'); }
+  else if(common > 0.52){ score += 4; }
+  if(Math.abs(n - ctx.avg) <= Math.max(2, ctx.avg * 0.2)){ score += 4; reasons.push('length sits right on the document average'); }
+  if(n >= 18 && n <= 30){ score += 3; reasons.push('medium, even sentence length — the AI comfort zone'); }
+  if(n > 34){ score += 4; reasons.push('very long, clause-stacked sentence'); }
+  if(seenContent){
+    var content = words.filter(function(w){ return w.length > 4 && !DET_STOP.has(w); });
+    if(content.length >= 5){
+      var rep = content.filter(function(w){ return seenContent[w]; }).length / content.length;
+      if(rep > 0.38){ score += 6; reasons.push('recycles vocabulary used earlier in the document'); }
+      content.forEach(function(w){ seenContent[w] = 1; });
+    }
+  }
+  var personal = (low.match(/\b(i|we|my|our|me|us|i'm|we're|i've)\b/g) || []).length;
   if(personal > 0){ score -= 14; reasons.push('personal voice (' + personal + ' first-person marker' + (personal > 1 ? 's' : '') + ')'); }
-  if(/(\bdon't\b|\bcan't\b|\bwon't\b|\bit's\b|\bthat's\b|\bdidn't\b|\bwasn't\b|\bisn't\b|\baren't\b)/.test(low)){ score -= 8; reasons.push('contraction — conversational'); }
-  var specifics = (s.match(/\b\d+(\.\d+)?\b/g) || []).length + (s.match(/\b[A-Z][a-z]+\s[A-Z][a-z]+\b/g) || []).length;
-  if(specifics > 0){ score -= 10; reasons.push('concrete specifics (numbers / names)'); }
-  if(/[!?]/.test(s)){ score -= 6; reasons.push('expressive punctuation'); }
-  if(words.length < 6){ score -= 6; reasons.push('short fragment — humans write these'); }
+  if(/(\bdon't\b|\bcan't\b|\bwon't\b|\bit's\b|\bthat's\b|\bdidn't\b|\bwasn't\b|\bisn't\b|\baren't\b|\bthere's\b|\bwhat's\b|\bi'm\b|\bwe're\b|\bthey're\b|\byou're\b)/.test(low)){ score -= 7; reasons.push('contraction — conversational'); }
+  var numbers = (s.match(/\b\d+(\.\d+)?\b/g) || []).length;
+  if(numbers > 0){ score -= 5; reasons.push('concrete specifics (numbers / dates)'); }
+  if(/[?]$/.test(s.trim())){ score -= 6; reasons.push('asks a question — AI essays rarely do'); }
+  else if(/!/.test(s)){ score -= 5; reasons.push('expressive punctuation'); }
+  if(/^(and|but|so|well|now|look|okay)\b/i.test(s.trim())){ score -= 6; reasons.push('starts with a conjunction — conversational human habit'); }
+  var informalHit = INFORMAL.filter(function(w){ return low.indexOf(w) !== -1; });
+  if(informalHit.length){ score -= 7; reasons.push('informal wording: “' + informalHit[0] + '”'); }
+  if(words.length < 6){ score -= 7; reasons.push('short fragment — humans write these'); }
+  score += ctx.rhythm + ctx.voiceDelta;
   score = Math.max(2, Math.min(98, Math.round(score)));
-  return { score: score, reasons: reasons.slice(0, 3) };
+  var allReasons = reasons.slice(0, 3);
+  if(ctx.rhythmReason && score >= 45) allReasons.push(ctx.rhythmReason);
+  if(ctx.voiceReason && score >= 45 && ctx.voiceDelta > 0) allReasons.push(ctx.voiceReason);
+  return { score: score, reasons: allReasons };
 }
 function splitSents(text){
   var t = text.replace(/\s+/g, ' ');
   ['Dr','Mr','Mrs','Ms','St','vs','etc','e.g','i.e','U.S','U.K'].forEach(function(a){ t = t.split(a + '.').join(a + '\u0001'); });
   return t.split(/(?<=[.!?])\s+/).map(function(x){ return x.trim().replace(/\u0001/g, '.'); }).filter(Boolean);
 }
-function bucket(score){ return score < 38 ? 'human' : score > 62 ? 'ai' : 'mixed'; }
+function bucket(score){ return score < 40 ? 'human' : score > 60 ? 'ai' : 'mixed'; }
 
 function gaugeHTML(pct, verdict){
   var C = 2 * Math.PI * 62;
@@ -641,7 +760,10 @@ function detectorTips(sents, scores){
   var avg = lens.reduce(function(x, y){ return x + y; }, 0) / lens.length;
   var sd = Math.sqrt(lens.reduce(function(x, l){ return x + Math.pow(l - avg, 2); }, 0) / lens.length);
   if(phraseHeavy) tips.push('Cut the generic AI phrases (' + phraseHeavy + ' sentence' + (phraseHeavy > 1 ? 's' : '') + ' flagged) — say the thing directly instead.');
-  if(sd < 8) tips.push('Vary your sentence length — mix short, punchy sentences with longer ones. AI text is often metronome-steady.');
+  var aiVocab = scores.filter(function(s){ return s.reasons.some(function(r){ return r.indexOf('words AI reaches for') !== -1 || r.indexOf('word AI reaches for') === 0 || r.indexOf('several words AI reaches for') === 0; }); }).length;
+  if(aiVocab >= 2) tips.push('Swap out the words AI reaches for (crucial, significant, landscape, foster, delve…) — plainer, more specific word choices read as yours.');
+  var uniformDoc = scores.some(function(s){ return s.reasons.some(function(r){ return r.indexOf('document rhythm') === 0; }); });
+  if(uniformDoc || sd < 8) tips.push('Vary your sentence length — mix short, punchy sentences with longer ones. AI text is metronome-steady; yours barely changes length from sentence to sentence.');
   if(noVoice) tips.push('Add your own voice: what YOU observed, decided, or found surprising, in your own words.');
   if(noSpecifics) tips.push('Add specifics: names, dates, numbers, quotes, examples from class. Generic claims are what read as AI.');
   if(aiCount === 0 && !tips.length) tips.push('This reads naturally. Keep the specifics and the varied rhythm — that is what makes writing sound like yours.');
@@ -655,19 +777,19 @@ function runDetector(){
     return;
   }
   var sents = splitSents(text);
-  var lens = sents.map(function(s){ return s.split(/\s+/).length; });
-  var avg = lens.reduce(function(x, y){ return x + y; }, 0) / lens.length;
-  var sd = Math.sqrt(lens.reduce(function(x, l){ return x + Math.pow(l - avg, 2); }, 0) / lens.length);
-  var scores = sents.map(function(s){ return sentenceScore(s, avg, sd); });
+  var ctx = docFeatures(sents);
+  var seenContent = {};
+  var scores = sents.map(function(s){ return sentenceScore(s, ctx, seenContent); });
   DET.sents = sents; DET.scores = scores;
   var counts = { human: 0, mixed: 0, ai: 0 };
   scores.forEach(function(s){ counts[bucket(s.score)]++; });
   var n = sents.length;
   var pct = { human: Math.round(counts.human / n * 100), mixed: 0, ai: Math.round(counts.ai / n * 100) };
   pct.mixed = Math.max(0, 100 - pct.human - pct.ai);
-  var verdict = pct.ai >= 50 ? 'AI' : pct.human >= 50 ? 'HUMAN' : 'MIXED';
+  var mean = scores.reduce(function(x, s){ return x + s.score; }, 0) / n;
+  var verdict = mean >= 58 ? 'AI' : (mean <= 42 && counts.ai / n < 0.25) ? 'HUMAN' : 'MIXED';
   renderDetectorResults('On-device check', pct, verdict, sents, scores.map(function(s){ return s.score; }),
-    'On-device estimate: style signals only — phrase patterns, rhythm, predictability, personal voice, and specifics. It is NOT GPTZero and cannot match a trained model. For the real model, use the GPTZero scan.');
+    'On-device estimate — now scored the way real detectors work: whole-document signals (burstiness / sentence-length rhythm, voice, AI-favored vocabulary, stock phrases, recycled wording) on top of per-sentence signals. Still an estimate, not a trained model; for a real model scan use GPTZero or the free Hugging Face scan below.');
   $('detTips').innerHTML = '<h3 style="font-size:16px;margin-bottom:4px">How to strengthen your voice</h3><ul class="list">' +
     detectorTips(sents, scores).map(function(t){ return '<li>' + esc(t) + '</li>'; }).join('') + '</ul>';
   showSentReason(0);
@@ -726,6 +848,86 @@ async function runGPTZero(){
   }
 }
 $('gzBtn').addEventListener('click', runGPTZero);
+
+/* ---- Hugging Face detector model (user's own FREE token, held in memory only) ----
+   Runs the open chatgpt-detector-roberta model — a real trained classifier, and the
+   token is free (huggingface.co → Settings → Access Tokens, read role is enough).
+   The model caps around 512 tokens, so long essays are scanned in passages and the
+   passage scores are combined, weighted by length. */
+$('hfSaveBtn').addEventListener('click', function(){
+  HF_KEY = $('hfKey').value.trim();
+  $('hfKeyStatus').textContent = HF_KEY ? 'Token ready — it stays in this tab\'s memory and is sent only to Hugging Face when you run a scan.' : 'Token cleared.';
+});
+async function hfClassify(chunk){
+  var r = await fetch('https://router.huggingface.co/hf-inference/models/Hello-SimpleAI/chatgpt-detector-roberta', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + HF_KEY },
+    body: JSON.stringify({ inputs: chunk, options: { wait_for_model: true } })
+  });
+  var d = null;
+  try{ d = await r.json(); }catch(e){ /* non-JSON error page */ }
+  if(!r.ok){
+    var msg = (d && d.error) ? String(d.error) : ('Hugging Face returned HTTP ' + r.status);
+    if(r.status === 401 || r.status === 403) msg = 'Hugging Face rejected the token (HTTP ' + r.status + '). Check you pasted the full token — it starts with hf_ — and that it has at least the read role.';
+    throw new Error(msg);
+  }
+  var preds = Array.isArray(d) ? (Array.isArray(d[0]) ? d[0] : d) : [];
+  var ai = null, human = null;
+  preds.forEach(function(p){
+    var lab = String((p && p.label) || '').toLowerCase();
+    if(/chatgpt|ai|fake|generated|machine|gpt/.test(lab)) ai = p.score;
+    else if(/human|real|person/.test(lab)) human = p.score;
+  });
+  if(ai === null && human !== null) ai = 1 - human;
+  if(ai === null) throw new Error('Unexpected answer from the model — try again in a moment.');
+  return ai;
+}
+async function runHF(){
+  var text = $('detectInput').value.trim();
+  var out = $('detectOut');
+  if(!HF_KEY){ HF_KEY = $('hfKey').value.trim(); }
+  if(!HF_KEY){
+    out.innerHTML = '<div class="flagbox">Add your free Hugging Face token first (open “Free API keys” above — sign up free at huggingface.co, then Settings → Access Tokens → create a read token), then run the scan.</div>';
+    return;
+  }
+  if(text.split(/\s+/).length < 25){
+    out.innerHTML = '<div class="flagbox">Paste a bit more text first — the model needs at least ~25 words, and a paragraph or more works far better.</div>';
+    return;
+  }
+  var sents = splitSents(text);
+  /* group sentences into passages under the model's input limit */
+  var chunks = [], cur = [], curLen = 0;
+  sents.forEach(function(s, i){
+    if(curLen + s.length > 1400 && cur.length){ chunks.push({ idx: cur, text: cur.map(function(j){ return sents[j]; }).join(' ') }); cur = []; curLen = 0; }
+    cur.push(i); curLen += s.length + 1;
+  });
+  if(cur.length) chunks.push({ idx: cur, text: cur.map(function(j){ return sents[j]; }).join(' ') });
+  out.innerHTML = '<p class="mut">Running the Hugging Face detector model on ' + chunks.length + ' passage' + (chunks.length > 1 ? 's' : '') + '… the first run can take ~20 seconds while the model wakes up. Your text goes to Hugging Face\'s API only.</p>';
+  try{
+    var sentProb = new Array(sents.length).fill(null);
+    var wSum = 0, wTotal = 0;
+    for(var c = 0; c < chunks.length; c++){
+      var p = await hfClassify(chunks[c].text);
+      chunks[c].idx.forEach(function(j){ sentProb[j] = p; });
+      wSum += p * chunks[c].text.length; wTotal += chunks[c].text.length;
+    }
+    var aiP = Math.round((wSum / wTotal) * 100);
+    var scores = sents.map(function(s, i){
+      var gp = sentProb[i] === null ? aiP : Math.round(sentProb[i] * 100);
+      return { score: gp, reasons: ['Hugging Face chatgpt-detector-roberta: ' + gp + '% ChatGPT probability for this passage'] };
+    });
+    DET.sents = sents; DET.scores = scores;
+    var verdict = aiP >= 60 ? 'AI' : aiP <= 40 ? 'HUMAN' : 'MIXED';
+    renderDetectorResults('Hugging Face model scan — ' + aiP + '% ChatGPT probability overall',
+      { human: 100 - aiP, mixed: 0, ai: aiP }, verdict, sents, scores.map(function(s){ return s.score; }),
+      'This is a real trained detector model (Hello-SimpleAI/chatgpt-detector-roberta, trained on human-vs-ChatGPT text) run through Hugging Face with your free token. It was trained on GPT-3.5-era text, so it is a strong signal, not proof — and it can miss heavily edited or very new AI writing.');
+    $('detTips').innerHTML = '<p class="small">Tip: rewrite the red passages with your own specifics, examples, and varied rhythm, then re-scan.</p>';
+    showSentReason(0);
+  }catch(e){
+    out.innerHTML = '<div class="flagbox">Hugging Face scan failed: ' + esc(e.message) + '<br><span class="small">If the model was still loading, wait ~20 seconds and run it again.</span></div>';
+  }
+}
+$('hfBtn').addEventListener('click', runHF);
 </script>
 <script>
 'use strict';
@@ -1029,6 +1231,89 @@ async function sendScreenChat(){
 }
 $('screenChatSend').addEventListener('click', sendScreenChat);
 $('screenChatInput').addEventListener('keydown', function(e){ if(e.key === 'Enter') sendScreenChat(); });
+</script>
+<script>
+'use strict';
+/* ================= Version, What's New, and update check =================
+   APP_VERSION is baked into this build. The published data:application/json;base64,eyJ1cGRhdGVkIjoiMjAyNi0xMC0xNSIsInZlcnNpb24iOiIyLjQuMCJ9 is
+   fetched with no-store caching: when a newer build ships, an already-open or
+   home-screen copy of an older build sees the newer version number there and
+   offers "Update now" (a reload onto the new build). */
+var APP_VERSION = '2.4.0';
+var CHANGELOG = [
+  { v: '2.4.0', date: 'Oct 15, 2026', notes: [
+    'AI detector rebuilt around whole-document signals — sentence rhythm, voice, AI-favored vocabulary — so a pasted ChatGPT essay no longer slips through as 0% AI.',
+    'This What\'s New panel: your current version, what changed in each update, and a Check for updates button.',
+    'Update banner: when a new version launches, StudyLens tells you right at the top and one tap loads it.',
+    'Refreshed look — deeper pine-green palette, warmer accents, cleaner cards and navigation.'
+  ]},
+  { v: '2.3.0', date: 'Oct 15, 2026', notes: [
+    'Screen chat: on the Screen tab, tap “Ask about my screen”, ask where something is, and StudyLens circles it right on your capture and explains it.'
+  ]},
+  { v: '2.2.0', date: 'Oct 15, 2026', notes: [
+    'Hugging Face detector scan added — a real trained detector model that runs with a free Hugging Face token, alongside the GPTZero scan.'
+  ]},
+  { v: '2.0.0', date: 'Oct 15, 2026', notes: [
+    'AI detector v2: circle gauge with a Human / Mixed / AI verdict, every sentence highlighted green, yellow, or red — tap any sentence to see exactly why it scored that way.',
+    'Optional real GPTZero scan using your own free API key.'
+  ]},
+  { v: '1.0.0', date: 'Oct 15, 2026', notes: [
+    'StudyLens launches: study packs (summary, key terms, flashcards, quiz) built from your own material, a Socratic tutor that helps without writing your work, and Screen See with on-device OCR.'
+  ]}
+];
+function newsItemHTML(entry, latest){
+  return '<div class="news-item"><div class="news-head"><span class="news-ver">v' + esc(entry.v) + '</span>' +
+    (latest ? '<span class="ver-chip">Latest</span>' : '') +
+    '<span class="news-date">' + esc(entry.date) + '</span></div><ul>' +
+    entry.notes.map(function(n){ return '<li>' + esc(n) + '</li>'; }).join('') + '</ul></div>';
+}
+function renderNews(){
+  $('railVer').textContent = 'v' + APP_VERSION;
+  $('verChip').textContent = 'Version ' + APP_VERSION;
+  $('newsLatest').innerHTML = newsItemHTML(CHANGELOG[0], true);
+  $('newsAll').innerHTML = CHANGELOG.map(function(e, i){ return newsItemHTML(e, i === 0); }).join('');
+}
+renderNews();
+function cmpVer(a, b){
+  var pa = String(a).split('.').map(function(x){ return parseInt(x, 10) || 0; });
+  var pb = String(b).split('.').map(function(x){ return parseInt(x, 10) || 0; });
+  for(var i = 0; i < Math.max(pa.length, pb.length); i++){
+    if((pa[i] || 0) !== (pb[i] || 0)) return (pa[i] || 0) < (pb[i] || 0) ? -1 : 1;
+  }
+  return 0;
+}
+var updateDismissed = false;
+function showUpdateBanner(latest){
+  if(updateDismissed) return;
+  $('ubTitle').textContent = 'StudyLens v' + latest + ' is available — you\'re on v' + APP_VERSION + '.';
+  $('updateBanner').hidden = false;
+}
+async function checkForUpdates(manual){
+  var status = $('updateStatus');
+  if(manual) status.textContent = 'Checking…';
+  try{
+    var r = await fetch('data:application/json;base64,eyJ1cGRhdGVkIjoiMjAyNi0xMC0xNSIsInZlcnNpb24iOiIyLjQuMCJ9' + Date.now(), { cache: 'no-store' });
+    if(!r.ok) throw new Error('HTTP ' + r.status);
+    var d = await r.json();
+    var latest = String(d.version || '').trim();
+    if(!latest) throw new Error('no version in response');
+    if(cmpVer(latest, APP_VERSION) > 0){
+      showUpdateBanner(latest);
+      if(manual) status.textContent = 'v' + latest + ' is available — use the Update now banner at the top of the page.';
+    } else if(manual){
+      status.textContent = 'You\'re on the latest version (v' + APP_VERSION + ').';
+    }
+  }catch(e){
+    if(manual) status.textContent = 'Couldn\'t check right now — the update check needs internet. You\'re on v' + APP_VERSION + '.';
+  }
+}
+$('checkUpdateBtn').addEventListener('click', function(){ checkForUpdates(true); });
+$('updateNowBtn').addEventListener('click', function(){ location.reload(); });
+$('updateLaterBtn').addEventListener('click', function(){
+  updateDismissed = true;
+  $('updateBanner').hidden = true;
+});
+checkForUpdates(false);
 </script>
 </body>
 </html>
