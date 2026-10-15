@@ -123,6 +123,22 @@ details .inner{margin-top:8px}
 /* screen */
 video.cap,img.cap{width:100%;border-radius:12px;border:1px solid var(--line);background:#000;max-height:340px;object-fit:contain}
 
+/* screen chat + pointer */
+.screen-layout{display:flex;gap:14px;align-items:flex-start}
+.screen-main{flex:1;min-width:0}
+.screen-side{flex:0 0 330px;width:330px}
+.screen-side .chat{max-height:300px}
+.stage{position:relative}
+.stage .cap{display:block}
+.pointer{position:absolute;z-index:6;pointer-events:none;width:0;height:0}
+.pointer .ring{position:absolute;left:0;top:0;width:46px;height:46px;margin:-23px 0 0 -23px;border:3px solid var(--acc);border-radius:50%;animation:pointpulse 1.6s ease-out infinite}
+.pointer .dot{position:absolute;left:-4px;top:-4px;width:8px;height:8px;border-radius:50%;background:var(--acc)}
+.pointer .tag{position:absolute;left:0;bottom:32px;transform:translateX(-50%);background:var(--acc);color:var(--acc-ink);font-size:12.5px;font-weight:700;padding:4px 10px;border-radius:999px;white-space:nowrap;box-shadow:var(--shadow);max-width:72vw;overflow:hidden;text-overflow:ellipsis}
+.pointer.below .tag{bottom:auto;top:32px}
+@keyframes pointpulse{0%{box-shadow:0 0 0 0 color-mix(in srgb, var(--acc) 45%, transparent)}100%{box-shadow:0 0 0 16px transparent}}
+@media (prefers-reduced-motion: reduce){.pointer .ring{animation:none}}
+@media (max-width:900px){.screen-layout{flex-direction:column}.screen-side{flex:none;width:100%}}
+
 @media (max-width:760px){
   .app{flex-direction:column}
   .rail{position:fixed;top:auto;bottom:0;left:0;right:0;height:auto;flex-direction:row;justify-content:space-around;padding:6px 4px calc(6px + env(safe-area-inset-bottom));border-right:0;border-top:1px solid var(--line);z-index:20}
@@ -296,27 +312,47 @@ video.cap,img.cap{width:100%;border-radius:12px;border:1px solid var(--line);bac
         <h2>Screen See</h2>
         <p>Share a window or tab on PC, or snap a photo of your notes on iPhone. StudyLens captures it, reads the text on-device, and can turn it into study material.</p>
       </div>
-      <div class="card">
-        <p class="small"><strong>PC:</strong> Share Screen works in Chrome/Edge. <strong>iPhone:</strong> iOS doesn't let web pages see other apps, so use the camera button to photograph your notes or screen instead. Captures are processed on this page and never uploaded.</p>
-        <div class="row">
-          <button class="btn" id="shareBtn">Share screen (PC)</button>
-          <label class="btn ghost filelabel" for="camInput">Camera / photo</label>
-          <input type="file" id="camInput" accept="image/*" capture="environment" hidden>
-          <button class="btn plain small" id="stopBtn" hidden>Stop sharing</button>
+      <div class="screen-layout">
+        <div class="screen-main">
+          <div class="card">
+            <p class="small"><strong>PC:</strong> Share Screen works in Chrome/Edge. <strong>iPhone:</strong> iOS doesn't let web pages see other apps, so use the camera button to photograph your notes or screen instead. Captures are processed on this page and never uploaded.</p>
+            <div class="row">
+              <button class="btn" id="shareBtn">Share screen (PC)</button>
+              <label class="btn ghost filelabel" for="camInput">Camera / photo</label>
+              <input type="file" id="camInput" accept="image/*" capture="environment" hidden>
+              <button class="btn plain small" id="stopBtn" hidden>Stop sharing</button>
+              <button class="btn ghost" id="sideChatBtn" aria-expanded="false">Ask about my screen</button>
+            </div>
+            <div class="notice" id="screenNotice" role="status"></div>
+            <div class="stage" style="margin-top:12px">
+              <video class="cap" id="screenVideo" autoplay playsinline muted hidden></video>
+              <img class="cap" id="capImg" hidden alt="Captured screen or photo">
+              <div class="pointer" id="pointer" hidden><span class="ring"></span><span class="dot"></span><span class="tag" id="pointerTag"></span></div>
+            </div>
+            <div class="row">
+              <button class="btn" id="capBtn" hidden>Capture frame</button>
+              <button class="btn ghost" id="ocrBtn" hidden>Read text (OCR)</button>
+              <button class="btn plain" id="useBtn" hidden>Send text to study material</button>
+            </div>
+          </div>
+          <div class="card" id="ocrCard" hidden>
+            <h3>Text found in capture</h3>
+            <p class="small" id="ocrStatus"></p>
+            <textarea id="ocrText" style="min-height:110px"></textarea>
+          </div>
         </div>
-        <div class="notice" id="screenNotice" role="status"></div>
-        <div style="margin-top:12px"><video class="cap" id="screenVideo" autoplay playsinline muted hidden></video></div>
-        <img class="cap" id="capImg" hidden alt="Captured screen or photo">
-        <div class="row">
-          <button class="btn" id="capBtn" hidden>Capture frame</button>
-          <button class="btn ghost" id="ocrBtn" hidden>Read text (OCR)</button>
-          <button class="btn plain" id="useBtn" hidden>Send text to study material</button>
-        </div>
-      </div>
-      <div class="card" id="ocrCard" hidden>
-        <h3>Text found in capture</h3>
-        <p class="small" id="ocrStatus"></p>
-        <textarea id="ocrText" style="min-height:110px"></textarea>
+        <aside class="card screen-side" id="screenSide" hidden aria-label="Chat about your screen">
+          <h3>Ask about your screen</h3>
+          <p class="small">Ask where something is — “Where is the Calvin cycle?” — and I'll circle it right on your capture and tell you about it. Or ask for help with anything on screen.</p>
+          <div class="chat" id="screenChatBox" style="margin-top:10px">
+            <div class="msg ai">Share your screen (or snap a photo of it), then ask me about anything on it. Try “Where is…?” and I'll point right at it.</div>
+          </div>
+          <div class="chatrow">
+            <input type="text" id="screenChatInput" placeholder="Ask about your screen…" aria-label="Ask about your screen">
+            <button class="btn" id="screenChatSend">Ask</button>
+          </div>
+          <p class="small" style="margin-top:8px">Pointing works on text the capture can read — buttons, labels, headings, notes. Pure icons with no text can't be circled.</p>
+        </aside>
       </div>
     </section>
   </main>
@@ -768,6 +804,7 @@ async function startScreen(){
     v.srcObject = stream; v.hidden = false;
     $('capBtn').hidden = false;
     $('stopBtn').hidden = false;
+    openScreenChat();
     stream.getVideoTracks()[0].addEventListener('ended', stopScreen);
   }catch(e){
     showNotice($('screenNotice'), 'Screen sharing was cancelled, or this browser blocked it. On PC use Chrome/Edge; on iPhone use the Camera / photo button instead.', 'err');
@@ -786,27 +823,33 @@ function showCapture(dataUrl){
   $('ocrBtn').hidden = false;
   $('ocrCard').hidden = true;
   $('useBtn').hidden = true;
+  $('pointer').hidden = true;
+  S.pointNorm = null;
+  S.ocrWords = [];
 }
 $('shareBtn').addEventListener('click', startScreen);
 $('stopBtn').addEventListener('click', stopScreen);
-$('capBtn').addEventListener('click', function(){
+function captureFrame(){
   var v = $('screenVideo');
   if(v && v.videoWidth){
     var c = document.createElement('canvas');
     c.width = v.videoWidth; c.height = v.videoHeight;
     c.getContext('2d').drawImage(v, 0, 0);
     showCapture(c.toDataURL('image/png'));
+    return true;
   }
-});
+  return false;
+}
+$('capBtn').addEventListener('click', captureFrame);
 $('camInput').addEventListener('change', function(e){
   var f = e.target.files[0]; if(!f) return;
   var r = new FileReader();
-  r.onload = function(){ showCapture(r.result); };
+  r.onload = function(){ showCapture(r.result); openScreenChat(); };
   r.readAsDataURL(f);
 });
-$('ocrBtn').addEventListener('click', async function(){
+async function runOCR(silent){
   var status = $('ocrStatus');
-  $('ocrCard').hidden = false;
+  if(!silent) $('ocrCard').hidden = false;
   status.textContent = 'Loading the text reader (first use needs internet)…';
   try{
     if(!window.Tesseract){
@@ -821,12 +864,22 @@ $('ocrBtn').addEventListener('click', async function(){
     var result = await Tesseract.recognize($('capImg').src, 'eng');
     var found = (result.data.text || '').trim();
     $('ocrText').value = found;
+    var rawWords = (result.data.words || []).slice();
+    if(!rawWords.length && result.data.blocks){
+      result.data.blocks.forEach(function(b){ (b.paragraphs || []).forEach(function(p){ (p.lines || []).forEach(function(l){ (l.words || []).forEach(function(w){ rawWords.push(w); }); }); }); });
+    }
+    S.ocrWords = rawWords.map(function(w){
+      return { text: w.text, x0: w.bbox.x0, y0: w.bbox.y0, x1: w.bbox.x1, y1: w.bbox.y1 };
+    }).filter(function(w){ return w.text && w.text.trim().length > 1; });
     status.textContent = found ? 'Done — review the text, fix anything misread, then send it to your study material.' : 'No clear text found in this capture. Try a closer, well-lit shot.';
     $('useBtn').hidden = false;
+    return found.length > 0;
   }catch(e){
     status.textContent = 'Could not load the text reader (it needs internet on first use). You can still view the capture and type out the key points manually.';
+    return false;
   }
-});
+}
+$('ocrBtn').addEventListener('click', function(){ runOCR(false); });
 $('useBtn').addEventListener('click', function(){
   var t = $('ocrText').value.trim();
   if(!t){ showNotice($('screenNotice'), 'No OCR text to send yet — run “Read text (OCR)” first.', 'err'); return; }
@@ -835,6 +888,147 @@ $('useBtn').addEventListener('click', function(){
   showTab('study');
   showNotice($('studyNotice'), 'Capture text added to your study material. Hit “Generate study pack” to build cards and a quiz from it.', 'ok');
 });
+
+/* ================= Screen chat: ask about the capture, AI points at it ================= */
+S.ocrWords = [];
+S.pointNorm = null;
+
+function openScreenChat(){
+  $('screenSide').hidden = false;
+  $('sideChatBtn').setAttribute('aria-expanded', 'true');
+}
+$('sideChatBtn').addEventListener('click', function(){
+  var side = $('screenSide');
+  var opening = side.hidden;
+  side.hidden = !opening;
+  $('sideChatBtn').setAttribute('aria-expanded', String(opening));
+  if(opening) $('screenChatInput').focus();
+});
+function screenChatAdd(text, who){
+  var box = $('screenChatBox');
+  var d = document.createElement('div');
+  d.className = 'msg ' + who;
+  d.textContent = text;
+  box.appendChild(d);
+  box.scrollTop = box.scrollHeight;
+}
+function normW(w){ return String(w).toLowerCase().replace(/[^a-z0-9]/g, ''); }
+function findWord(target){
+  var words = S.ocrWords || [];
+  if(!words.length || !target) return null;
+  var toks = String(target).split(/\s+/).map(normW).filter(function(t){ return t.length >= 3; });
+  toks.sort(function(a, b){ return b.length - a.length; });
+  for(var i = 0; i < toks.length; i++){
+    var t = toks[i], j, w;
+    for(j = 0; j < words.length; j++){ w = normW(words[j].text); if(w === t) return words[j]; }
+    for(j = 0; j < words.length; j++){ w = normW(words[j].text); if(w.length >= 3 && (w.indexOf(t) === 0 || t.indexOf(w) === 0)) return words[j]; }
+  }
+  return null;
+}
+function sentenceWith(wordText, sents){
+  var t = normW(wordText);
+  if(!t) return null;
+  return sents.find(function(s){ return s.split(/\s+/).some(function(tok){ return normW(tok) === t; }); }) || null;
+}
+function locPhrase(nx, ny){
+  var v = ny < 0.34 ? 'top' : ny > 0.66 ? 'bottom' : 'middle';
+  var h = nx < 0.34 ? 'left' : nx > 0.66 ? 'right' : 'center';
+  if(v === 'middle' && h === 'center') return 'in the center of your screen';
+  if(h === 'center') return 'near the ' + v + '-center of your screen';
+  if(v === 'middle') return 'on the ' + h + ' side of your screen, about halfway down';
+  return 'near the ' + v + '-' + h + ' of your screen';
+}
+function placePointer(){
+  var p = $('pointer');
+  if(p.hidden || !S.pointNorm) return;
+  var img = $('capImg');
+  if(img.hidden || !img.naturalWidth) return;
+  var ew = img.clientWidth, eh = img.clientHeight;
+  if(!ew || !eh) return;
+  var scale = Math.min(ew / img.naturalWidth, eh / img.naturalHeight);
+  var cw = img.naturalWidth * scale, ch = img.naturalHeight * scale;
+  p.style.left = ((ew - cw) / 2 + S.pointNorm.x * cw) + 'px';
+  p.style.top = ((eh - ch) / 2 + S.pointNorm.y * ch) + 'px';
+  p.classList.toggle('below', S.pointNorm.y < 0.2);
+  $('pointerTag').style.transform = S.pointNorm.x < 0.25 ? 'translateX(-12%)' : S.pointNorm.x > 0.75 ? 'translateX(-88%)' : 'translateX(-50%)';
+}
+function pointAt(word){
+  var img = $('capImg');
+  if(!img.naturalWidth) return false;
+  S.pointNorm = { x: ((word.x0 + word.x1) / 2) / img.naturalWidth, y: ((word.y0 + word.y1) / 2) / img.naturalHeight };
+  $('pointerTag').textContent = word.text;
+  $('pointer').hidden = false;
+  requestAnimationFrame(placePointer);
+  return true;
+}
+window.addEventListener('resize', placePointer);
+function extractTarget(q){
+  var m = q.match(/where(?:'s| is| are)?\s+(?:the\s+|a\s+|an\s+)?(.+?)[?.!]*$/i);
+  if(m) return m[1].trim();
+  m = q.match(/(?:find|locate|highlight|show me|point (?:to|at))\s+(?:the\s+|a\s+|an\s+)?(.+?)[?.!]*$/i);
+  if(m) return m[1].trim();
+  return '';
+}
+async function ensureScreenData(){
+  if(S.ocrWords && S.ocrWords.length) return true;
+  if(S.stream && captureFrame()) return runOCR(true);
+  if(!$('capImg').hidden && $('capImg').src) return runOCR(true);
+  return false;
+}
+async function sendScreenChat(){
+  var inp = $('screenChatInput'), q = inp.value.trim();
+  if(!q) return;
+  inp.value = '';
+  screenChatAdd(q, 'me');
+  screenChatAdd('Looking at your screen…', 'ai');
+  var thinking = $('screenChatBox').lastElementChild;
+  await ensureScreenData();
+  var ocrTextVal = $('ocrText').value.trim();
+  var target = extractTarget(q);
+  var word = target ? findWord(target) : null;
+  var kws = q.toLowerCase().replace(/[^a-z0-9 ]/g, ' ').split(/\s+/).filter(function(w){
+    return w.length > 3 && !STOP.has(w) && ['screen', 'help', 'this', 'that', 'what', 'where', 'point', 'show', 'find'].indexOf(w) === -1;
+  });
+  for(var i = 0; i < kws.length && !word; i++) word = findWord(kws[i]);
+  var pointNote = '';
+  if(word && pointAt(word)){
+    pointNote = 'I circled “' + word.text + '” on your capture — it\'s ' + locPhrase(S.pointNorm.x, S.pointNorm.y) + '.';
+  }
+  thinking.remove();
+  if(OLLAMA && ocrTextVal){
+    try{
+      var r = await fetch(OLLAMA + '/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ model: 'llama3.1', stream: false, messages: [
+          { role: 'system', content: 'You are StudyLens, a Socratic study tutor looking at the text read from the student\'s screen. Answer their question about what is on screen, briefly and clearly. Guide and explain; never write their assignments for them. Text on the student\'s screen:\n' + ocrTextVal },
+          { role: 'user', content: q }
+        ] }) });
+      if(r.ok){
+        var d = await r.json();
+        var ans = (d.message && d.message.content) || '';
+        if(ans){ screenChatAdd(ans + (pointNote ? '\n\n' + pointNote : ''), 'ai'); return; }
+      }
+    }catch(e){ /* fall through to built-in answers */ }
+  }
+  var sents = ocrTextVal ? splitSents(ocrTextVal) : [];
+  var reply;
+  if(word){
+    var ctx = sentenceWith(word.text, sents);
+    reply = 'Found it. ' + pointNote + (ctx ? '\n\nIt\'s in this line on your screen: “' + ctx + '”' : '');
+  } else if(!ocrTextVal){
+    reply = 'I can\'t see anything yet — share your screen with “Share screen (PC)” or take a photo of it, then ask again and I\'ll point right at what you\'re looking for.';
+  } else if(target){
+    reply = 'I read your screen but couldn\'t spot “' + target + '” in it. It may be an icon or image with no text, or the capture is blurry — try Capture frame again, closer up. The text I can see starts with: “' + ocrTextVal.slice(0, 140) + '…”';
+  } else {
+    var hit = null;
+    for(var k = 0; k < kws.length && !hit; k++) hit = sentenceWith(kws[k], sents);
+    if(hit) reply = 'From your screen: “' + hit + '”\n\nWant me to dig into that part, or quiz you on it?';
+    else if(sents.length) reply = 'Here\'s what\'s on your screen: ' + sents.slice(0, 2).join(' ') + '\n\nAsk me “where is …” about anything in it and I\'ll circle it for you.';
+    else reply = 'I couldn\'t read any text from that capture. Try a closer, sharper capture and ask again.';
+  }
+  screenChatAdd(reply, 'ai');
+}
+$('screenChatSend').addEventListener('click', sendScreenChat);
+$('screenChatInput').addEventListener('keydown', function(e){ if(e.key === 'Enter') sendScreenChat(); });
 </script>
 </body>
 </html>
