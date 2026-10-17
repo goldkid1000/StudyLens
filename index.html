@@ -55,6 +55,7 @@ button{font-family:inherit}
 .update-banner .btn{background:var(--surface);color:var(--acc);border-color:transparent}
 .update-banner .btn:hover{background:var(--surface2)}
 .update-banner .btn.ub-later{background:transparent;color:inherit;border:1px solid currentColor}
+.update-banner .ub-notes{margin:9px 0 2px;padding-left:18px;font-size:13.5px;line-height:1.6;text-align:left}
 .news-item{padding:11px 0;border-bottom:1px solid var(--line)}
 .news-item:last-child{border-bottom:0;padding-bottom:2px}
 .news-head{display:flex;flex-wrap:wrap;gap:8px;align-items:baseline}
@@ -270,13 +271,13 @@ mark.stock{background:var(--warn-bg);color:inherit;border-radius:3px;padding:0 2
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
       Screen
     </button>
-    <div class="rail-ver">Version <b id="railVer">v2.10.0</b></div>
+    <div class="rail-ver">Version <b id="railVer">v2.10.1</b></div>
     <p class="rail-note">Everything runs in this tab — your text is never uploaded by StudyLens. Optional scans you start yourself (GPTZero, Hugging Face, Ollama) go only to the service you picked.</p>
   </nav>
 
   <main>
     <div class="update-banner" id="updateBanner" hidden>
-      <div class="ub-text"><strong id="ubTitle">A new version of StudyLens is available.</strong><br><span id="ubText">Tap Update now to load the latest version — this tab will refresh.</span></div>
+      <div class="ub-text"><strong id="ubTitle">A new version of StudyLens is available.</strong><br><span id="ubText">Tap Update now to load the latest version — this tab will refresh.</span><ul class="ub-notes" id="ubNotes" hidden></ul></div>
       <button class="btn" id="updateNowBtn">Update now</button>
       <button class="btn ub-later" id="updateLaterBtn">Later</button>
     </div>
@@ -290,7 +291,7 @@ mark.stock{background:var(--warn-bg);color:inherit;border-radius:3px;padding:0 2
       <div class="card" id="newsCard">
         <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between">
           <h3 style="margin:0">What's new</h3>
-          <span class="ver-chip" id="verChip">Version 2.10.0</span>
+          <span class="ver-chip" id="verChip">Version 2.10.1</span>
         </div>
         <div id="newsLatest"></div>
         <div class="row">
@@ -1832,12 +1833,17 @@ $('screenChatInput').addEventListener('keydown', function(e){ if(e.key === 'Ente
 <script>
 'use strict';
 /* ================= Version, What's New, and update check =================
-   APP_VERSION is baked into this build. The published data:application/json;base64,eyJ1cGRhdGVkIjoiMjAyNi0xMC0xNyIsInZlcnNpb24iOiIyLjEwLjAifQ== is
+   APP_VERSION is baked into this build. The published data:application/json;base64,eyJ1cGRhdGVkIjoiMjAyNi0xMC0xNyIsInZlcnNpb24iOiIyLjEwLjEifQ== is
    fetched with no-store caching: when a newer build ships, an already-open or
    home-screen copy of an older build sees the newer version number there and
    offers "Update now" (a reload onto the new build). */
-var APP_VERSION = '2.10.0';
+var APP_VERSION = '2.10.1';
 var CHANGELOG = [
+  { v: '2.10.1', date: 'Oct 17, 2026', notes: [
+    'Update notice shows once per update (what changed), then never again until the next update — works on PC and phone.',
+    'When an update launches, the banner at the top lists what changed in that version. Once you tap Update now or Later, StudyLens remembers that you saw it — closing and reopening the tab, or coming back later, will not show that update again. It only pops up again when a newer update launches.',
+    'Opening What\'s new or tapping Check for updates never brings the notice back — the full history is always there when you want it.'
+  ]},
   { v: '2.10.0', date: 'Oct 17, 2026', notes: [
     'Essay feedback with reviewers: pick Strict Professor, Encouraging Coach, or Peer Reviewer — or type your own rubric, one criterion per line — and get structure, clarity, and grammar-pattern notes on your own writing, with sentence and paragraph numbers. Suggestions only; it never rewrites your essay.',
     'Batch file scan: choose several files at once (PDF, DOCX, TXT/MD, or images read with on-device OCR) and the same trained V12 detector scores each one — page by page for PDFs — with an overall summary. Files are read in this tab only; nothing is uploaded.',
@@ -1937,24 +1943,86 @@ function cmpVer(a, b){
   }
   return 0;
 }
-var updateDismissed = false;
-function showUpdateBanner(latest){
-  if(updateDismissed) return;
+/* ---- Once-per-version update notices -----------------------------------
+   The last version whose notes the user has seen is remembered in
+   localStorage, so a version's notice shows exactly ONCE — it survives
+   reloads, tab closes, and revisits, on PC and phone alike — and never
+   shows again until a NEWER update launches. The in-memory copy is only a
+   fallback for browsers that block storage; it is never the source of
+   truth when storage works. */
+var SEEN_KEY = 'studylens.update.lastSeenVersion';
+var seenMem = '';
+function getSeenVersion(){
+  try{ var v = localStorage.getItem(SEEN_KEY); if(v) return v; }catch(e){}
+  return seenMem;
+}
+function markVersionSeen(v){
+  if(!v) return;
+  var cur = getSeenVersion();
+  var best = (cur && cmpVer(cur, v) > 0) ? cur : v;
+  seenMem = best;
+  try{ localStorage.setItem(SEEN_KEY, best); }catch(e){}
+}
+function changelogNotes(v){
+  for(var i = 0; i < CHANGELOG.length; i++){ if(CHANGELOG[i].v === v) return CHANGELOG[i].notes; }
+  return null;
+}
+var bannerVersion = ''; /* the version the visible banner is about */
+function fillBannerNotes(notes){
+  var ul = $('ubNotes');
+  if(notes && notes.length){
+    ul.innerHTML = notes.map(function(n){ return '<li>' + esc(n) + '</li>'; }).join('');
+    ul.hidden = false;
+  } else {
+    ul.innerHTML = '';
+    ul.hidden = true;
+  }
+}
+/* A newer version is available: show THAT version's notes, once. */
+function showUpdateBanner(latest, remoteNotes){
+  if(cmpVer(getSeenVersion(), latest) >= 0) return; /* already seen this one */
+  bannerVersion = latest;
+  $('updateNowBtn').hidden = false;
+  $('updateLaterBtn').textContent = 'Later';
   $('ubTitle').textContent = 'StudyLens v' + latest + ' is available — you\'re on v' + APP_VERSION + '.';
+  $('ubText').textContent = 'Here\'s what\'s new in v' + latest + ':';
+  fillBannerNotes((remoteNotes && remoteNotes.length) ? remoteNotes : changelogNotes(latest));
   $('updateBanner').hidden = false;
+}
+/* First load after an update landed: show THIS version's notes, once. */
+function showUpdatedNotice(){
+  if(cmpVer(getSeenVersion(), APP_VERSION) >= 0) return; /* already seen */
+  bannerVersion = APP_VERSION;
+  $('updateNowBtn').hidden = true;
+  $('updateLaterBtn').textContent = 'Got it';
+  $('ubTitle').textContent = 'StudyLens was updated to v' + APP_VERSION + ' — here\'s what changed.';
+  $('ubText').textContent = 'This shows once for this update; the full history is always under What\'s new.';
+  fillBannerNotes(changelogNotes(APP_VERSION));
+  $('updateBanner').hidden = false;
+}
+function dismissUpdateBanner(){
+  if(bannerVersion) markVersionSeen(bannerVersion);
+  bannerVersion = '';
+  $('updateBanner').hidden = true;
 }
 async function checkForUpdates(manual){
   var status = $('updateStatus');
   if(manual) status.textContent = 'Checking…';
   try{
-    var r = await fetch('data:application/json;base64,eyJ1cGRhdGVkIjoiMjAyNi0xMC0xNyIsInZlcnNpb24iOiIyLjEwLjAifQ==' + Date.now(), { cache: 'no-store' });
+    var r = await fetch('data:application/json;base64,eyJ1cGRhdGVkIjoiMjAyNi0xMC0xNyIsInZlcnNpb24iOiIyLjEwLjEifQ==' + Date.now(), { cache: 'no-store' });
     if(!r.ok) throw new Error('HTTP ' + r.status);
     var d = await r.json();
     var latest = String(d.version || '').trim();
     if(!latest) throw new Error('no version in response');
     if(cmpVer(latest, APP_VERSION) > 0){
-      showUpdateBanner(latest);
-      if(manual) status.textContent = 'v' + latest + ' is available — use the Update now banner at the top of the page.';
+      if(cmpVer(getSeenVersion(), latest) >= 0){
+        /* Newer version exists but its notice was already seen — never
+           re-show it. A manual check still says so in plain words. */
+        if(manual) status.textContent = 'v' + latest + ' is available — you\'ve already seen this update\'s notes. Reload this tab whenever you\'re ready to load it.';
+      } else {
+        showUpdateBanner(latest, Array.isArray(d.notes) ? d.notes : null);
+        if(manual) status.textContent = 'v' + latest + ' is available — see the banner at the top of the page for what\'s new.';
+      }
     } else if(manual){
       status.textContent = 'You\'re on the latest version (v' + APP_VERSION + ').';
     }
@@ -1963,11 +2031,18 @@ async function checkForUpdates(manual){
   }
 }
 $('checkUpdateBtn').addEventListener('click', function(){ checkForUpdates(true); });
-$('updateNowBtn').addEventListener('click', function(){ location.reload(); });
-$('updateLaterBtn').addEventListener('click', function(){
-  updateDismissed = true;
-  $('updateBanner').hidden = true;
+$('updateNowBtn').addEventListener('click', function(){
+  if(bannerVersion) markVersionSeen(bannerVersion);
+  location.reload();
 });
+$('updateLaterBtn').addEventListener('click', dismissUpdateBanner);
+/* On load: if this build is newer than the last version the user has seen
+   (or nothing has been seen yet), show this version's notes once. The
+   update check below can still replace it with a newer version's banner. */
+(function(){
+  var seen = getSeenVersion();
+  if(!seen || cmpVer(APP_VERSION, seen) > 0) showUpdatedNotice();
+})();
 checkForUpdates(false);
 </script>
 <script>
