@@ -271,7 +271,7 @@ mark.stock{background:var(--warn-bg);color:inherit;border-radius:3px;padding:0 2
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
       Screen
     </button>
-    <div class="rail-ver">Version <b id="railVer">v2.10.1</b></div>
+    <div class="rail-ver">Version <b id="railVer">v2.11.0</b></div>
     <p class="rail-note">Everything runs in this tab — your text is never uploaded by StudyLens. Optional scans you start yourself (GPTZero, Hugging Face, Ollama) go only to the service you picked.</p>
   </nav>
 
@@ -291,7 +291,7 @@ mark.stock{background:var(--warn-bg);color:inherit;border-radius:3px;padding:0 2
       <div class="card" id="newsCard">
         <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between">
           <h3 style="margin:0">What's new</h3>
-          <span class="ver-chip" id="verChip">Version 2.10.1</span>
+          <span class="ver-chip" id="verChip">Version 2.11.0</span>
         </div>
         <div id="newsLatest"></div>
         <div class="row">
@@ -313,6 +313,7 @@ mark.stock{background:var(--warn-bg);color:inherit;border-radius:3px;padding:0 2
           <button class="btn plain small" id="sampleBtn">Load sample notes</button>
           <button class="btn plain small" id="clearBtn">Clear</button>
         </div>
+        <p class="small" id="autosaveLine" style="margin-top:8px">Drafts auto-save on this device as you type — closing the tab won&rsquo;t lose them. Screen captures are never auto-saved. <span id="autosaveStatus">Nothing saved yet.</span> <button class="btn plain small" id="clearAutosaveBtn" type="button">Clear saved drafts</button></p>
         <div class="notice" id="studyNotice" role="status"></div>
       </div>
       <div class="card" id="summaryCard" hidden>
@@ -1594,6 +1595,10 @@ function showCapture(dataUrl){
   S.ocrWords = [];
   S.captureSaved = false;
 }
+/* Exact text saveCapture appended to the study material, per capture. The
+   autosave strips these recorded blocks back out, so capture-derived text
+   is never persisted — only what the user typed is auto-saved. */
+var captureAppended = [];
 function saveCapture(){
   var img = $('capImg');
   if(img.hidden || !img.src){
@@ -1617,7 +1622,9 @@ function saveCapture(){
       ? '\nText read from the capture:\n' + ocr
       : '\n(The image was downloaded; its text has not been read yet — run "Read text (OCR)" on the Screen tab and Save again to add the text too.)');
     var m = $('material');
-    m.value = (m.value ? m.value + '\n\n' : '') + block;
+    var sep = m.value ? '\n\n' : '';
+    m.value = m.value + sep + block;
+    captureAppended.push(sep + block);
     S.captureSaved = true;
     showNotice($('screenNotice'), ocr
       ? 'Capture saved — the image downloaded, and its text was added to your study material on the Study tab.'
@@ -1837,8 +1844,13 @@ $('screenChatInput').addEventListener('keydown', function(e){ if(e.key === 'Ente
    fetched with no-store caching: when a newer build ships, an already-open or
    home-screen copy of an older build sees the newer version number there and
    offers "Update now" (a reload onto the new build). */
-var APP_VERSION = '2.10.1';
+var APP_VERSION = '2.11.0';
 var CHANGELOG = [
+  { v: '2.11.0', date: 'Oct 17, 2026', notes: [
+    'Autosave: what you type now saves on this device as you type — study material, detector text, tutor and Voice Coach drafts, and your custom rubric — so closing the tab never wipes it. A “Saved …” line under Your material shows when it last saved, and Clear saved drafts wipes it. On-device only (localStorage); nothing is uploaded.',
+    'Screen captures are still never auto-saved: if your study material holds text from a saved capture, that capture text is left out of the auto-save and your earlier saved draft stays put.',
+    'Check for updates now actually checks: it reads version.json from this site instead of a baked-in copy that could never report a newer version. If the check can\'t reach the site (offline, or the preview link), it says so instead of pretending.'
+  ]},
   { v: '2.10.1', date: 'Oct 17, 2026', notes: [
     'Update notice shows once per update (what changed), then never again until the next update — works on PC and phone.',
     'When an update launches, the banner at the top lists what changed in that version. Once you tap Update now or Later, StudyLens remembers that you saw it — closing and reopening the tab, or coming back later, will not show that update again. It only pops up again when a newer update launches.',
@@ -2009,7 +2021,10 @@ async function checkForUpdates(manual){
   var status = $('updateStatus');
   if(manual) status.textContent = 'Checking…';
   try{
-    var r = await fetch('data:application/json;base64,eyJ1cGRhdGVkIjoiMjAyNi0xMC0xNyIsInZlcnNpb24iOiIyLjEwLjEifQ==' + Date.now(), { cache: 'no-store' });
+    /* The version check reads version.json from this same site, so it can
+       actually report a newer version. (The old check fetched a copy of the
+       version baked into this very build, which could never be newer.) */
+    var r = await fetch('version.json', { cache: 'no-store' });
     if(!r.ok) throw new Error('HTTP ' + r.status);
     var d = await r.json();
     var latest = String(d.version || '').trim();
@@ -2044,6 +2059,102 @@ $('updateLaterBtn').addEventListener('click', dismissUpdateBanner);
   if(!seen || cmpVer(APP_VERSION, seen) > 0) showUpdatedNotice();
 })();
 checkForUpdates(false);
+</script>
+<script>
+'use strict';
+/* ================= Autosave (v2.11.0) =====================================
+   Saves what the user TYPES on this device — study material, detector text,
+   tutor + Voice Coach drafts, custom rubric — into localStorage, so closing
+   the tab never wipes it. On-device only; nothing is uploaded.
+
+   NEVER persisted: screen captures. Capture-derived text that saveCapture
+   appended to the study material is stripped back out (via the exact
+   recorded blocks) before saving. If the material holds capture text this
+   tab didn't record (e.g. an older session's), the stored material is left
+   at its previous good copy and the status line says so. */
+var AUTOSAVE_KEY = 'studylens.autosave.v1';
+var AUTOSAVE_FIELDS = ['material', 'detectInput', 'chatInput', 'coachInput', 'revRubric'];
+var CAPTURE_MARKER = '[Screen capture saved from StudyLens Screen See]';
+var autosaveTimer = null;
+function autosaveStripCaptures(text){
+  var out = String(text || '');
+  (typeof captureAppended !== 'undefined' ? captureAppended : []).forEach(function(b){ if(b) out = out.split(b).join(''); });
+  return out;
+}
+function autosaveSave(){
+  var status = $('autosaveStatus');
+  try{
+    var prev = null;
+    try{ prev = JSON.parse(localStorage.getItem(AUTOSAVE_KEY) || 'null'); }catch(e){ prev = null; }
+    var data = { savedAt: Date.now(), fields: {} };
+    var skippedCapture = false, skippedLarge = false;
+    AUTOSAVE_FIELDS.forEach(function(id){
+      var el = $(id); if(!el) return;
+      var v = el.value || '';
+      if(id === 'material'){
+        if(autosaveStripCaptures(v).indexOf(CAPTURE_MARKER) !== -1){
+          /* Unrecorded capture text present — keep the previous stored copy. */
+          skippedCapture = true;
+          if(prev && prev.fields && typeof prev.fields.material === 'string') data.fields.material = prev.fields.material;
+          return;
+        }
+        v = autosaveStripCaptures(v);
+      }
+      if(v.length > 200000){ skippedLarge = true; return; }
+      data.fields[id] = v;
+    });
+    localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(data));
+    if(status) status.textContent = 'Saved ' + new Date(data.savedAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) + '.' +
+      (skippedCapture ? ' Capture text in your material was left out (captures are never stored).' : '') +
+      (skippedLarge ? ' One very long draft was too big to save.' : '');
+  }catch(e){
+    /* Storage blocked or full: drafts just won't survive a close. Stay quiet. */
+    if(status) status.textContent = 'Couldn\'t save drafts on this device (storage blocked or full).';
+  }
+}
+function autosaveSchedule(){
+  if(autosaveTimer) clearTimeout(autosaveTimer);
+  autosaveTimer = setTimeout(function(){ autosaveTimer = null; autosaveSave(); }, 800);
+}
+function autosaveRestore(){
+  var raw = null;
+  try{ raw = localStorage.getItem(AUTOSAVE_KEY); }catch(e){ raw = null; }
+  if(!raw) return;
+  var data = null;
+  try{ data = JSON.parse(raw); }catch(e){ return; }
+  if(!data || !data.fields) return;
+  var restored = [];
+  AUTOSAVE_FIELDS.forEach(function(id){
+    var el = $(id); if(!el) return;
+    var v = data.fields[id];
+    if(typeof v === 'string' && v && !el.value){ el.value = v; restored.push(id); }
+  });
+  var status = $('autosaveStatus');
+  if(restored.length){
+    if(status) status.textContent = 'Restored your saved draft from ' + new Date(data.savedAt || Date.now()).toLocaleString([], { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }) + '.';
+    if(restored.indexOf('material') !== -1) showNotice($('studyNotice'), 'Restored your saved study material from last time — it was saved on this device only.', 'ok');
+  } else if(status){
+    status.textContent = 'Saved ' + new Date(data.savedAt || Date.now()).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) + '.';
+  }
+}
+function autosaveClear(){
+  try{ localStorage.removeItem(AUTOSAVE_KEY); }catch(e){}
+  AUTOSAVE_FIELDS.forEach(function(id){ var el = $(id); if(el) el.value = ''; });
+  var status = $('autosaveStatus');
+  if(status) status.textContent = 'Saved drafts cleared.';
+  showNotice($('studyNotice'), 'Saved drafts cleared — the boxes above are empty again.', 'ok');
+}
+AUTOSAVE_FIELDS.forEach(function(id){
+  var el = $(id); if(el) el.addEventListener('input', autosaveSchedule);
+});
+/* Programmatic fills don't fire 'input' — schedule a save after them too. */
+if($('clearBtn')) $('clearBtn').addEventListener('click', function(){ setTimeout(autosaveSave, 0); });
+if($('sampleBtn')) $('sampleBtn').addEventListener('click', function(){ setTimeout(autosaveSave, 0); });
+if($('fileInput')) $('fileInput').addEventListener('change', function(){ setTimeout(autosaveSave, 600); });
+if($('saveCaptureBtn')) $('saveCaptureBtn').addEventListener('click', function(){ setTimeout(autosaveSave, 0); });
+if($('clearAutosaveBtn')) $('clearAutosaveBtn').addEventListener('click', autosaveClear);
+window.addEventListener('pagehide', autosaveSave);
+autosaveRestore();
 </script>
 <script>
 'use strict';
