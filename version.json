@@ -1,1 +1,8 @@
-{"notes":["Second visual pass (\"Canopy\"): deeper pine + harvest-gold duotone, layered botanical background, gradient-bordered cards, gradient display headings, glowing gradient buttons, letter-badged quiz options, larger flashcards, glowing gradient active tab on mobile. Dark mode follows the new palette. All features and the V14 detector unchanged."],"notify":true,"updated":"2026-10-19","version":"2.14.0"}
+{
+  "version": "2.14.1",
+  "updated": "2026-10-19",
+  "notify": true,
+  "notes": [
+    "Detector upgraded to V16: fewer false flags on human writing (6.1% vs 7.4%), better GPT-5 catch (91.7% vs 89.2%). Nothing else changed."
+  ]
+}
