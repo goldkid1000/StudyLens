@@ -1,8 +1,8 @@
 {
-  "version": "2.14.1",
+  "version": "2.15.0",
   "updated": "2026-10-19",
   "notify": true,
   "notes": [
-    "Detector upgraded to V16: fewer false flags on human writing (6.1% vs 7.4%), better GPT-5 catch (91.7% vs 89.2%). Nothing else changed."
+    "Athenaeum visual rework: ink-navy + parchment + copper, serif type, parchment index flashcards. True fullscreen on phones."
   ]
 }
