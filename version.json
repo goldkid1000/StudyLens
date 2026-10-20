@@ -1,8 +1,1 @@
-{
-  "version": "2.15.0",
-  "updated": "2026-10-19",
-  "notify": true,
-  "notes": [
-    "Athenaeum visual rework: ink-navy + parchment + copper, serif type, parchment index flashcards. True fullscreen on phones."
-  ]
-}
+{"notes":["Simple Study is here: Word Bank Fill-in-the-Blank, Matching, True/False and Multiple Choice — all generated from your own material.","Snap your material: take a photo of notes or a textbook page and turn it into a quiz (you confirm what it reads first).","Fix My Mistakes: photo of a graded test finds your wrong answers, shows your weak spots, and drills just those.","Upload almost any file — Excel, Word, PDF, PowerPoint, CSV, text, images — and get plain-language explanations (including what each spreadsheet formula does) plus practice questions."],"notify":true,"updated":"2026-10-20","version":"2.16.0"}
