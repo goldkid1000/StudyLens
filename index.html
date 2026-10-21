@@ -3358,8 +3358,12 @@ ssRefresh();
    fetched with no-store caching: when a newer build ships, an already-open or
    home-screen copy of an older build sees the newer version number there and
    offers "Update now" (a reload onto the new build). */
-var APP_VERSION = '2.16.0';
+var APP_VERSION = '2.16.1';
 var CHANGELOG = [
+  { v: '2.16.1', date: 'Oct 21, 2026', notify: true, notes: [
+    'Fixed: the on-device AI detector was silently falling back to rough heuristic scoring because its trained model file was missing from the published app. The trained V16 classifier (87.3% held-out accuracy, 6.1% false-flag rate on human writing) now loads correctly — paste writing into the detector and you get the real trained scores with per-sentence highlights.',
+    'Also fixed: the "update available" check was looking for its version file in the wrong place, so installed copies never offered the Update button. Updates are now detected again — when a newer build ships you will see the update banner.'
+  ] },
   { v: '2.16.0', date: 'Oct 20, 2026', notes: [
     'Simple Study is here: Word Bank Fill-in-the-Blank, Matching, True/False and Multiple Choice made from your own material — plus Snap your material: photograph your notes and turn them into quizzes.',
     'Fix my mistakes: photograph graded work and StudyLens finds the questions you missed, shows your weak spots, re-teaches each idea from your own notes, and builds practice on just those ideas.',
