@@ -406,6 +406,24 @@ mark.stock{background:var(--warn-bg);color:inherit;border-radius:4px;padding:0 3
   .ss-match-btn{font-size:14px;padding:12px 11px}
   .ss-q{font-size:18px}
 }
+
+/* ================= v2.17.0 motion + target polish =================
+   Gentle, purposeful motion: Simple Study stages rise in, feedback fades
+   up, the detector gauge sweeps to its score, and flashcards turn over.
+   The global reduced-motion rule above (transitions/animations off)
+   covers every one of these. Small buttons and mode buttons now meet
+   the 44px tap-target floor on every screen size, not just phones. */
+.btn.small{min-height:44px}
+.mode-btn{min-height:44px}
+.gauge svg{transform-origin:50% 50%;animation:gaugeIn .65s var(--ease) both}
+.gauge circle{transition:stroke-dasharray .9s var(--ease)}
+@keyframes gaugeIn{from{opacity:0;transform:scale(.96) rotate(-4deg)}to{opacity:1;transform:scale(1) rotate(0deg)}}
+.flash.card-flip{animation:cardFlip .38s var(--ease)}
+@keyframes cardFlip{0%{transform:rotateY(0deg)}50%{transform:rotateY(88deg)}100%{transform:rotateY(0deg)}}
+#ssPlay.ss-enter{animation:ssModeIn .32s var(--ease) both}
+@keyframes ssModeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.ss-feed{animation:feedIn .25s var(--ease) both}
+@keyframes feedIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
 </style>
 </head>
 <body>
@@ -560,6 +578,7 @@ mark.stock{background:var(--warn-bg);color:inherit;border-radius:4px;padding:0 3
 
         <div id="ssEmpty">
           <div class="ss-feed info" style="margin-top:14px">No material yet. Paste your notes in “Your material” above and tap <strong>Generate study pack</strong> — or tap <strong>Snap your material</strong> / <strong>Add a file</strong> and StudyLens will read it for you.</div>
+          <div class="row"><button class="btn" id="ssSampleBtn">Try sample material</button></div>
         </div>
 
         <div id="ssPicker" hidden>
@@ -993,6 +1012,11 @@ function generateStudy(){
   var text = $('material').value.trim();
   if(text.length < 120){ showNotice($('studyNotice'), 'Paste a bit more material first — a paragraph or more works best.', 'err'); return; }
   hideNotice($('studyNotice'));
+  /* A fresh pack invalidates Simple Study state tied to the OLD material:
+     spreadsheet formula questions and a Fix-My-Mistakes weak-spot filter
+     used to survive into the new pack, mixing in questions — or a filter
+     matching nothing — from material the learner has moved on from. */
+  if(window.SS){ SS.extraMC = []; SS.filter = null; SS.missed = []; SS.fixItems = []; SS.fixConcepts = []; }
   S.material = text;
   S.sentences = getSentences(text);
   var f = wordFreq(text);
@@ -1130,13 +1154,27 @@ function renderCard(){
   $('flashA').textContent = c.a;
   $('flashA').hidden = !S.cardFlipped;
   $('flashHint').textContent = S.cardFlipped ? (inReview ? 'Grade yourself honestly below' : 'Tap to hide the answer') : 'Tap to reveal the answer';
+  $('flashBox').setAttribute('aria-pressed', S.cardFlipped ? 'true' : 'false');
   $('flashPos').textContent = (S.cardIdx + 1) + ' / ' + S.cards.length;
   if(inReview) $('reviewMsg').textContent = S.drillWeak
     ? 'Drilling your weak areas — card ' + (S.reviewPos + 1) + ' of ' + S.reviewQueue.length + '. Flip the card, then grade honestly: Again keeps its term in your weak areas; Good and Easy schedule it back like a normal review.'
     : 'Review ' + (S.reviewPos + 1) + ' of ' + S.reviewQueue.length + ' due — flip the card, then grade how well you knew it. Again brings it back in ~10 minutes; Good and Easy push it days out. That spacing is what makes it stick.';
   ['gradeAgain', 'gradeGood', 'gradeEasy'].forEach(function(id){ $(id).disabled = !S.cardFlipped; });
 }
-function flipCard(){ if(!S.cards.length) return; S.cardFlipped = !S.cardFlipped; renderCard(); }
+var CARD_FLIPPING = false;
+function flipCard(){
+  if(!S.cards.length || CARD_FLIPPING) return;
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(reduce){ S.cardFlipped = !S.cardFlipped; renderCard(); return; }
+  CARD_FLIPPING = true;
+  var box = $('flashBox');
+  box.classList.add('card-flip');
+  window.setTimeout(function(){
+    S.cardFlipped = !S.cardFlipped;
+    renderCard();
+    window.setTimeout(function(){ box.classList.remove('card-flip'); CARD_FLIPPING = false; }, 200);
+  }, 180);
+}
 $('flashBox').addEventListener('click', flipCard);
 $('flashBox').addEventListener('keydown', function(e){ if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); flipCard(); } });
 $('nextCardBtn').addEventListener('click', function(){ if(!S.cards.length) return; S.cardIdx = (S.cardIdx + 1) % S.cards.length; S.cardFlipped = false; renderCard(); });
@@ -1510,8 +1548,24 @@ function renderDetectorResults(title, pct, verdict, sents, scores, explain){
       '</div>' +
     '</div>';
   $('detectOut').innerHTML = html;
+  animateGauge();
   $('detectOut').querySelectorAll('.det-sent').forEach(function(el){
     el.addEventListener('click', function(){ showSentReason(parseInt(el.getAttribute('data-i'), 10)); });
+  });
+}
+/* Sweep the gauge arcs from empty to their final values (the arc CSS
+   transition does the work; reduced-motion users get the final state
+   immediately because that rule disables transitions). */
+function animateGauge(){
+  var arcs = $('detectOut').querySelectorAll('.gauge circle[stroke-dasharray]');
+  arcs.forEach(function(c){
+    var final = c.getAttribute('stroke-dasharray');
+    if(!final || final.indexOf(' ') === -1) return;
+    var total = final.split(' ')[1];
+    c.style.strokeDasharray = '0 ' + total;
+    window.requestAnimationFrame(function(){
+      window.requestAnimationFrame(function(){ c.style.strokeDasharray = final; });
+    });
   });
 }
 function showSentReason(i){
@@ -2381,6 +2435,20 @@ function ssSentFor(term){
   for(var i = 0; i < S.sentences.length; i++){ if(sentenceHasTerm(S.sentences[i], term)) return S.sentences[i]; }
   return null;
 }
+/* How many times a term occurs in a sentence. Question builders that
+   blank or swap a term must use sentences where it occurs EXACTLY once:
+   blanking only the first occurrence leaks the answer when the term
+   appears again later in the same sentence, and swapping only the first
+   occurrence can leave a "false" statement that still asserts the term
+   elsewhere — neither has one defensible answer. */
+function ssTermCount(s, term){
+  var hits = String(s).match(new RegExp(termRegex(term).source, 'gi'));
+  return hits ? hits.length : 0;
+}
+function ssSingleSentFor(term){
+  for(var i = 0; i < S.sentences.length; i++){ if(ssTermCount(S.sentences[i], term) === 1) return S.sentences[i]; }
+  return null;
+}
 /* Definition subjects ("X is …" / "X are …") are key terms too — they are
    the same subjects buildCards() turns into "What is X?" cards. A page that
    is mostly definitions has few repeated words, so extractTerms() alone
@@ -2409,14 +2477,17 @@ function ssAllTerms(text, sentences){
 function ssTargetFor(term){
   var d = ssDefFor(term);
   if(d) return d.def;
-  var s = ssSentFor(term);
+  var s = ssSingleSentFor(term);
   return s ? s.replace(termRegex(term), '$1_____') : null;
 }
 
 /* ---------- Simple Study state ---------- */
 var SS = { mode: null, qs: [], idx: 0, score: 0, filter: null, extraMC: [],
            picked: null, answered: false, matchSel: null, matchDone: 0, matchMiss: 0,
-           fixItems: [], fixConcepts: [] };
+           missed: [], fixItems: [], fixConcepts: [] };
+/* Remember a question the learner missed (once per question) so the
+   results screen can offer a focused "practice what I missed" round. */
+function ssNoteMiss(q){ if(q && SS.missed.indexOf(q) === -1) SS.missed.push(q); }
 
 function ssPoolTerms(){
   var t = S.terms.slice();
@@ -2433,7 +2504,7 @@ function ssBuildWordBank(){
   terms.forEach(function(term){
     var sent = null;
     for(var i = 0; i < S.sentences.length; i++){
-      if(!used[S.sentences[i]] && sentenceHasTerm(S.sentences[i], term)){ sent = S.sentences[i]; break; }
+      if(!used[S.sentences[i]] && ssTermCount(S.sentences[i], term) === 1){ sent = S.sentences[i]; break; }
     }
     if(!sent) return;
     var distract = shuffleArr(S.terms.filter(function(t){ return t !== term && !sentenceHasTerm(sent, t); })).slice(0, 4);
@@ -2461,11 +2532,14 @@ function ssBuildTF(){
       if(!used[S.sentences[i]] && sentenceHasTerm(S.sentences[i], term)){ sent = S.sentences[i]; break; }
     }
     if(!sent) return;
-    var swaps = S.terms.filter(function(t){ return t !== term; });
-    if(!swaps.length) return;
+    /* A swap-in term must not already appear in the sentence (otherwise
+       the "false" statement can still be true), and a swap is only clean
+       when the original term occurs exactly once. Otherwise this stays a
+       true statement — never ship an ambiguous one. */
+    var swaps = S.terms.filter(function(t){ return t !== term && !sentenceHasTerm(sent, t); });
     used[sent] = 1;
     var swapped = null, swapTerm = '';
-    if(Math.random() < 0.5){
+    if(swaps.length && ssTermCount(sent, term) === 1 && Math.random() < 0.5){
       swapTerm = swaps[Math.floor(Math.random() * swaps.length)];
       var attempt = sent.replace(termRegex(term), '$1' + swapTerm);
       if(attempt !== sent){
@@ -2495,7 +2569,7 @@ function ssBuildMC(){
   });
   terms.forEach(function(term){
     if(asked[term] || qs.length >= 8) return;
-    var sent = ssSentFor(term);
+    var sent = ssSingleSentFor(term);
     if(!sent) return;
     var others = shuffleArr(S.terms.filter(function(t){ return t !== term && !sentenceHasTerm(sent, t); })).slice(0, 3);
     if(others.length < 3) return;
@@ -2539,7 +2613,7 @@ function ssBindQuit(){
 }
 function ssStartMode(mode){
   SS.mode = mode; SS.idx = 0; SS.score = 0; SS.answered = false; SS.picked = null;
-  SS.matchSel = null; SS.matchDone = 0; SS.matchMiss = 0;
+  SS.matchSel = null; SS.matchDone = 0; SS.matchMiss = 0; SS.missed = [];
   if(mode === 'wordbank') SS.qs = ssBuildWordBank();
   else if(mode === 'matching') SS.qs = ssBuildMatching();
   else if(mode === 'tf') SS.qs = ssBuildTF();
@@ -2565,6 +2639,8 @@ function ssNext(){
   else ssRenderQ();
 }
 function ssRenderQ(){
+  var play = $('ssPlay');
+  if(play){ play.classList.remove('ss-enter'); void play.offsetWidth; play.classList.add('ss-enter'); }
   if(SS.mode === 'wordbank') ssRenderWordBank();
   else if(SS.mode === 'matching') ssRenderMatching();
   else if(SS.mode === 'tf') ssRenderTF();
@@ -2581,8 +2657,11 @@ function ssResults(){
     '<div class="ss-score">' + score + ' of ' + total + (SS.mode === 'matching' ? ' pairs matched' : ' correct') + '</div>' +
     '<p class="mut">' + esc(msg) + '</p>' +
     '<div class="row"><button class="btn" id="ssRetryBtn">Keep practicing</button>' +
+    (SS.missed.length ? '<button class="btn ghost" id="ssMissedBtn">Practice what I missed (' + SS.missed.length + ')</button>' : '') +
     '<button class="btn ghost" id="ssModesBtn">Try another mode</button></div>';
   $('ssRetryBtn').addEventListener('click', function(){ ssStartMode(SS.mode); });
+  var mb = $('ssMissedBtn');
+  if(mb) mb.addEventListener('click', ssPracticeMissed);
   $('ssModesBtn').addEventListener('click', function(){
     SS.mode = null;
     play.hidden = true;
@@ -2590,6 +2669,21 @@ function ssResults(){
     $('simpleCard').scrollIntoView({ block: 'start' });
   });
   bumpStreak();
+}
+/* v2.17.0 addition — "Practice what I missed": a focused round built
+   from just the questions missed in the round just finished, in the same
+   mode. It exists because re-doing the whole set to reach the two shaky
+   questions is where practice usually gets abandoned. */
+function ssPracticeMissed(){
+  var qs = SS.missed.slice();
+  if(!qs.length) return;
+  SS.missed = [];
+  SS.qs = qs; SS.idx = 0; SS.score = 0; SS.answered = false; SS.picked = null;
+  SS.matchSel = null; SS.matchDone = 0; SS.matchMiss = 0;
+  qs.forEach(function(q){ if(q) q.tried = false; });
+  $('ssPlay').hidden = false;
+  ssRenderQ();
+  $('simpleCard').scrollIntoView({ block: 'start' });
 }
 
 /* ----- Word Bank Fill-in-the-Blank ----- */
@@ -2642,6 +2736,7 @@ function ssRenderWordBank(){
       blank.classList.remove('empty');
     } else {
       q.tried = true;
+      ssNoteMiss(q);
       feed.innerHTML = '<div class="ss-feed bad">Not quite — “' + esc(SS.picked) + '” doesn\'t fit this sentence. Tap the blank to clear it and try another word.</div>';
       var wrongBtn = null;
       stage.querySelectorAll('.ss-word').forEach(function(b){ if(b.getAttribute('data-word') === SS.picked) wrongBtn = b; });
@@ -2692,6 +2787,7 @@ function ssRenderMatching(){
         }
       } else {
         SS.matchMiss += 1;
+        if(pair) ssNoteMiss(pair);
         b.classList.remove('ss-shake');
         void b.offsetWidth;
         b.classList.add('ss-shake');
@@ -2719,7 +2815,7 @@ function ssRenderTF(){
     if(SS.answered) return;
     SS.answered = true;
     var right = saidTrue === q.isTrue;
-    if(right) SS.score += 1;
+    if(right) SS.score += 1; else ssNoteMiss(q);
     btn.classList.add(right ? 'correct' : 'wrong');
     (q.isTrue ? $('ssTrueBtn') : $('ssFalseBtn')).classList.add('correct');
     $('ssTrueBtn').disabled = true;
@@ -2753,7 +2849,7 @@ function ssRenderMC(){
       SS.answered = true;
       var picked = b.getAttribute('data-opt');
       var right = picked === q.answer;
-      if(right) SS.score += 1;
+      if(right) SS.score += 1; else ssNoteMiss(q);
       stage.querySelectorAll('.ss-opt').forEach(function(x){
         x.disabled = true;
         if(x.getAttribute('data-opt') === q.answer) x.classList.add('correct');
@@ -2919,8 +3015,8 @@ function ssExplainFormula(formula, sheet){
     if(fn === 'AVERAGE') return 'Finds the average (mean) of the numbers in ' + rangeLabel(args) + '.';
     if(fn === 'MIN') return 'Finds the smallest number in ' + rangeLabel(args) + '.';
     if(fn === 'MAX') return 'Finds the biggest number in ' + rangeLabel(args) + '.';
-    if(fn === 'COUNT') return 'Counts how many cells in ' + rangeLabel(args) + ' contain numbers.';
-    if(fn === 'COUNTA') return 'Counts how many cells in ' + rangeLabel(args) + ' are not empty.';
+    if(fn === 'COUNT') return 'Counts how many cells in ' + rangeLabel(args).replace(/^the cells from /, '') + ' contain numbers.';
+    if(fn === 'COUNTA') return 'Counts how many cells in ' + rangeLabel(args).replace(/^the cells from /, '') + ' are not empty.';
     if(fn === 'IF'){
       var parts = ssSplitArgs(args);
       return 'Checks ' + ssExplainCond(parts[0], sheet) + '. If that is true, it shows ' + ssValLabel(parts[1]) + '; if it is not true, it shows ' + ssValLabel(parts[2]) + '.';
@@ -3004,6 +3100,8 @@ function ssApplyMaterial(text){
   $('cardsHint').textContent = S.cards.length + ' flashcards ready. Browse them freely, or hit Review due to grade cards and space the repeats out.';
   $('quizHint').textContent = S.quiz.length + ' quiz questions ready — built from your material.';
   SS.mode = null;
+  SS.filter = null;
+  SS.missed = [];
   $('ssPlay').hidden = true;
   ssRefresh();
 }
@@ -3346,6 +3444,15 @@ $('fixInput').addEventListener('change', function(e){
 document.querySelectorAll('[data-ssmode]').forEach(function(b){
   b.addEventListener('click', function(){ ssStartMode(b.getAttribute('data-ssmode')); });
 });
+/* First-run shortcut in the Simple Study empty state: one tap loads the
+   built-in sample into the same confirm step every other intake uses,
+   so a new user sees exactly what will be quizzed before anything is
+   built. */
+$('ssSampleBtn').addEventListener('click', function(){
+  $('material').value = SAMPLE_NOTES;
+  hideNotice($('ssNotice'));
+  ssStartConfirm(SAMPLE_NOTES, {});
+});
 /* When the paste flow generates a pack, summaryCard unhides — refresh the
    Simple Study picker so the modes appear with the new material. */
 new MutationObserver(function(){ ssRefresh(); }).observe($('summaryCard'), { attributes: true, attributeFilter: ['hidden'] });
@@ -3358,15 +3465,20 @@ ssRefresh();
    fetched with no-store caching: when a newer build ships, an already-open or
    home-screen copy of an older build sees the newer version number there and
    offers "Update now" (a reload onto the new build). */
-var APP_VERSION = '2.17.0';
+var APP_VERSION = '2.17.1';
 var CHANGELOG = [
+  { v: '2.17.1', date: 'Oct 21, 2026', notify: true, notes: [
+    'New in Simple Study: finish a round and you can tap \u201cPractice what I missed\u201d for a short round of just the questions you got wrong. Plus a one-tap sample on the empty state so you can see how it works before adding your own material.',
+    'Question quality fixes: Word Bank, True/False, Matching and Multiple Choice no longer build questions from sentences where the answer term appears twice (that leaked answers and could make a \u201cfalse\u201d statement arguably true), spreadsheet COUNT explanations read cleanly, and starting a new pack no longer carries old weak-spot filters, formula questions, or flashcard scheduling into it.',
+    'Motion and polish: flashcards now flip over, the detector gauge sweeps to its score, Simple Study questions glide in \u2014 all of it switches off with reduced-motion settings. The focus timer settles a finished session the moment you return to its tab, and every button now meets the 44px tap-target size.'
+  ] },
   { v: '2.17.0', date: 'Oct 21, 2026', notify: true, notes: [
     'Detector upgraded to V17: paraphrased-AI detection improved (59.8% vs 55.4% on held-out tests) with no rise in false flags on human writing (6.0%). Overall accuracy 87.3%, GPT-5 detection 91.7%. A score is still a signal to review — never proof.',
     'Yesterday\u2019s fix holds: the trained detector model and the update check both load from the right place now, so the on-device check runs the real trained classifier and installed copies get the Update button when a newer build ships.'
   ] },
   { v: '2.16.1', date: 'Oct 21, 2026', notes: [
     'Fixed: the on-device AI detector was silently falling back to rough heuristic scoring because its trained model file was missing from the published app. The trained V16 classifier (87.3% held-out accuracy, 6.1% false-flag rate on human writing) now loads correctly — paste writing into the detector and you get the real trained scores with per-sentence highlights.',
-    'Also fixed: the "update available" check was looking for its version file in the wrong place, so installed copies never offered the Update button. Updates are now detected again — when a newer build ships you will see the update banner.'
+    'Also fixed: the \"update available\" check was looking for its version file in the wrong place, so installed copies never offered the Update button. Updates are now detected again — when a newer build ships you will see the update banner.'
   ] },
   { v: '2.16.0', date: 'Oct 20, 2026', notes: [
     'Simple Study is here: Word Bank Fill-in-the-Blank, Matching, True/False and Multiple Choice made from your own material — plus Snap your material: photograph your notes and turn them into quizzes.',
@@ -3572,9 +3684,19 @@ async function checkForUpdates(manual){
   var status = $('updateStatus');
   if(manual) status.textContent = 'Checking…';
   try{
-    var r = await fetch('assets/version.json?t=' + Date.now(), { cache: 'no-store' });
-    if(!r.ok) throw new Error('HTTP ' + r.status);
-    var d = await r.json();
+    /* The published site serves version.json at the root; the app-bundle
+       layout serves assets/version.json. The old code fetched ONLY the
+       assets path, which 404s on the published site, so installed copies
+       never saw update offers. Try both, published layout first. */
+    var d = null;
+    var vpaths = ['version.json?t=', 'assets/version.json?t='];
+    for(var pi = 0; pi < vpaths.length && !d; pi++){
+      try{
+        var vr = await fetch(vpaths[pi] + Date.now(), { cache: 'no-store' });
+        if(vr.ok) d = await vr.json();
+      }catch(ve){ /* try the next location */ }
+    }
+    if(!d) throw new Error('version file not found in either location');
     var latest = String(d.version || '').trim();
     if(!latest) throw new Error('no version in response');
     if(cmpVer(latest, APP_VERSION) > 0){
@@ -3637,6 +3759,10 @@ checkForUpdates(false);
 var SRS = {};
 function srsKey(c){ return c.q + '' + c.a; }
 function srsInit(){
+  /* Scheduling belongs to the CURRENT pack — the Cards note has always
+     promised it resets with a new pack, but graded state for identical
+     question/answer text used to carry over. Start clean each pack. */
+  SRS = {};
   S.cards.forEach(function(c){
     var k = srsKey(c);
     if(!SRS[k]) SRS[k] = { ef: 2.5, reps: 0, interval: 0, due: 0 };
@@ -3892,6 +4018,11 @@ $('customSetBtn').addEventListener('click', function(){
   setTimer(v, 'focus');
 });
 $('timerToggleBtn').addEventListener('click', toggleTimer);
+/* Background tabs throttle setInterval, so a finished session used to
+   sit un-logged (and the beep un-played) until the browser got around
+   to the next tick. The timer itself is endAt-based, so one catch-up
+   tick the moment the tab becomes visible settles everything. */
+document.addEventListener('visibilitychange', function(){ if(!document.hidden && FOCUS.running) tickTimer(); });
 $('timerResetBtn').addEventListener('click', function(){ setTimer(FOCUS.total / 60, FOCUS.mode); });
 $('breakBtn').addEventListener('click', function(){ setTimer(5, 'break'); toggleTimer(); });
 renderTimer();
