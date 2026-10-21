@@ -668,7 +668,7 @@ mark.stock{background:var(--warn-bg);color:inherit;border-radius:4px;padding:0 3
           <button class="btn ghost" id="hfBtn">Run Hugging Face scan</button>
           <button class="btn plain small" id="detSampleBtn">Try sample writing</button>
         </div>
-        <p class="small" style="margin-top:8px">Three ways to check: the <strong>on-device check</strong> runs the trained V17 classifier right here in the tab — word + character-pattern TF-IDF models with learned weights, trained on real human-vs-AI writing (HC3 plus modern GPT-4/ChatGPT samples). It's instant, free, needs no key, and nothing is uploaded; its measured accuracy and honest limits are printed next to every score. The <strong>GPTZero scan</strong> and <strong>Hugging Face scan</strong> run other trained models using your own free keys (below). No score from any of them proves authorship — use them to strengthen your own voice.</p>
+        <p class="small" style="margin-top:8px">Three ways to check: the <strong>on-device check</strong> runs the trained V18 classifier right here in the tab — word + character-pattern TF-IDF models with learned weights, trained on real human-vs-AI writing (HC3 plus modern GPT-4/ChatGPT samples). It's instant, free, needs no key, and nothing is uploaded; its measured accuracy and honest limits are printed next to every score. The <strong>GPTZero scan</strong> and <strong>Hugging Face scan</strong> run other trained models using your own free keys (below). No score from any of them proves authorship — use them to strengthen your own voice.</p>
         <details>
           <summary>Free API keys (optional) — which ones work here</summary>
           <div class="inner">
@@ -714,7 +714,7 @@ mark.stock{background:var(--warn-bg);color:inherit;border-radius:4px;padding:0 3
 
       <div class="card">
         <h3>Batch file scan</h3>
-        <p class="mut">Scan several files at once with the same on-device V17 detector. PDF, DOCX, TXT/MD, and images (read with on-device OCR) are supported — PDFs are also scored page by page where a page has enough text. Files are read right here in this tab; nothing is uploaded. The PDF/DOCX/image readers load from a CDN on first use, like the Screen tab's text reader.</p>
+        <p class="mut">Scan several files at once with the same on-device V18 detector. PDF, DOCX, TXT/MD, and images (read with on-device OCR) are supported — PDFs are also scored page by page where a page has enough text. Files are read right here in this tab; nothing is uploaded. The PDF/DOCX/image readers load from a CDN on first use, like the Screen tab's text reader.</p>
         <div class="row">
           <label class="btn ghost filelabel" for="batchInput">Choose files…</label>
           <input type="file" id="batchInput" accept=".pdf,.docx,.txt,.md,.png,.jpg,.jpeg,.webp,.gif" multiple hidden>
@@ -1631,16 +1631,21 @@ function runHeuristicDetector(){
 }
 /* ---- Trained on-device classifier (two-block TF-IDF + logistic regression) ----
    A real trained model, not scoring rules: learned weights shipped in
-   assets/classifier.json (format studylens-classifier-v17, fetched from this
+   assets/classifier.json (format studylens-classifier-v18, fetched from this
    app's own files on first use). A sentence model scores every sentence from
    two TF-IDF blocks — word uni+bigrams and char_wb 3–5 grams — each
    L2-normalized separately, then concatenated. A document model combines
-   whole-document word TF-IDF with 11 aggregates of the sentence scores into
+   whole-document word TF-IDF with 17 aggregates of the sentence scores (the
+   11 score aggregates plus 6 distribution features: sentence-length spread,
+   mean sentence length, short-sentence share, score spread, lowest score,
+   lowest-3 mean) into
    human / ai / mixed probabilities: the doc logits first pass through the
    model file's calibration transform (per-class affine, applied BEFORE
    softmax), and the verdict is MIXED iff calibrated P(mixed) >= t_mixed
    (0.25, read from the model file), else the larger of P(human) / P(ai).
-   Held-out metrics (V17): 87.3% accuracy overall, 6.0% false-flag rate on human writing.
+   Held-out metrics (V18): 86.2% accuracy overall, 4.8% false-flag rate on
+   human writing; 61% catch on a held-out humanized-AI adversarial set
+   (V17 caught 0% there).
    This JS inference was verified
    against the Python reference before shipping: 300/300 prediction
    agreement on the held-out verification sample. */
@@ -1652,7 +1657,7 @@ function loadClassifier(){
     if(!r.ok) throw new Error('HTTP ' + r.status);
     return r.json();
   }).then(function(o){
-    if(!o || o.format !== 'studylens-classifier-v17') throw new Error('unexpected model format');
+    if(!o || o.format !== 'studylens-classifier-v18') throw new Error('unexpected model format');
     CLF = o;
     function idxOf(vocab){ var m = new Map(); vocab.forEach(function(v, i){ m.set(v, i); }); return m; }
     CLF_IDX = { sw: idxOf(o.sentence_model.word.vocabulary), sc: idxOf(o.sentence_model.char_wb.vocabulary), doc: idxOf(o.doc_model.vocabulary) };
@@ -1709,9 +1714,9 @@ function v7SentP(sent){
   cf.forEach(function(v, c){ z += sm.coef[W + c] * v * sm.char_wb.idf[c] / cn; });
   return 1 / (1 + Math.exp(-z));
 }
-function v7Aggregates(ps, wordCount){
+function v7Aggregates(ps, wordCount, lens){
   var w = Math.max(1, wordCount);
-  if(!ps.length) return [0, 0, 0, 0, 0, Math.log(w) / 10, 0, 0, 0, 0, 0];
+  if(!ps.length) return [0, 0, 0, 0, 0, Math.log(w) / 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
   var n = ps.length, mean = 0, mx = -Infinity;
   ps.forEach(function(p){ mean += p; if(p > mx) mx = p; });
   mean /= n;
@@ -1730,22 +1735,37 @@ function v7Aggregates(ps, wordCount){
   var top = sorted.slice(-3), topMean = 0;
   top.forEach(function(p){ topMean += p; });
   topMean /= top.length;
-  return [f50, mean, mx, sd, Math.log1p(n) / 5, Math.log(w) / 10, f80, f20, f80 * f20, fmid, topMean];
+  /* V18 distribution features — computed identically to the Python trainer
+     (feats18.py): sentence-length burstiness (CV), mean sentence length,
+     short-sentence fraction, sentence-score IQR / min / bottom-3 mean. */
+  var bot = sorted.slice(0, 3), botMean = 0;
+  bot.forEach(function(p){ botMean += p; });
+  botMean /= bot.length;
+  var lmean = 0;
+  lens.forEach(function(l){ lmean += l; });
+  lmean /= n;
+  var lsd = 0, shortN = 0;
+  lens.forEach(function(l){ lsd += (l - lmean) * (l - lmean); if(l <= 8) shortN++; });
+  lsd = Math.sqrt(lsd / n);
+  var lcv = lmean > 0 ? lsd / lmean : 0;
+  function qat(p){ return sorted[Math.min(n - 1, Math.floor(p * n))]; }
+  return [f50, mean, mx, sd, Math.log1p(n) / 5, Math.log(w) / 10, f80, f20, f80 * f20, fmid, topMean,
+    lcv, lmean / 50, shortN / n, qat(0.75) - qat(0.25), sorted[0], botMean];
 }
 function v7Analyze(text){
   var dm = CLF.doc_model;
   var sents = v7SplitSents(text);
   var sentP = sents.map(function(s){ return v7SentP(s); });
-  var scoring = [];
-  sents.forEach(function(s, i){ if(s.split(/\s+/).filter(Boolean).length >= 5) scoring.push(sentP[i]); });
+  var scoring = [], scoringLens = [];
+  sents.forEach(function(s, i){ var swc = s.split(/\s+/).filter(Boolean).length; if(swc >= 5){ scoring.push(sentP[i]); scoringLens.push(swc); } });
   var wc = String(text).split(/\s+/).filter(Boolean).length;
-  var agg = v7Aggregates(scoring, wc);
+  var agg = v7Aggregates(scoring, wc, scoringLens);
   var df = v7WordCounts(text, CLF_IDX.doc), dn = v7Norm(df, dm.idf);
   var V = dm.vocabulary.length;
   var logits = dm.classes.map(function(_, k){
     var row = dm.coef[k], s = dm.intercept[k];
     df.forEach(function(v, c){ s += row[c] * v * dm.idf[c] / dn; });
-    for(var j = 0; j < 11; j++) s += row[V + j] * agg[j];
+    for(var j = 0; j < agg.length; j++) s += row[V + j] * agg[j];
     return s;
   });
   /* Calibration (from the model file's "calibration" object): per-class
@@ -1782,7 +1802,7 @@ function v7Reasons(sent){
   if(pos.length) out.push('words pushing toward AI: ' + pos.join(', '));
   if(neg.length) out.push('words pushing toward human: ' + neg.join(', '));
   if(!out.length) out.push('few of this sentence\'s words are in the model\'s vocabulary — it leans on character patterns and the document score');
-  out.push('the V17 sentence model also weighs character patterns — word shapes, spacing, and punctuation habits');
+  out.push('the V18 sentence model also weighs character patterns — word shapes, spacing, and punctuation habits');
   return out;
 }
 function clfTips(text, sents){
@@ -1811,7 +1831,7 @@ async function runClassifierDetector(){
   var res = v7Analyze(text);
   var sents = res.sents;
   if(!sents.length){
-    out.innerHTML = '<div class="flagbox">No full sentences found — the V17 model reads complete sentences (4+ words each). Paste a paragraph or two of connected writing.</div>';
+    out.innerHTML = '<div class="flagbox">No full sentences found — the V18 model reads complete sentences (4+ words each). Paste a paragraph or two of connected writing.</div>';
     return;
   }
   var scores = sents.map(function(s, i){
@@ -1823,8 +1843,8 @@ async function runClassifierDetector(){
   var verdict = res.verdict.toUpperCase();
   var confP = res.verdict === 'mixed' ? res.proba.mixed : Math.max(res.proba.human, res.proba.ai);
   var confLabel = confP >= 0.9 ? 'High confidence' : confP >= 0.6 ? 'Medium confidence' : 'Low confidence';
-  renderDetectorResults('Trained on-device model (V17) — ' + pA + '% AI probability · ' + confLabel, pct, verdict, sents, scores.map(function(s){ return s.score; }),
-    'V17, with probabilities calibrated on held-out data: on held-out writing it never trained on, overall accuracy is <strong>87.3%</strong>, GPT-5 detection is <strong>91.7%</strong>, and the false-flag rate on human writing is <strong>6.0%</strong>. Paraphrased-AI detection improved to <strong>59.8%</strong> but is still the hardest call after Mixed — a Mixed result means uncertain, not proof. <strong>A score is a signal to review — never proof of who wrote something.</strong>');
+  renderDetectorResults('Trained on-device model (V18) — ' + pA + '% AI probability · ' + confLabel, pct, verdict, sents, scores.map(function(s){ return s.score; }),
+    'V18, with probabilities calibrated on held-out data: on held-out writing it never trained on, overall accuracy is <strong>86.2%</strong>, GPT-5 detection is <strong>86.8%</strong>, and the false-flag rate on human writing is <strong>4.8%</strong>. V18 was retrained on AI writing rewritten to sound human and catches <strong>61%</strong> of it on a held-out set (V17 caught 0%) — still the hardest call after Mixed, so a Mixed or borderline result means uncertain, not proof. <strong>A score is a signal to review — never proof of who wrote something.</strong>');
   $('detTips').innerHTML = '<h3 style="font-size:16px;margin-bottom:4px">How to strengthen your voice</h3><ul class="list">' +
     clfTips(text, sents).map(function(t){ return '<li>' + esc(t) + '</li>'; }).join('') + '</ul>';
   showSentReason(0);
@@ -3465,8 +3485,12 @@ ssRefresh();
    fetched with no-store caching: when a newer build ships, an already-open or
    home-screen copy of an older build sees the newer version number there and
    offers "Update now" (a reload onto the new build). */
-var APP_VERSION = '2.17.1';
+var APP_VERSION = '2.18.0';
 var CHANGELOG = [
+  { v: '2.18.0', date: 'Oct 21, 2026', notify: true, notes: [
+    'Detector upgraded to V18, retrained against AI writing that was rewritten to sound human — the style that slipped past the old detector. On a held-out set of humanized essays in styles it never trained on, detection rose from 0% to 61%, and the false-flag rate on human writing fell to 4.8% (from 6.0%). Overall held-out accuracy 86.2%.',
+    'Honest trade-off: GPT-5 detection eased to 86.8% and one older paraphrase set dipped, so daily training keeps pushing on those next. Borderline scores are still the hardest calls — a score is a signal to review, never proof of who wrote something.'
+  ] },
   { v: '2.17.1', date: 'Oct 21, 2026', notify: true, notes: [
     'New in Simple Study: finish a round and you can tap \u201cPractice what I missed\u201d for a short round of just the questions you got wrong. Plus a one-tap sample on the empty state so you can see how it works before adding your own material.',
     'Question quality fixes: Word Bank, True/False, Matching and Multiple Choice no longer build questions from sentences where the answer term appears twice (that leaked answers and could make a \u201cfalse\u201d statement arguably true), spreadsheet COUNT explanations read cleanly, and starting a new pack no longer carries old weak-spot filters, formula questions, or flashcard scheduling into it.',
@@ -4083,7 +4107,7 @@ $('exportCsvBtn').addEventListener('click', exportAnki);
    StudyLens. Essay feedback = pattern checks on the user's OWN writing
    (structure / clarity / mechanical grammar patterns) framed by the chosen
    reviewer's rubric — suggestions only, it never rewrites the draft. Batch
-   scan reuses the trained V17 classifier (v7Analyze) per file and per PDF
+   scan reuses the trained V18 classifier (v7Analyze) per file and per PDF
    page — no new scores are invented. The writing timeline keeps timestamped
    snapshots of the detector box in memory only: never uploaded, gone when
    the tab closes. */
