@@ -1,9 +1,9 @@
 {
  "notes": [
-  "Lab tab tidied: it is Lab Snapshot only now — the standalone protractor, calculator, practice, lesson and video sections that sat above Snapshot are removed.",
-  "Geology keeps its tools inside the module: the strike & dip and cross section rounds carry the 360° protractor and the strike & dip calculator. Bearing conversion now also accepts plain N, E, S and W."
+  "Worked examples in every Lab Snapshot module: one tap deals fresh numbers and walks each answer step by step (given, rule, result). Feedback now names the classic traps — strike − 90 tick, dip direction vs opposite strike, flipped E/W bearings, swapped gradient and titration values — and geology rounds show a plain 'how this is checked' audit line.",
+  "Weak photo reads now get retake tips and a one-tap retake on the confirm step instead of a dead end, and the in-round protractor reads out the quadrant bearing live as you drag."
  ],
  "notify": true,
  "updated": "2026-10-22",
- "version": "2.21.2"
+ "version": "2.21.3"
 }

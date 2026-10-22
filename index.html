@@ -450,6 +450,13 @@ mark.stock{background:var(--warn-bg);color:inherit;border-radius:4px;padding:0 3
 .snap-item .snap-q{font-size:16.5px;line-height:1.6;margin:0}
 .snap-fb{margin-top:9px;font-size:15px;line-height:1.65}
 .snap-fb.ok{color:var(--acc-deep);font-weight:600}
+.snap-quality{border:1.5px dashed var(--line-strong);border-radius:14px;padding:12px 15px;margin-top:12px;background:var(--surface3);font-size:15px;line-height:1.6}
+.snap-quality ul{margin:6px 0 10px;padding-left:20px}
+.snap-audit{border:1.5px solid var(--line);border-left:5px solid var(--acc);border-radius:12px;padding:11px 14px;margin-top:12px;background:var(--surface3);font-size:14.5px;line-height:1.65}
+.snap-example{border:1.5px solid var(--line);border-radius:14px;padding:13px 15px;margin-top:12px;background:var(--surface3);font-size:15px;line-height:1.65}
+.snap-example h4{margin:0 0 6px;font-size:16px}
+.snap-example ol{margin:8px 0 2px;padding-left:22px}
+.snap-example li{margin-bottom:10px}
 .snap-photo{max-width:100%;border-radius:12px;margin-top:12px}
 textarea.snap-text{width:100%;background:var(--surface3);border:1.5px solid var(--line);border-radius:14px;color:var(--ink);padding:13px 14px;font-size:15.5px;font-family:inherit;min-height:110px}
 input.snap-in{background:var(--surface3);border:1.5px solid var(--line);border-radius:12px;color:var(--ink);padding:11px 13px;font-size:16px;font-family:inherit;width:150px;min-height:44px;margin-top:9px}
@@ -979,6 +986,17 @@ input.snap-in{background:var(--surface3);border:1.5px solid var(--line);border-r
         <div class="row"><button class="btn" id="snapPickBtn">Choose a photo</button></div>
         <img id="snapPreview" class="snap-photo" alt="Your lab sheet photo" hidden>
         <div id="snapOcrMsg" class="lab-msg" aria-live="polite"></div>
+        <div id="snapQuality1" class="snap-quality" hidden>
+          <p style="margin:0"><b>Retake tips</b> — a clearer photo reads far better:</p>
+          <ul>
+            <li><b>Flatten the page</b> so it lies smooth, no curls or shadows across it.</li>
+            <li><b>More light</b> — sit near a window or a lamp.</li>
+            <li><b>Fill the frame</b> with the sheet, edges just inside the picture.</li>
+            <li><b>Avoid glare</b> — tilt the phone a touch if the paper shines.</li>
+            <li><b>Straight-on</b> — hold the phone parallel to the page, not at an angle.</li>
+          </ul>
+          <div class="row"><button class="btn plain snap-retake" id="snapRetakeBtn1">↻ Retake photo</button></div>
+        </div>
         <div id="snapFallback" hidden>
           <label for="snapPaste" style="display:block;font-weight:700;font-size:13.5px;margin:12px 0 6px">No photo handy? Paste or type a few lines from the sheet</label>
           <textarea id="snapPaste" class="snap-text" placeholder="Just the title and a question or two — enough to show what kind of lab it is"></textarea>
@@ -989,6 +1007,18 @@ input.snap-in{background:var(--surface3);border:1.5px solid var(--line);border-r
       <div class="card" id="snapTypeCard" hidden>
         <h3>2 · What kind of lab is it?</h3>
         <div id="snapTypeOut" aria-live="polite"></div>
+        <div id="snapQuality" class="snap-quality" hidden>
+          <p style="margin:0"><b>That photo read weakly</b> — the type above is a best guess. A retake usually reads much better:</p>
+          <ul>
+            <li><b>Flatten the page</b> so it lies smooth, no curls or shadows across it.</li>
+            <li><b>More light</b> — sit near a window or a lamp.</li>
+            <li><b>Fill the frame</b> with the sheet, edges just inside the picture.</li>
+            <li><b>Avoid glare</b> — tilt the phone a touch if the paper shines.</li>
+            <li><b>Straight-on</b> — hold the phone parallel to the page, not at an angle.</li>
+          </ul>
+          <div class="row"><button class="btn plain snap-retake" id="snapRetakeBtn">↻ Retake photo</button></div>
+          <p class="lab-msg" style="margin-bottom:0">Rather keep going? Start practice below, or pick the right type from the library — never a dead end.</p>
+        </div>
         <p class="lab-msg"><b>Not saved:</b> once practice starts, what was read from your photo is dropped — the round below is built from StudyLens's own templates. Wrong type? Pick another:</p>
         <div class="row">
           <button class="btn" id="snapGoBtn">Start practice</button>
@@ -1062,6 +1092,11 @@ input.snap-in{background:var(--surface3);border:1.5px solid var(--line);border-r
               <button class="btn plain" id="snapClearBtn">Clear drawing</button>
             </div>
             <p class="lab-msg" id="snapLineRead" hidden></p>
+            <div id="snapAudit" class="snap-audit" hidden></div>
+            <div class="row" style="margin-top:12px">
+              <button class="btn plain" id="snapExampleBtn">Show me one worked example</button>
+            </div>
+            <div id="snapExample" class="snap-example" hidden></div>
             <div id="snapItems"></div>
             <div class="row">
               <button class="btn" id="snapCheckBtn">Check my answers</button>
@@ -3696,8 +3731,13 @@ ssRefresh();
    fetched with no-store caching: when a newer build ships, an already-open or
    home-screen copy of an older build sees the newer version number there and
    offers "Update now" (a reload onto the new build). */
-var APP_VERSION = '2.21.2';
+var APP_VERSION = '2.21.3';
 var CHANGELOG = [
+  { v: '2.21.3', date: 'Oct 22, 2026', notify: true, notes: [
+    'Worked examples in Lab Snapshot: every module now has a “Show me one worked example” button — it deals fresh numbers (never from your sheet) and walks every answer step by step: given → rule → result. The example round stays live so you can try it yourself.',
+    'Feedback names the classic traps now: the dip tick on the strike − 90 side, dip direction mixed up with the opposite strike, a quadrant bearing with E and W flipped, relief ÷ run swapped in a gradient, and swapped volumes in M₁V₁ = M₂V₂. Geology rounds also carry a plain “How this is checked” line — the exact rules the app grades with, so you can audit it against your textbook.',
+    'Snap help: if a photo reads weakly, the confirm step shows retake tips (flatten the page, more light, fill the frame, avoid glare, straight-on) with a one-tap retake — never a dead end. And the protractor inside a round now reads out the quadrant bearing live as you drag, next to the azimuth.'
+  ] },
   { v: '2.21.2', date: 'Oct 22, 2026', notify: true, notes: [
     'Lab tab tidied: it is Lab Snapshot only now. The standalone protractor, calculator, practice, lesson and video sections that used to sit above Snapshot are gone.',
     'Geology keeps its tools, inside the module: open the strike & dip or cross section round and the 360° protractor and the strike & dip calculator are right there with it. One accuracy fix rode along: converting a bearing back to an azimuth now accepts plain N, E, S and W too, not just bearings like N50°E.'
@@ -4967,7 +5007,7 @@ if($('labCalcBtn')){
    moment practice starts. Every practice question, diagram and answer
    comes from the built-in templates below with fresh random values —
    nothing from the learner's sheet is stored, shown again, or reused. */
-var SNAP = { text: null, detected: null, type: null, banned: ['50,25', '310,60'], round: null, strokes: [], drawMode: true, line: null };
+var SNAP = { text: null, detected: null, type: null, banned: ['50,25', '310,60'], round: null, strokes: [], drawMode: true, line: null, ocrConf: null, lowQ: false };
 var SNAP_OCR_SRC = 'https://cdn.jsdelivr.net/npm/tesseract.js@5.0.5/dist/tesseract.min.js';
 var SNAP_TYPES = {
   strike:  { label: 'Geology \u2014 strike & dip worksheet (azimuth method)', topic: 'strike and dip', format: 'Problems give a strike and a dip and ask for the map symbol and its directions. Practice deals a fresh strike/dip pair and checks your line, the dip side, the dip direction, and the bearing.' },
@@ -5034,29 +5074,37 @@ function snapLoadTess(){
   });
   return snapTessPromise;
 }
-function snapHandleText(text){
+function snapHandleText(text, conf){
   if(!text || String(text).trim().length < 8){
-    snapOcrFailed('Too little readable text there — try a closer, straight-on photo, or paste a few lines from the sheet below.');
+    SNAP.lowQ = true;
+    snapOcrFailed('Too little readable text there — try the retake tips below, or paste a few lines from the sheet instead.');
     return;
   }
   SNAP.text = String(text);
+  SNAP.ocrConf = (typeof conf === 'number') ? conf : null;
+  /* Weak read = the reader's own confidence is low, or very little text came back.
+     The detected type is then a best guess, so the confirm step shows retake help. */
+  SNAP.lowQ = (SNAP.ocrConf !== null && SNAP.ocrConf < 60) || String(text).trim().length < 60;
   SNAP.banned = snapExtractPairs(text);
   SNAP.type = snapDetectType(text);
   SNAP.detected = SNAP.type;
   $('snapOcrMsg').textContent = '';
+  var q1 = $('snapQuality1'); if(q1) q1.hidden = true;
   snapShowType();
 }
 function snapStart(source){
   if(typeof source === 'string'){ snapHandleText(source); return; }
+  var q0 = $('snapQuality1'); if(q0) q0.hidden = true;
   $('snapOcrMsg').textContent = 'Reading your photo on this device… first use downloads the reader, which can take a moment.';
   snapLoadTess()
     .then(function(){ return window.Tesseract.recognize(source, 'eng'); })
-    .then(function(r){ snapHandleText(r && r.data ? r.data.text : ''); })
-    .catch(function(){ snapOcrFailed('The photo reader could not load or finish — check your connection and try again, or paste a few lines from the sheet below instead.'); });
+    .then(function(r){ snapHandleText(r && r.data ? r.data.text : '', r && r.data && typeof r.data.confidence === 'number' ? r.data.confidence : null); })
+    .catch(function(){ snapOcrFailed('The photo reader could not load or finish — check your connection and try again, use the retake tips below, or paste a few lines from the sheet instead.'); });
 }
 function snapOcrFailed(msg){
   $('snapOcrMsg').textContent = msg;
   $('snapFallback').hidden = false;
+  var q1 = $('snapQuality1'); if(q1) q1.hidden = false;
 }
 
 /* ---------- step 2: confirm the detected type only ---------- */
@@ -5067,6 +5115,7 @@ function snapShowType(){
     '<p class="lab-msg">' + d.format + '</p>' +
     '<p class="lab-msg"><b>Not saved:</b> your photo stays on your device and isn\'t saved — what was read is only used to pick this type, and it is dropped when practice starts.</p>';
   $('snapTypeCard').hidden = false;
+  var qual = $('snapQuality'); if(qual) qual.hidden = !SNAP.lowQ;
   snapRenderGlossary();
   snapScrollTo($('snapTypeCard'));
 }
@@ -5157,8 +5206,57 @@ function snapBuildRound(){
   }
   SNAP.round = R;
   R.items.forEach(function(it, i){ items.appendChild(snapItemEl(it, i)); });
+  var exReset = $('snapExample'); if(exReset){ exReset.hidden = true; exReset.innerHTML = ''; }
+  snapRenderAudit();
   $('snapPracticeCard').hidden = false;
   snapScrollTo($('snapPracticeCard'));
+}
+/* "How this is checked" — the exact grading rules, stated plainly in the
+   geology modules so the learner can audit the app against their textbook. */
+function snapRenderAudit(){
+  var el = $('snapAudit'); if(!el) return;
+  var t = SNAP.round ? SNAP.round.type : SNAP.type;
+  if(t !== 'strike' && t !== 'xsect'){ el.hidden = true; el.innerHTML = ''; return; }
+  el.innerHTML = '<b>How this is checked — audit it against your textbook:</b> dip direction = strike + 90° · opposite strike = strike + 180° · azimuths count clockwise from North (000° = N, 090° = E) · a strike line reads the same from both ends · answers within ±3° count · in a section drawn perpendicular to the strike, the angle you draw is the <b>true dip</b>, tilted toward the dip direction (A′ side here).';
+  el.hidden = false;
+}
+function snapExampleResult(it, R){
+  if(it.kind === 'angle') return labPad(it.answer) + '°';
+  if(it.kind === 'quad') return it.answer;
+  if(it.kind === 'num') return snapFix(it.answer) + (it.unit ? ' ' + it.unit : '');
+  if(it.kind === 'word') return '“' + it.answer + '”';
+  if(it.kind === 'line') return 'the line runs ' + labPad(R.strike) + '° / ' + labPad(labOpposite(R.strike)) + '°';
+  if(it.kind === 'dip') return 'the tick goes on the RIGHT, with the dip number ' + R.dip + ' written beside the strike line';
+  if(it.kind === 'tilt') return 'the band tilts ' + R.dip + '° down toward A′';
+  if(it.kind === 'self') return 'compare with the key points';
+  return '';
+}
+/* Worked example: deal a FRESH round (the banned-pair guard applies to the
+   deal, exactly as in practice) and walk every item of that round —
+   given → rule/formula → result. The fresh round stays live to try. */
+function snapShowExample(){
+  snapBuildRound();
+  var R = SNAP.round; if(!R) return;
+  var givens;
+  if(R.type === 'strike' || R.type === 'xsect') givens = 'a fresh measurement: strike ' + labPad(R.strike) + '°, dip ' + R.dip + '°';
+  else if(R.type === 'angles') givens = 'a fresh direction: the line’s solid end at ' + labPad(R.angle) + '°';
+  else if(R.type === 'topo' && R.topo) givens = 'a fresh map: lowest contour ' + R.topo.base + ' m, contour interval ' + R.topo.ci + ' m';
+  else givens = 'fresh values, in the questions below';
+  var html = '<h4>Worked example — ' + givens + '</h4>' +
+    '<p class="lab-msg">Dealt fresh just now — never from a worksheet photo. Every item of this round, solved step by step. The round is live: try it yourself, or tap “New round” for another.</p>' +
+    '<ol>';
+  R.items.forEach(function(it, i){
+    var rule = it.explain || '';
+    if(!rule){
+      if(it.kind === 'line') rule = 'The long line of the symbol runs along the strike, and a line reads the same from both ends, 180° apart.';
+      else if(it.kind === 'dip') rule = 'Rotate the paper so the strike direction points at the top; the dip direction (strike + 90°) then falls on the right — draw the short tick on the right, perpendicular to the strike line, then rotate the paper back.';
+      else if(it.kind === 'tilt') rule = 'The section is perpendicular to the strike, so the angle drawn in the section is the true dip; the band slopes down toward A′, the dip-direction side.';
+      else rule = 'Use the definitions in this module’s glossary (Research panel).';
+    }
+    html += '<li><b>Question ' + (i + 1) + ':</b> ' + esc(it.q) + '<br><span class="mut">Rule:</span> ' + rule + '<br><span class="mut">Result:</span> <b>' + esc(snapExampleResult(it, R)) + '</b>' + (it.kind === 'self' ? '<br>' + esc(it.points) : '') + '</li>';
+  });
+  html += '</ol>';
+  var el = $('snapExample'); if(el){ el.innerHTML = html; el.hidden = false; }
 }
 function snapShowStage(on){
   $('snapStage').hidden = !on;
@@ -5169,7 +5267,7 @@ function snapShowStage(on){
 function snapRenderLineRead(){
   if(!SNAP.line) return;
   var a = SNAP.line.getAz();
-  $('snapLineRead').textContent = 'Your line reads ' + labPad(a) + '° / ' + labPad(labOpposite(a)) + '°.';
+  $('snapLineRead').textContent = 'Your line reads ' + labPad(a) + '° / ' + labPad(labOpposite(a)) + '° — quadrant bearing ' + azToQuad(a) + ' (for the ' + labPad(a) + '° end).';
   var inp = document.querySelector('#snapItems input[data-kind="line"]');
   if(inp && document.activeElement !== inp) inp.value = Math.round(a) % 360;
 }
@@ -5283,7 +5381,7 @@ function snapBuildTopo(R, head){
     { kind: 'num', answer: elev(2), tol: 0, unit: 'm', q: 'What is the elevation of point X? (It sits on a labelled contour.)', explain: 'X sits on the third ring in from the edge: ' + base + ' + 2 × ' + ci + ' = ' + elev(2) + ' m.' },
     { kind: 'num', answer: ci, tol: 0, unit: 'm', q: 'What is the contour interval of this map?', explain: 'Neighbouring rings differ by ' + ci + ' m (' + elev(1) + ' − ' + elev(0) + '), so the interval is ' + ci + ' m.' },
     { kind: 'num', answer: summit - base, tol: 0, unit: 'm', q: 'What is the relief of this area? (highest − lowest elevation shown)', explain: 'Relief = summit ' + summit + ' m − lowest contour ' + base + ' m = ' + (summit - base) + ' m.' },
-    { kind: 'num', answer: grad, tol: Math.max(0.6, grad * 0.06), unit: 'm/km', q: 'Point P is on the ' + base + ' m contour and point Q is on the ' + elev(3) + ' m contour, ' + distKm + ' km apart on the ground. What is the gradient between them?', explain: 'Gradient = elevation change ÷ distance = (' + elev(3) + ' − ' + base + ') ÷ ' + distKm + ' = ' + (3 * ci) + ' ÷ ' + distKm + ' = ' + snapFix(grad) + ' m/km.' }
+    { kind: 'num', answer: grad, tol: Math.max(0.6, grad * 0.06), unit: 'm/km', q: 'Point P is on the ' + base + ' m contour and point Q is on the ' + elev(3) + ' m contour, ' + distKm + ' km apart on the ground. What is the gradient between them?', explain: 'Gradient = elevation change ÷ distance = (' + elev(3) + ' − ' + base + ') ÷ ' + distKm + ' = ' + (3 * ci) + ' ÷ ' + distKm + ' = ' + snapFix(grad) + ' m/km.', trap: { v: distKm / (3 * ci), tol: Math.max(0.05, (distKm / (3 * ci)) * 0.3), msg: 'That is distance ÷ elevation change — relief and run are swapped. A gradient puts the elevation change on top: (higher − lower) ÷ distance.' } }
   ];
 }
 
@@ -5316,8 +5414,8 @@ function snapBuildChem(R, head){
   R.items = [
     { kind: 'num', answer: init, tol: 0.15, unit: 'mL', q: 'Read the burette: what is the initial reading at the meniscus?', explain: 'Read the bottom of the meniscus at eye level: ' + init.toFixed(1) + ' mL.' },
     { kind: 'num', answer: vol, tol: 0.15, unit: 'mL', q: 'At the endpoint the burette reads ' + fin.toFixed(1) + ' mL. What volume was delivered?', explain: 'Delivered = final − initial = ' + fin.toFixed(1) + ' − ' + init.toFixed(1) + ' = ' + vol.toFixed(1) + ' mL.' },
-    { kind: 'num', answer: ma, tol: 0.012, unit: 'M', q: 'The base in the burette is ' + mb + ' M and the acid–base reaction is 1:1. The flask held 25.0 mL of acid. Find the acid\'s concentration.', explain: 'M₁V₁ = M₂V₂ → acid M = ' + mb + ' × ' + vol.toFixed(1) + ' ÷ 25.0 = ' + snapFix(ma) + ' M.' },
-    { kind: 'num', answer: stockVol, tol: Math.max(0.4, stockVol * 0.04), unit: 'mL', q: 'Solution prep: you need ' + targetV + ' mL of ' + targetM + ' M solution, made from a ' + stock + ' M stock. How many mL of stock do you measure out?', explain: 'M₁V₁ = M₂V₂ → V₁ = ' + targetM + ' × ' + targetV + ' ÷ ' + stock + ' = ' + snapFix(stockVol) + ' mL, then top up to ' + targetV + ' mL with water.' }
+    { kind: 'num', answer: ma, tol: 0.012, unit: 'M', q: 'The base in the burette is ' + mb + ' M and the acid–base reaction is 1:1. The flask held 25.0 mL of acid. Find the acid\'s concentration.', explain: 'M₁V₁ = M₂V₂ → acid M = ' + mb + ' × ' + vol.toFixed(1) + ' ÷ 25.0 = ' + snapFix(ma) + ' M.', trap: { v: mb * va / vol, tol: Math.max(0.012, (mb * va / vol) * 0.1), msg: 'That is M₁V₁ = M₂V₂ with the volumes swapped — you divided by the delivered volume instead of multiplying by it. The delivered base volume pairs with the base concentration; the 25.0 mL is the acid’s own volume.' } },
+    { kind: 'num', answer: stockVol, tol: Math.max(0.4, stockVol * 0.04), unit: 'mL', q: 'Solution prep: you need ' + targetV + ' mL of ' + targetM + ' M solution, made from a ' + stock + ' M stock. How many mL of stock do you measure out?', explain: 'M₁V₁ = M₂V₂ → V₁ = ' + targetM + ' × ' + targetV + ' ÷ ' + stock + ' = ' + snapFix(stockVol) + ' mL, then top up to ' + targetV + ' mL with water.', trap: { v: stock * targetV / targetM, tol: Math.max(0.4, (stock * targetV / targetM) * 0.08), msg: 'That solves M₁V₁ = M₂V₂ with the concentrations swapped — the stock’s own concentration belongs on the stock side: V₁ = (target M × target V) ÷ stock M.' } }
   ];
 }
 
@@ -5485,6 +5583,13 @@ function snapConceptBank(){
 function snapNormQuad(s){
   return String(s || '').toUpperCase().replace(/\s+/g, '').replace(/DEG/g, '°').replace(/^([NSEW])0+/, '$1').replace(/0+°/, '°');
 }
+/* True when the learner's bearing is the mirror image of the answer —
+   same numbers, E and W flipped (an azimuth a answered as 360 − a). */
+function snapQuadFlipped(gotStr, ansStr){
+  var g = quadToAz(gotStr), a = quadToAz(ansStr);
+  if(g === null || a === null || g === a) return false;
+  return g === Math.round(labNorm(360 - a));
+}
 function snapGrade(){
   var R = SNAP.round; if(!R) return;
   var score = 0, total = R.items.length;
@@ -5505,8 +5610,14 @@ function snapGrade(){
       if(err <= 3) say(true, 'Correct — ' + labPad(it.answer) + '° (you were within ' + Math.round(err) + '°).');
       else {
         var hint = '';
-        if(R.type === 'strike' && it.answer === labDipDirection(R.strike) && Math.round(labNorm(g2)) === Math.round(labNorm(R.strike - 90))) hint = ' That\'s strike − 90 — dip is strike + 90, the other way round.';
-        else if(R.type === 'strike' && it.answer === labDipDirection(R.strike) && Math.round(labNorm(g2)) === Math.round(R.strike)) hint = ' That\'s the strike itself — dip points 90° clockwise from it.';
+        var gN = Math.round(labNorm(g2));
+        var isDipDirItem = (R.type === 'strike' || R.type === 'xsect') && it.answer === labDipDirection(R.strike);
+        if(isDipDirItem && gN === Math.round(labNorm(R.strike - 90))) hint = ' That\'s strike − 90 — dip is strike + 90, the other way round.';
+        else if(isDipDirItem && gN === Math.round(R.strike)) hint = ' That\'s the strike itself — dip points 90° clockwise from it.';
+        else if(isDipDirItem && gN === Math.round(labOpposite(R.strike))) hint = ' That\'s the opposite strike (strike + 180°) — don\'t confuse it with the dip direction, which is only a quarter-turn away: strike + 90°.';
+        else if(R.type === 'strike' && it.answer === labOpposite(R.strike) && gN === Math.round(labDipDirection(R.strike))) hint = ' That\'s the dip direction (strike + 90°). The opposite strike is the same line read from the other end: strike + 180°.';
+        else if(R.type === 'xsect' && it.answer === R.strike && gN === Math.round(labDipDirection(R.strike))) hint = ' That\'s the dip direction itself. The strike sits 90° back from it: dip direction − 90°.';
+        else if(gN === Math.round(labOpposite(it.answer))) hint = ' That\'s exactly 180° out — the same line read from the wrong end. Read toward the end the question asks for.';
         else { var s2 = snapSigned(g2, it.answer); hint = ' The target sits ' + Math.round(err) + '° ' + (s2 > 0 ? 'clockwise' : 'counterclockwise') + ' from your answer.'; }
         say(false, 'Not quite — you put ' + labPad(g2) + '°, the answer is ' + labPad(it.answer) + '°.' + hint + ' ' + (it.explain || ''));
       }
@@ -5514,11 +5625,13 @@ function snapGrade(){
       var g3 = inp ? parseFloat(inp.value) : NaN;
       if(isNaN(g3)){ say(false, 'No answer typed yet.'); return; }
       if(Math.abs(g3 - it.answer) <= it.tol) say(true, 'Correct — ' + snapFix(it.answer) + (it.unit ? ' ' + it.unit : '') + '. ' + it.explain);
+      else if(it.trap && Math.abs(g3 - it.trap.v) <= it.trap.tol) say(false, 'Not quite — you put ' + snapFix(g3) + '. ' + it.trap.msg + ' Worked steps: ' + it.explain);
       else say(false, 'Not quite — you put ' + snapFix(g3) + ', the answer is ' + snapFix(it.answer) + (it.unit ? ' ' + it.unit : '') + '. Worked steps: ' + it.explain);
     } else if(it.kind === 'quad'){
       var g4 = inp ? inp.value : '';
       if(!g4 || !g4.trim()){ say(false, 'No bearing typed yet.'); return; }
       if(snapNormQuad(g4) === snapNormQuad(it.answer)) say(true, 'Correct — ' + it.answer + '.');
+      else if(snapQuadFlipped(g4, it.answer)) say(false, 'Not quite — you wrote “' + esc(g4.trim()) + '”, the bearing is ' + it.answer + '. Classic trap: that is the mirror image — you flipped the sideways letter (E ↔ W). The angle is right; the side is wrong: this direction leans ' + it.answer.slice(-1) + '. ' + it.explain);
       else say(false, 'Not quite — you wrote “' + esc(g4.trim()) + '”, the bearing is ' + it.answer + '. ' + it.explain);
     } else if(it.kind === 'dip'){
       if(!R.dipPick){ say(false, 'Pick a side first — left or right.'); return; }
@@ -5638,6 +5751,8 @@ if($('snapPickBtn')){
   $('snapTypeConceptBtn').addEventListener('click', function(){ snapSetType('concept'); });
   $('snapCheckBtn').addEventListener('click', snapGrade);
   $('snapNewBtn').addEventListener('click', snapNewRound);
+  $('snapExampleBtn').addEventListener('click', snapShowExample);
+  document.querySelectorAll('.snap-retake').forEach(function(b){ b.addEventListener('click', function(){ $('snapFile').click(); }); });
   $('snapDrawToggleBtn').addEventListener('click', function(){ snapSetDrawMode(!SNAP.drawMode); });
   $('snapUndoBtn').addEventListener('click', snapUndoStroke);
   $('snapClearBtn').addEventListener('click', snapClearDrawing);
