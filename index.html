@@ -82,6 +82,9 @@ main{flex:1;min-width:0;max-width:940px;margin:0 auto;padding:30px 24px 64px;wid
 .tabhead{margin-bottom:20px;padding:2px 2px 0}
 .tabhead h2{font-size:32px;font-weight:700;letter-spacing:-.02em}
 .tabhead p{color:var(--mut);margin:8px 0 0;max-width:62ch;font-size:15.5px;line-height:1.65}
+.snap-subhead{margin:26px 0 16px;padding:2px 2px 0}
+.snap-subhead h3{font-size:24px;font-weight:700;letter-spacing:-.01em;color:var(--ink)}
+.snap-subhead p{color:var(--mut);margin:8px 0 0;max-width:62ch;font-size:15.5px;line-height:1.65}
 
 .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:22px;margin-bottom:16px;box-shadow:var(--shadow-sm);transition:box-shadow .25s var(--ease),border-color .25s var(--ease)}
 .card h3{font-size:18px;font-weight:700;margin-bottom:6px;letter-spacing:-.01em}
@@ -510,10 +513,6 @@ input.snap-in{background:var(--surface3);border:1.5px solid var(--line);border-r
     <button class="navbtn" data-tab="lab">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
       Lab
-    </button>
-    <button class="navbtn" data-tab="snap">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-      Snap
     </button>
     <button class="navbtn" data-tab="tutor">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
@@ -966,8 +965,8 @@ input.snap-in{background:var(--surface3);border:1.5px solid var(--line);border-r
     <!-- ============ PROTRACTOR LAB ============ -->
     <section class="tab" id="tab-lab">
       <div class="tabhead">
-        <h2>Protractor Lab</h2>
-        <p>The clear 360° circle ruler from geology lab, rebuilt as a tool you can spin. Learn strike &amp; dip, read compass directions (azimuths) off a map, and practise the worksheet method until it feels easy.</p>
+        <h2>Lab</h2>
+        <p>Every lab tool in one place. Spin the 360° protractor, work the strike &amp; dip calculator and practice mode — then, further down, Lab Snapshot: photograph any lab worksheet and StudyLens loads the matching practice module (cross sections, topo contours, titration, microscope work, vectors, data charts) with your notes and a research panel beside it.</p>
       </div>
 
       <div class="card">
@@ -1047,12 +1046,11 @@ input.snap-in{background:var(--surface3);border:1.5px solid var(--line);border-r
         </div>
         <p style="margin-top:14px">Still stuck? <a href="https://www.youtube.com/results?search_query=strike+and+dip+protractor+azimuth+tutorial" target="_blank" rel="noopener">Search YouTube for more strike &amp; dip protractor tutorials</a>.</p>
       </div>
-    </section>
-
-    <!-- ============ LAB SNAPSHOT ============ -->
-    <section class="tab" id="tab-snap">
-      <div class="tabhead">
-        <h2>Lab Snapshot</h2>
+    
+      <!-- ============ LAB SNAPSHOT (inside Lab tab since v2.21.1) ============ -->
+      <div id="snapBlock">
+      <div class="snap-subhead">
+        <h3>Lab Snapshot — snap a lab sheet, get its practice module</h3>
         <p>Snap a photo of any lab worksheet and StudyLens spots what kind of lab it is, then builds a practice version in the same format — same skills, fresh numbers — drawn out so you can sketch on it and get every answer checked.</p>
         <p class="snap-type"><strong>Your photo stays on your device and isn't saved — practice uses fresh numbers in the same format.</strong> The photo is read once, right here, only to detect the lab type; the words and numbers on your sheet are never stored, synced, or turned into practice questions.</p>
       </div>
@@ -1153,7 +1151,9 @@ input.snap-in{background:var(--surface3);border:1.5px solid var(--line);border-r
           </aside>
         </div>
       </div>
+      </div>
     </section>
+
   </main>
 </div>
 <script>
@@ -3752,8 +3752,12 @@ ssRefresh();
    fetched with no-store caching: when a newer build ships, an already-open or
    home-screen copy of an older build sees the newer version number there and
    offers "Update now" (a reload onto the new build). */
-var APP_VERSION = '2.21.0';
+var APP_VERSION = '2.21.1';
 var CHANGELOG = [
+  { v: '2.21.1', date: 'Oct 22, 2026', notify: true, notes: [
+    'Lab Snapshot moved home: it now lives inside the Lab tab, under the protractor, strike & dip calculator and practice mode — one tab for every lab tool. The separate Snap tab is gone.',
+    'Nothing else changed: the photo is still read on your device only to detect the lab type and is never saved, practice still uses fresh numbers from StudyLens templates, and your notes still live on this device only.'
+  ] },
   { v: '2.21.0', date: 'Oct 22, 2026', notify: true, notes: [
     'New: Lab Snapshot. Photograph any lab worksheet and StudyLens spots what kind of lab it is, then loads the matching practice module — geology strike & dip and cross sections, topographic contours, titration, microscope & curves, vectors, data charts — with fresh numbers every round, a diagram you can draw on, step-by-step checking, plus your own notes and a research panel beside the work.',
     'Your photo stays on your device and isn\'t saved: the reading only detects the lab type, then what was read is dropped. Practice comes from StudyLens\'s own templates with randomized values — never from your sheet\'s words or numbers. Your notes are your own writing, kept on this device only.'

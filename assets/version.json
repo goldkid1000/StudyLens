@@ -1,9 +1,9 @@
 {
  "notes": [
-  "New: Lab Snapshot. Photograph any lab worksheet and StudyLens spots what kind of lab it is, then loads the matching practice module — geology strike & dip and cross sections, topographic contours, titration, microscope & curves, vectors, data charts — with fresh numbers every round, a diagram you can draw on, step-by-step checking, plus your own notes and a research panel beside the work.",
-  "Your photo stays on your device and isn't saved: the reading only detects the lab type, then what was read is dropped. Practice comes from StudyLens's own templates with randomized values — never from your sheet's words or numbers. Your notes are your own writing, kept on this device only."
+  "Lab Snapshot moved home: it now lives inside the Lab tab, under the protractor, strike & dip calculator and practice mode \u2014 one tab for every lab tool. The separate Snap tab is gone.",
+  "Nothing else changed: the photo is still read on your device only to detect the lab type and is never saved, practice still uses fresh numbers from StudyLens templates, and your notes still live on this device only."
  ],
  "notify": true,
  "updated": "2026-10-22",
- "version": "2.21.0"
+ "version": "2.21.1"
 }
