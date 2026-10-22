@@ -1,9 +1,9 @@
 {
  "notes": [
-  "New: Protractor Lab. The clear 360° circle ruler from geology lab, rebuilt as a tool you can spin: drag the strike line and read its azimuth both ways, with the quadrant bearing (like N50°E) worked out for you.",
-  "Strike & dip calculator: type a strike and dip and see the symbol drawn the worksheet way — dip tick on the right once the strike points up — plus the dip direction (strike + 90°), the opposite strike direction, and azimuth ↔ bearing conversions. Practice mode deals you random strike/dip pairs and checks your line and dip side step by step, and a Confused? Watch section links real instructor videos on strike, dip, and azimuths."
+  "New: Lab Snapshot. Photograph any lab worksheet and StudyLens spots what kind of lab it is, then loads the matching practice module — geology strike & dip and cross sections, topographic contours, titration, microscope & curves, vectors, data charts — with fresh numbers every round, a diagram you can draw on, step-by-step checking, plus your own notes and a research panel beside the work.",
+  "Your photo stays on your device and isn't saved: the reading only detects the lab type, then what was read is dropped. Practice comes from StudyLens's own templates with randomized values — never from your sheet's words or numbers. Your notes are your own writing, kept on this device only."
  ],
  "notify": true,
  "updated": "2026-10-22",
- "version": "2.20.0"
+ "version": "2.21.0"
 }

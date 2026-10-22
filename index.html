@@ -443,6 +443,41 @@ mark.stock{background:var(--warn-bg);color:inherit;border-radius:4px;padding:0 3
 .lab-vid p{margin:7px 0 0;font-size:14.5px}
 .lab-msg{margin-top:12px;font-size:15px;line-height:1.65}
 .lab-q{font-size:17px;line-height:1.6;margin-top:6px}
+/* lab snapshot */
+.snap-stage{position:relative;width:100%;max-width:440px;margin:10px auto 0}
+.snap-stage svg{width:100%;height:auto;display:block}
+.snap-stage canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:crosshair}
+.snap-type{font-size:16.5px;line-height:1.65}
+.snap-item{border:1.5px solid var(--line);border-radius:14px;padding:14px 15px;margin-top:12px;background:var(--surface3)}
+.snap-item .snap-q{font-size:16.5px;line-height:1.6;margin:0}
+.snap-fb{margin-top:9px;font-size:15px;line-height:1.65}
+.snap-fb.ok{color:var(--acc-deep);font-weight:600}
+.snap-photo{max-width:100%;border-radius:12px;margin-top:12px}
+textarea.snap-text{width:100%;background:var(--surface3);border:1.5px solid var(--line);border-radius:14px;color:var(--ink);padding:13px 14px;font-size:15.5px;font-family:inherit;min-height:110px}
+input.snap-in{background:var(--surface3);border:1.5px solid var(--line);border-radius:12px;color:var(--ink);padding:11px 13px;font-size:16px;font-family:inherit;width:150px;min-height:44px;margin-top:9px}
+.btn.snap-pick.on{outline:3px solid var(--acc);outline-offset:1px}
+.snap-layout{display:grid;grid-template-columns:1fr;gap:16px;margin-top:6px}
+.snap-side{display:flex;flex-direction:column;gap:14px}
+.snap-panel{border:1.5px solid var(--line);border-radius:14px;padding:14px 15px;background:var(--surface2)}
+.snap-panel h4{margin:0 0 6px;font-size:16px}
+.snap-panel .small{font-size:13.5px;line-height:1.55}
+#snapNotesCanvas{width:100%;height:140px;display:block;margin-top:10px;background:var(--surface3);border:1.5px solid var(--line);border-radius:12px;touch-action:none;cursor:crosshair}
+#snapResearchIn{background:var(--surface3);border:1.5px solid var(--line);border-radius:12px;color:var(--ink);padding:11px 13px;font-size:15.5px;font-family:inherit;min-height:44px}
+#snapGlossary{margin-top:12px;font-size:14.5px;line-height:1.6}
+#snapGlossary dt{font-weight:700;color:var(--acc-deep);margin-top:8px}
+#snapGlossary dd{margin:0}
+.snap-side-tabs{display:none;gap:8px;margin-top:10px;flex-wrap:wrap}
+@media (min-width:960px){
+  .snap-layout{grid-template-columns:minmax(0,1fr) 310px}
+}
+@media (max-width:959px){
+  .snap-side-tabs{display:flex}
+  .snap-layout.snap-show-notes .snap-main{display:none}
+  .snap-layout.snap-show-notes .snap-panel#snapResearchPanel{display:none}
+  .snap-layout.snap-show-research .snap-main{display:none}
+  .snap-layout.snap-show-research .snap-panel#snapNotesPanel{display:none}
+  .snap-layout:not(.snap-show-notes):not(.snap-show-research) .snap-side{display:none}
+}
 </style>
 </head>
 <body>
@@ -475,6 +510,10 @@ mark.stock{background:var(--warn-bg);color:inherit;border-radius:4px;padding:0 3
     <button class="navbtn" data-tab="lab">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
       Lab
+    </button>
+    <button class="navbtn" data-tab="snap">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+      Snap
     </button>
     <button class="navbtn" data-tab="tutor">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
@@ -1007,6 +1046,112 @@ mark.stock{background:var(--warn-bg);color:inherit;border-radius:4px;padding:0 3
           <p><a href="https://www.youtube.com/watch?v=Bg40zSYCwZk" target="_blank" rel="noopener">Bearings, Azimuths &amp; Deflection Angles</a> — GEE141 surveying lesson: how azimuths and quadrant bearings convert back and forth.</p>
         </div>
         <p style="margin-top:14px">Still stuck? <a href="https://www.youtube.com/results?search_query=strike+and+dip+protractor+azimuth+tutorial" target="_blank" rel="noopener">Search YouTube for more strike &amp; dip protractor tutorials</a>.</p>
+      </div>
+    </section>
+
+    <!-- ============ LAB SNAPSHOT ============ -->
+    <section class="tab" id="tab-snap">
+      <div class="tabhead">
+        <h2>Lab Snapshot</h2>
+        <p>Snap a photo of any lab worksheet and StudyLens spots what kind of lab it is, then builds a practice version in the same format — same skills, fresh numbers — drawn out so you can sketch on it and get every answer checked.</p>
+        <p class="snap-type"><strong>Your photo stays on your device and isn't saved — practice uses fresh numbers in the same format.</strong> The photo is read once, right here, only to detect the lab type; the words and numbers on your sheet are never stored, synced, or turned into practice questions.</p>
+      </div>
+
+      <div class="card">
+        <h3>1 · Photo of your lab sheet</h3>
+        <p>A clear, straight-on photo or screenshot works best. Reading happens on this device — nothing is uploaded.</p>
+        <input type="file" id="snapFile" accept="image/*" hidden>
+        <div class="row"><button class="btn" id="snapPickBtn">Choose a photo</button></div>
+        <img id="snapPreview" class="snap-photo" alt="Your lab sheet photo" hidden>
+        <div id="snapOcrMsg" class="lab-msg" aria-live="polite"></div>
+        <div id="snapFallback" hidden>
+          <label for="snapPaste" style="display:block;font-weight:700;font-size:13.5px;margin:12px 0 6px">No photo handy? Paste or type a few lines from the sheet</label>
+          <textarea id="snapPaste" class="snap-text" placeholder="Just the title and a question or two — enough to show what kind of lab it is"></textarea>
+          <div class="row"><button class="btn plain" id="snapPasteBtn">Use this text</button></div>
+        </div>
+      </div>
+
+      <div class="card" id="snapTypeCard" hidden>
+        <h3>2 · What kind of lab is it?</h3>
+        <div id="snapTypeOut" aria-live="polite"></div>
+        <p class="lab-msg"><b>Not saved:</b> once practice starts, what was read from your photo is dropped — the round below is built from StudyLens's own templates. Wrong type? Pick another:</p>
+        <div class="row">
+          <button class="btn" id="snapGoBtn">Start practice</button>
+          <button class="btn plain" id="snapTypeStrikeBtn">Strike &amp; dip</button>
+          <button class="btn plain" id="snapTypeAnglesBtn">Angles &amp; bearings</button>
+          <button class="btn plain" id="snapTypeNumericBtn">Numeric lab</button>
+          <button class="btn plain" id="snapTypeConceptBtn">Concept review</button>
+        </div>
+        <div class="row">
+          <label for="snapTypeLib" style="font-weight:700;font-size:13.5px">Lab library:</label>
+          <select id="snapTypeLib" style="min-height:44px">
+            <option value="strike">Geology — strike &amp; dip / azimuth</option>
+            <option value="xsect">Geology — cross section A–A′</option>
+            <option value="topo">Topographic maps &amp; contours</option>
+            <option value="chem">Chemistry — titration &amp; solutions</option>
+            <option value="bio">Biology — microscope &amp; curves</option>
+            <option value="physics">Physics — vectors &amp; angles</option>
+            <option value="data">Ecology / data — charts &amp; rates</option>
+            <option value="angles">Angles &amp; bearings</option>
+            <option value="numeric">Numeric lab</option>
+            <option value="concept">Concept review</option>
+          </select>
+          <button class="btn plain" id="snapTypeLibBtn">Load module</button>
+        </div>
+      </div>
+
+      <div class="card" id="snapPracticeCard" hidden>
+        <h3>3 · Your practice round</h3>
+        <div id="snapRoundHead" class="lab-q"></div>
+        <div class="snap-side-tabs" role="group" aria-label="Workspace panels">
+          <button class="btn plain snap-tabbtn on" data-side="work">Workspace</button>
+          <button class="btn plain snap-tabbtn" data-side="notes">Notes</button>
+          <button class="btn plain snap-tabbtn" data-side="research">Research</button>
+        </div>
+        <div class="snap-layout">
+          <div class="snap-main" id="snapMainCol">
+            <div class="snap-stage" id="snapStage" hidden>
+              <svg id="snapSvg" viewBox="0 0 360 360" role="img" aria-label="Practice diagram"></svg>
+              <canvas id="snapCanvas" width="720" height="720" aria-label="Free-draw layer: sketch and write numbers here"></canvas>
+            </div>
+            <div class="row" id="snapDrawTools" hidden>
+              <button class="btn plain" id="snapDrawToggleBtn">✏️ Draw mode — tap to move the line</button>
+              <button class="btn plain" id="snapUndoBtn">Undo stroke</button>
+              <button class="btn plain" id="snapClearBtn">Clear drawing</button>
+            </div>
+            <p class="lab-msg" id="snapLineRead" hidden></p>
+            <div id="snapItems"></div>
+            <div class="row">
+              <button class="btn" id="snapCheckBtn">Check my answers</button>
+              <button class="btn plain" id="snapNewBtn">New round</button>
+            </div>
+            <div id="snapScore" class="lab-msg" aria-live="polite"></div>
+          </div>
+          <aside class="snap-side" id="snapSideCol">
+            <div class="snap-panel" id="snapNotesPanel">
+              <h4>Your notes</h4>
+              <p class="small">Your own words and sketches, for this lab. Kept <b>on this device only</b> (localStorage) — never synced, never uploaded.</p>
+              <textarea id="snapNotesText" class="snap-text" placeholder="Type notes while you work…" aria-label="Your notes"></textarea>
+              <canvas id="snapNotesCanvas" width="600" height="280" aria-label="Sketch pad for notes"></canvas>
+              <div class="row">
+                <button class="btn plain" id="snapNotesUndoBtn">Undo sketch</button>
+                <button class="btn plain" id="snapNotesClearBtn">Clear sketch</button>
+              </div>
+            </div>
+            <div class="snap-panel" id="snapResearchPanel">
+              <h4>Research</h4>
+              <p class="small">Look a term up — reference only. Research explains words and ideas; it does not work the problems.</p>
+              <div class="row" style="margin-top:0">
+                <input type="text" id="snapResearchIn" placeholder="Type a term…" aria-label="Research a term" style="flex:1;min-width:120px">
+              </div>
+              <div class="row">
+                <button class="btn plain" id="snapResearchWebBtn">🔎 Search the web</button>
+                <button class="btn plain" id="snapResearchWikiBtn">📖 Reference / wiki</button>
+              </div>
+              <div id="snapGlossary"></div>
+            </div>
+          </aside>
+        </div>
       </div>
     </section>
   </main>
@@ -3607,8 +3752,12 @@ ssRefresh();
    fetched with no-store caching: when a newer build ships, an already-open or
    home-screen copy of an older build sees the newer version number there and
    offers "Update now" (a reload onto the new build). */
-var APP_VERSION = '2.20.0';
+var APP_VERSION = '2.21.0';
 var CHANGELOG = [
+  { v: '2.21.0', date: 'Oct 22, 2026', notify: true, notes: [
+    'New: Lab Snapshot. Photograph any lab worksheet and StudyLens spots what kind of lab it is, then loads the matching practice module — geology strike & dip and cross sections, topographic contours, titration, microscope & curves, vectors, data charts — with fresh numbers every round, a diagram you can draw on, step-by-step checking, plus your own notes and a research panel beside the work.',
+    'Your photo stays on your device and isn\'t saved: the reading only detects the lab type, then what was read is dropped. Practice comes from StudyLens\'s own templates with randomized values — never from your sheet\'s words or numbers. Your notes are your own writing, kept on this device only.'
+  ] },
   { v: '2.20.0', date: 'Oct 22, 2026', notify: true, notes: [
     'New: Protractor Lab. The clear 360\u00b0 circle ruler from geology lab, rebuilt as a tool you can spin: drag the strike line and read its azimuth both ways, with the quadrant bearing (like N50\u00b0E) worked out for you.',
     'Strike \u0026 dip calculator: type a strike and dip and see the symbol drawn the worksheet way \u2014 dip tick on the right once the strike points up \u2014 plus the dip direction (strike + 90\u00b0), the opposite strike direction, and azimuth \u2194 bearing conversions. Practice mode deals you random strike/dip pairs and checks your line and dip side step by step, and a Confused? Watch section links real instructor videos on strike, dip, and azimuths.'
@@ -4917,6 +5066,703 @@ document.querySelectorAll('.lab-step').forEach(function(btn){
     if(body) body.hidden = !body.hidden;
   });
 });
+</script>
+<script>
+'use strict';
+/* ================= Lab Snapshot (v2.21.0) =================
+   The learner's photo is read ONCE, on-device, only to detect the lab
+   TYPE. Extracted text lives in one volatile variable (SNAP.text), is
+   never written to storage or sent anywhere, and is set to null the
+   moment practice starts. Every practice question, diagram and answer
+   comes from the built-in templates below with fresh random values —
+   nothing from the learner's sheet is stored, shown again, or reused. */
+var SNAP = { text: null, detected: null, type: null, banned: ['50,25', '310,60'], round: null, strokes: [], drawMode: true, line: null };
+var SNAP_OCR_SRC = 'https://cdn.jsdelivr.net/npm/tesseract.js@5.0.5/dist/tesseract.min.js';
+var SNAP_TYPES = {
+  strike:  { label: 'Geology \u2014 strike & dip worksheet (azimuth method)', topic: 'strike and dip', format: 'Problems give a strike and a dip and ask for the map symbol and its directions. Practice deals a fresh strike/dip pair and checks your line, the dip side, the dip direction, and the bearing.' },
+  xsect:   { label: 'Geology \u2014 cross section (A\u2013A\u2032)', topic: 'geologic cross section', format: 'Problems show a slice through the ground along a line A\u2013A\u2032 and ask you to draw rock layers dipping at a given angle. Practice deals a strike and dip: work out the dip direction, then tilt the layer band to the dip and check it.' },
+  topo:    { label: 'Topographic map & contours', topic: 'topographic maps contour lines', format: 'Problems ask you to read elevations off contour lines, find relief, and work out gradients. Practice draws a fresh contour hill with marked points to read.' },
+  chem:    { label: 'Chemistry \u2014 titration & solution prep', topic: 'titration molarity', format: 'Problems read a burette, find the volume delivered, and use M\u2081V\u2081 = M\u2082V\u2082. Practice draws a fresh burette over a flask with new readings and concentrations.' },
+  bio:     { label: 'Biology \u2014 microscope & growth curves', topic: 'microscope field of view survivorship curve', format: 'Problems size specimens from the microscope field of view and read values off curves. Practice draws a fresh field of view and a survivorship curve to read.' },
+  physics: { label: 'Physics \u2014 vectors & angles', topic: 'vectors components resultant', format: 'Problems break a vector into components and combine vectors. Practice draws a fresh vector on a grid and checks its components and a resultant.' },
+  data:    { label: 'Ecology / data \u2014 charts & rates', topic: 'population growth rate data analysis', format: 'Problems read a chart and compute means, rates, and percent change. Practice draws a fresh data chart and checks your reading and maths.' },
+  angles:  { label: 'Angle & bearing measurement sheet', topic: 'azimuth bearing protractor', format: 'Problems show a direction on a protractor or compass and ask you to read it or convert it. Practice shows a fresh angle to read both ways, convert to a quadrant bearing, and rotate 90\u00b0.' },
+  numeric: { label: 'Numeric lab worksheet', topic: 'lab calculations', format: 'Problems give measurements and ask for a calculated result. Practice uses the same kinds of calculations \u2014 density, percent, averages, unit conversions \u2014 with fresh measurements and worked steps for every miss.' },
+  concept: { label: 'Concept / review sheet', topic: 'science study concepts', format: 'This one reads as ideas and definitions rather than measurements, so practice is a self-check round: questions with the key points to compare your answer against \u2014 honestly labelled, since no answer key is stored.' }
+};
+var SNAP_GLOSSARY = {
+  strike: [['Strike', 'The compass direction (azimuth) of the horizontal line across a tilted rock layer.'], ['Dip', 'How steeply the layer tilts from flat, 0–90°, measured perpendicular to the strike, downhill.'], ['Dip direction', 'The azimuth the layer tilts toward — strike + 90° with the worksheet method.'], ['Azimuth', 'A direction counted clockwise from North, 0–360°.'], ['Quadrant bearing', 'A direction named from the nearest cardinal point, like N50°E.']],
+  xsect: [['Cross section', 'A side-view slice through the ground along a line, drawn as if the Earth were cut open.'], ['True dip', 'The real dip angle, seen only in a section drawn perpendicular to the strike.'], ['Apparent dip', 'The shallower angle a layer appears to make in a section not perpendicular to strike — always less than the true dip.'], ['Strike', 'The compass direction of the horizontal line across the layer; the section line A–A′ is drawn perpendicular to it.'], ['A–A′', 'The endpoints of the section line on the map; the profile is drawn between them.']],
+  topo: [['Contour line', 'A line joining points of equal elevation; every point on one line is the same height.'], ['Contour interval', 'The elevation difference between neighbouring contour lines.'], ['Relief', 'Highest elevation minus lowest elevation in an area.'], ['Gradient', 'Steepness: elevation change divided by horizontal distance.'], ['Index contour', 'The thicker, labelled contour, usually every fifth line.']],
+  chem: [['Titration', 'Adding a measured volume of one solution to another until the reaction just completes.'], ['Burette', 'The graduated tube that delivers the titrant; read the meniscus at eye level.'], ['Meniscus', 'The curved surface of the liquid — read its bottom for water-based solutions.'], ['Molarity (M)', 'Moles of solute per litre of solution.'], ['Endpoint', 'The moment the indicator changes colour, signalling the reaction is complete.'], ['M₁V₁ = M₂V₂', 'At the endpoint the moles match the reaction ratio — for 1:1 reactions the two sides are equal.']],
+  bio: [['Field of view', 'The circle you see through the microscope; its diameter shrinks as magnification rises.'], ['Magnification', 'How many times larger the image is than the object. Total = eyepiece × objective.'], ['Survivorship curve', 'A graph of how many of a starting group remain alive at each age.'], ['Type I curve', 'Most survive to old age, then die quickly (like humans).'], ['Type III curve', 'Huge early losses, few survivors (like oysters or fish).']],
+  physics: [['Vector', 'A quantity with size and direction, drawn as an arrow.'], ['Component', 'The part of a vector along one axis: x = L·cos θ, y = L·sin θ.'], ['Resultant', 'The single vector equal to two or more vectors added together.'], ['Magnitude', 'The length (size) of a vector, from Pythagoras: √(x² + y²).']],
+  data: [['Rate', 'Change divided by the time it took: (last − first) ÷ years.'], ['Mean', 'The values added together, divided by how many there are.'], ['Percent change', '(new − old) ÷ old × 100.'], ['Per capita rate', 'A rate per individual in the population.']],
+  angles: [['Azimuth', 'A direction counted clockwise from North, 0–360°.'], ['Bearing', 'A direction named from North or South toward East or West, like S30°W.'], ['Protractor', 'The circle ruler for measuring angles; on an azimuth protractor 0° is North and numbers climb clockwise.']],
+  numeric: [['Density', 'Mass ÷ volume.'], ['Gradient', 'Rise ÷ run.'], ['Average (mean)', 'Add the values, divide by the count.'], ['Unit conversion', 'Multiply or divide by the conversion factor — 100 cm = 1 m, 1000 mL = 1 L.']],
+  concept: [['Variable', 'Anything that can change in an experiment.'], ['Control', 'The unchanged comparison that isolates the variable’s effect.'], ['Hypothesis', 'A testable prediction that an experiment can support or refute.']]
+};
+function snapHits(t, words){ var n = 0; words.forEach(function(w){ var i = 0; while((i = t.indexOf(w, i)) >= 0){ n++; i += w.length; } }); return n; }
+function snapDetectType(text){
+  var t = ' ' + String(text || '').toLowerCase().replace(/\s+/g, ' ') + ' ';
+  if(snapHits(t, ['cross section', 'cross-section']) >= 1) return 'xsect';
+  var sd = snapHits(t, ['strike', 'dip ', 'azimuth', 'brunton']);
+  if(sd >= 2) return 'strike';
+  if(sd >= 1 && snapHits(t, ['protractor', 'bearing', 'degrees']) >= 1) return 'strike';
+  if(snapHits(t, ['titration', 'burette', 'buret', 'molarity', 'titrant', 'endpoint']) >= 2) return 'chem';
+  if(snapHits(t, ['microscope', 'field of view', 'magnification', 'survivorship', 'ocular', 'objective lens']) >= 2) return 'bio';
+  if(snapHits(t, ['vector', 'resultant', 'component', 'free-body', 'projectile']) >= 2) return 'physics';
+  if(snapHits(t, ['topographic', 'contour', 'elevation', 'relief', 'quadrangle']) >= 2) return 'topo';
+  if(snapHits(t, ['population', 'per capita', 'quadrat', 'transect', 'growth rate', 'species richness']) >= 2) return 'data';
+  if(snapHits(t, ['protractor', 'bearing', 'measure the angle', 'compass direction', 'degrees']) >= 2) return 'angles';
+  if(snapHits(t, ['calculate', 'density', 'volume', 'mass', 'percent', 'concentration', 'trial', 'average', 'data table', 'gradient']) >= 2) return 'numeric';
+  return 'concept';
+}
+function snapExtractPairs(text){
+  var out = SNAP.banned.slice();
+  var nums = String(text || '').match(/\d+(?:\.\d+)?/g) || [];
+  for(var i = 0; i + 1 < nums.length; i++){
+    var p = Math.round(parseFloat(nums[i])) + ',' + Math.round(parseFloat(nums[i + 1]));
+    if(out.indexOf(p) < 0) out.push(p);
+  }
+  return out;
+}
+function snapScrollTo(el){ if(el && el.scrollIntoView){ try{ el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }catch(e){} } }
+
+/* ---------- step 1: read the photo (transient) ---------- */
+var snapTessPromise = null;
+function snapLoadTess(){
+  if(window.Tesseract) return Promise.resolve();
+  if(snapTessPromise) return snapTessPromise;
+  snapTessPromise = new Promise(function(res, rej){
+    var s = document.createElement('script');
+    s.src = SNAP_OCR_SRC;
+    s.onload = function(){ res(); };
+    s.onerror = function(){ rej(new Error('ocr load failed')); };
+    document.head.appendChild(s);
+  });
+  return snapTessPromise;
+}
+function snapHandleText(text){
+  if(!text || String(text).trim().length < 8){
+    snapOcrFailed('Too little readable text there — try a closer, straight-on photo, or paste a few lines from the sheet below.');
+    return;
+  }
+  SNAP.text = String(text);
+  SNAP.banned = snapExtractPairs(text);
+  SNAP.type = snapDetectType(text);
+  SNAP.detected = SNAP.type;
+  $('snapOcrMsg').textContent = '';
+  snapShowType();
+}
+function snapStart(source){
+  if(typeof source === 'string'){ snapHandleText(source); return; }
+  $('snapOcrMsg').textContent = 'Reading your photo on this device… first use downloads the reader, which can take a moment.';
+  snapLoadTess()
+    .then(function(){ return window.Tesseract.recognize(source, 'eng'); })
+    .then(function(r){ snapHandleText(r && r.data ? r.data.text : ''); })
+    .catch(function(){ snapOcrFailed('The photo reader could not load or finish — check your connection and try again, or paste a few lines from the sheet below instead.'); });
+}
+function snapOcrFailed(msg){
+  $('snapOcrMsg').textContent = msg;
+  $('snapFallback').hidden = false;
+}
+
+/* ---------- step 2: confirm the detected type only ---------- */
+function snapShowType(){
+  var d = SNAP_TYPES[SNAP.type] || SNAP_TYPES.concept;
+  $('snapTypeOut').innerHTML =
+    '<p class="snap-type">Looks like: <b>' + d.label + '</b></p>' +
+    '<p class="lab-msg">' + d.format + '</p>' +
+    '<p class="lab-msg"><b>Not saved:</b> your photo stays on your device and isn\'t saved — what was read is only used to pick this type, and it is dropped when practice starts.</p>';
+  $('snapTypeCard').hidden = false;
+  snapRenderGlossary();
+  snapScrollTo($('snapTypeCard'));
+}
+function snapSetType(t){
+  SNAP.type = t;
+  snapShowType();
+}
+
+/* ---------- step 3: practice rounds from templates ---------- */
+function snapRi(a, b){ return a + Math.floor(Math.random() * (b - a + 1)); }
+function snapFix(n){ return String(Math.round(n * 100) / 100); }
+function snapAngDiff(a, b){ var d = Math.abs(labNorm(a) - labNorm(b)) % 360; return Math.min(d, 360 - d); }
+function snapLineDiff(a, b){ var d = snapAngDiff(a, b); return Math.min(d, 180 - d); }
+function snapSigned(a, b){ var s = ((labNorm(b) - labNorm(a)) % 360 + 540) % 360 - 180; return s; }
+function snapRandStrikeDip(){
+  var dips = [10, 15, 20, 30, 35, 40, 45, 50, 55, 65, 70, 75, 80], s, d, guard = 0;
+  do { s = 5 + Math.floor(Math.random() * 351); d = dips[Math.floor(Math.random() * dips.length)]; guard++; }
+  while(guard < 60 && SNAP.banned.indexOf(s + ',' + d) >= 0);
+  return [s, d];
+}
+function snapBuildRound(){
+  var type = SNAP.type || 'concept';
+  var R = { type: type, items: [], dipPick: null };
+  $('snapScore').textContent = '';
+  SNAP.strokes = []; snapRedraw();
+  var head = $('snapRoundHead'), items = $('snapItems');
+  items.innerHTML = '';
+  snapClearSvg();
+  SNAP.line = null; SNAP.xsect = null;
+  snapRenderGlossary();
+  if(type === 'strike'){
+    var sd = snapRandStrikeDip(); R.strike = sd[0]; R.dip = sd[1];
+    head.innerHTML = 'A measurement is taken at the center dot: <b>strike ' + labPad(sd[0]) + '° · dip ' + sd[1] + '°</b>. Build the symbol and its directions — the same 4 steps as on paper.';
+    snapShowStage(true);
+    SNAP.line = labBuildProtractor($('snapSvg'), (sd[0] + 137) % 360);
+    SNAP.line.onChange = snapRenderLineRead;
+    snapSetDrawMode(false);
+    snapRenderLineRead();
+    R.items = [
+      { kind: 'line', q: 'Spin the copper line (line mode, above) or type the azimuth here, so the line runs along the strike.', unit: '°' },
+      { kind: 'angle', answer: labDipDirection(sd[0]), q: 'Which compass direction does the layer dip toward? (an azimuth)', unit: '°', explain: 'Dip direction is strike + 90°: ' + labPad(sd[0]) + '° + 90° = ' + labPad(labDipDirection(sd[0])) + '°.' },
+      { kind: 'dip', q: 'Picture the paper rotated so the strike direction points at the top. Which side of the strike line does the short dip tick go on?' },
+      { kind: 'angle', answer: labOpposite(sd[0]), q: 'Read the same strike line from the other end: what is the opposite strike direction?', unit: '°', explain: 'A line reads the same from both ends, 180° apart: ' + labPad(sd[0]) + '° + 180° = ' + labPad(labOpposite(sd[0])) + '°.' },
+      { kind: 'quad', answer: azToQuad(sd[0]), q: 'Write the strike as a quadrant bearing (like N40°E).', explain: azToQuad(sd[0]) + ' — quadrant bearings name the nearest cardinal direction, the angle from it, and the side it leans toward.' }
+    ];
+  } else if(type === 'angles'){
+    var A; do { A = 5 + Math.floor(Math.random() * 351); } while(A === 50 || A === 310);
+    R.angle = A;
+    head.innerHTML = 'A direction is marked on the protractor — the copper line, read toward its solid end dot. Read it the way you would on paper.';
+    snapShowStage(true);
+    SNAP.line = labBuildProtractor($('snapSvg'), A);
+    snapSetDrawMode(true);
+    $('snapLineRead').hidden = true;
+    R.items = [
+      { kind: 'angle', answer: A, q: 'Read the azimuth toward the solid end of the line.', unit: '°', explain: 'Count clockwise from North (0° at the top) to the solid end: ' + labPad(A) + '°.' },
+      { kind: 'angle', answer: labOpposite(A), q: 'Read the same line from the other end.', unit: '°', explain: 'The other end is 180° away: ' + labPad(A) + '° + 180° = ' + labPad(labOpposite(A)) + '°.' },
+      { kind: 'quad', answer: azToQuad(A), q: 'Convert that direction to a quadrant bearing (like S30°W).', explain: azToQuad(A) + ' — start from the nearest cardinal direction and count toward the line.' },
+      { kind: 'angle', answer: labNorm(A + 90), q: 'A second line sits exactly 90° clockwise from this one. What is its azimuth?', unit: '°', explain: 'Perpendicular, clockwise: ' + labPad(A) + '° + 90° = ' + labPad(labNorm(A + 90)) + '°.' }
+    ];
+  } else if(type === 'xsect'){
+    snapBuildXsect(R, head);
+  } else if(type === 'topo'){
+    snapBuildTopo(R, head);
+  } else if(type === 'chem'){
+    snapBuildChem(R, head);
+  } else if(type === 'bio'){
+    snapBuildBio(R, head);
+  } else if(type === 'physics'){
+    snapBuildPhysics(R, head);
+  } else if(type === 'data'){
+    snapBuildData(R, head);
+  } else if(type === 'numeric'){
+    head.innerHTML = 'Same kinds of calculations as your lab, with fresh measurements. Show your working on the drawing layer if the round has one — type each answer in its box.';
+    snapShowStage(false);
+    var tpls = snapNumTemplates(), picked = [];
+    while(picked.length < 4 && tpls.length){
+      var idx = Math.floor(Math.random() * tpls.length);
+      picked.push(tpls.splice(idx, 1)[0]());
+    }
+    R.items = picked.map(function(p){ return { kind: 'num', q: p.q, answer: p.a, tol: p.tol, unit: p.unit, explain: p.ex }; });
+  } else {
+    head.innerHTML = 'A self-check round: answer each question in your own words, reveal the key points, and mark yourself honestly. Nothing here is stored.';
+    snapShowStage(false);
+    var bank = snapConceptBank(SNAP.detected === 'strike' || /geolog|rock|layer|mineral/.test('') ? 'geo' : 'method');
+    R.items = bank.map(function(b){ return { kind: 'self', q: b.q, points: b.points, got: null }; });
+  }
+  SNAP.round = R;
+  R.items.forEach(function(it, i){ items.appendChild(snapItemEl(it, i)); });
+  $('snapPracticeCard').hidden = false;
+  snapScrollTo($('snapPracticeCard'));
+}
+function snapShowStage(on){
+  $('snapStage').hidden = !on;
+  $('snapDrawTools').hidden = !on;
+  $('snapLineRead').hidden = !on;
+  if(!on){ $('snapLineRead').hidden = true; }
+}
+function snapRenderLineRead(){
+  if(!SNAP.line) return;
+  var a = SNAP.line.getAz();
+  $('snapLineRead').textContent = 'Your line reads ' + labPad(a) + '° / ' + labPad(labOpposite(a)) + '°.';
+  var inp = document.querySelector('#snapItems input[data-kind="line"]');
+  if(inp && document.activeElement !== inp) inp.value = Math.round(a) % 360;
+}
+function snapClearSvg(){ var svg = $('snapSvg'); if(svg){ while(svg.firstChild) svg.removeChild(svg.firstChild); } }
+function snapRenderGlossary(){
+  var el = $('snapGlossary'); if(!el) return;
+  var g = SNAP_GLOSSARY[SNAP.type] || SNAP_GLOSSARY.concept;
+  var html = '<dl>';
+  g.forEach(function(e){ html += '<dt>' + e[0] + '</dt><dd>' + e[1] + '</dd>'; });
+  el.innerHTML = html + '</dl>';
+  var t = SNAP_TYPES[SNAP.type], inp = $('snapResearchIn');
+  if(t && inp && !inp.value) inp.placeholder = 'Type a term… e.g. ' + t.topic;
+}
+function snapSvgText(svg, x, y, str, size, anchor, weight){
+  var t = labEl('text', {x: x, y: y, 'text-anchor': anchor || 'middle', style: 'fill:var(--ink);font-size:' + (size || 13) + 'px;font-weight:' + (weight || 600)}, svg);
+  t.textContent = str;
+  return t;
+}
+
+/* ----- Geology: cross section A–A′ ----- */
+function snapBuildXsect(R, head){
+  var sd = snapRandStrikeDip(); R.strike = sd[0]; R.dip = sd[1];
+  var dd = labDipDirection(sd[0]);
+  head.innerHTML = 'Cross section A–A′ runs perpendicular to a strike of <b>' + labPad(sd[0]) + '°</b>, pointing toward the dip direction. The layers dip <b>' + sd[1] + '°</b>. Work out the dip direction, set the layer band, then answer.';
+  snapShowStage(true);
+  snapDrawXsect(sd[1]);
+  snapSetDrawMode(false);
+  snapRenderTiltRead();
+  R.items = [
+    { kind: 'angle', answer: dd, q: 'Which compass direction does the layer dip toward? (strike + 90°)', unit: '°', explain: 'Dip direction = ' + labPad(sd[0]) + '° + 90° = ' + labPad(dd) + '°. The section A–A′ points that way, so layers slope down toward A′ (the right side).' },
+    { kind: 'tilt', q: 'Drag on the section to tilt the copper layer band until it dips at ' + sd[1] + '° toward A′ (down to the right). The protractor ticks around the pivot measure the angle below horizontal.' },
+    { kind: 'word', answer: 'true', q: 'This section is drawn perpendicular to the strike, so the angle in the drawing is the ____ dip. (Type one word: true or apparent)', explain: 'True dip. Only a section perpendicular to strike shows the real dip; any other section shows a shallower apparent dip.' },
+    { kind: 'angle', answer: sd[0], q: 'Working backwards: the dip direction is ' + labPad(dd) + '°. What was the strike?', unit: '°', explain: 'Strike = dip direction − 90°: ' + labPad(dd) + '° − 90° = ' + labPad(sd[0]) + '°.' }
+  ];
+}
+function snapDrawXsect(dip){
+  var svg = $('snapSvg'); snapClearSvg();
+  var cx = 180, cy = 196;
+  labEl('rect', {x:26, y:26, width:308, height:308, style:'fill:var(--surface2);stroke:var(--line-strong);stroke-width:1.4'}, svg);
+  for(var gx = 51; gx < 334; gx += 25) labEl('line', {x1:gx, y1:26, x2:gx, y2:334, style:'stroke:var(--line);stroke-width:.7;opacity:.45'}, svg);
+  for(var gy = 51; gy < 334; gy += 25) labEl('line', {x1:26, y1:gy, x2:334, y2:gy, style:'stroke:var(--line);stroke-width:.7;opacity:.45'}, svg);
+  labEl('polyline', {points: '34,96 105,78 175,94 248,72 326,90', style:'fill:none;stroke:var(--ink);stroke-width:2.6'}, svg);
+  snapSvgText(svg, 44, 62, 'A', 17, 'middle', 800);
+  snapSvgText(svg, 316, 62, 'A′', 17, 'middle', 800);
+  snapSvgText(svg, 180, 48, 'surface profile', 11.5, 'middle', 500);
+  for(var d = 0; d <= 90; d += 5){
+    var p1 = labPol(cx, cy, 122, 90 + d), p2 = labPol(cx, cy, d % 15 === 0 ? 106 : 113, 90 + d);
+    labEl('line', {x1:p1[0].toFixed(1), y1:p1[1].toFixed(1), x2:p2[0].toFixed(1), y2:p2[1].toFixed(1), style:'stroke:var(--mut);stroke-width:1'}, svg);
+    if(d % 15 === 0){ var lp = labPol(cx, cy, 94, 90 + d); snapSvgText(svg, lp[0], lp[1] + 4, String(d), 10.5); }
+  }
+  labEl('line', {x1:cx - 150, y1:cy, x2:cx + 150, y2:cy, style:'stroke:var(--mut);stroke-width:1.2;stroke-dasharray:5 5'}, svg);
+  SNAP.xsect = { tilt: 0, target: dip, cx: cx, cy: cy, g: labEl('g', {}, svg) };
+  labEl('circle', {cx:cx, cy:cy, r:5, style:'fill:var(--ink);stroke:var(--surface);stroke-width:1.6'}, svg);
+  snapDrawLayer();
+  function tiltFromEvent(e){
+    var rect = svg.getBoundingClientRect(); if(!rect.width) return null;
+    var x = (e.clientX - rect.left) / rect.width * 360, y = (e.clientY - rect.top) / rect.height * 360;
+    var t = Math.atan2(y - cy, x - cx) * 180 / Math.PI;
+    while(t > 90) t -= 180; while(t <= -90) t += 180;
+    return Math.max(-85, Math.min(85, t));
+  }
+  var dragging = false;
+  svg.addEventListener('pointerdown', function(e){ if(!SNAP.xsect || !SNAP.round || SNAP.round.type !== 'xsect') return; dragging = true; var t = tiltFromEvent(e); if(t !== null){ SNAP.xsect.tilt = t; snapDrawLayer(); snapRenderTiltRead(); } e.preventDefault(); });
+  svg.addEventListener('pointermove', function(e){ if(!dragging || !SNAP.xsect) return; var t = tiltFromEvent(e); if(t !== null){ SNAP.xsect.tilt = t; snapDrawLayer(); snapRenderTiltRead(); } });
+  ['pointerup', 'pointercancel'].forEach(function(ev){ svg.addEventListener(ev, function(){ dragging = false; }); });
+}
+function snapDrawLayer(){
+  var X = SNAP.xsect; if(!X) return;
+  var g = X.g; while(g.firstChild) g.removeChild(g.firstChild);
+  var th = X.tilt * Math.PI / 180, dx = Math.cos(th), dy = Math.sin(th), px = -dy, py = dx, L = 148, W = 13;
+  var pts = [
+    (X.cx - dx * L - px * W).toFixed(1) + ',' + (X.cy - dy * L - py * W).toFixed(1),
+    (X.cx + dx * L - px * W).toFixed(1) + ',' + (X.cy + dy * L - py * W).toFixed(1),
+    (X.cx + dx * L + px * W).toFixed(1) + ',' + (X.cy + dy * L + py * W).toFixed(1),
+    (X.cx - dx * L + px * W).toFixed(1) + ',' + (X.cy - dy * L + py * W).toFixed(1)
+  ].join(' ');
+  labEl('polygon', {points: pts, style:'fill:var(--acc);opacity:.5;stroke:var(--acc-deep);stroke-width:2'}, g);
+}
+function snapRenderTiltRead(){
+  if(!SNAP.xsect) return;
+  var t = SNAP.xsect.tilt;
+  $('snapLineRead').textContent = 'Layer tilt: ' + Math.abs(Math.round(t)) + '° ' + (t > 0.5 ? 'down toward A′ (right)' : t < -0.5 ? 'down to the left' : '(flat)') + ' — target dip ' + SNAP.xsect.target + '°.';
+}
+
+/* ----- Topographic maps ----- */
+function snapBuildTopo(R, head){
+  var base = snapRi(2, 6) * 100, ci = [10, 20, 25][snapRi(0, 2)], rings = 5;
+  R.topo = { base: base, ci: ci };
+  var distKm = [1.5, 2, 2.5, 3][snapRi(0, 3)];
+  var elev = function(i){ return base + i * ci; };
+  var summit = base + rings * ci;
+  var grad = (3 * ci) / distKm;
+  head.innerHTML = 'A contour hill. The contour interval and every ring\'s elevation are labelled — read the map, then answer.';
+  snapShowStage(true);
+  snapSetDrawMode(true);
+  $('snapLineRead').hidden = true;
+  var svg = $('snapSvg'); snapClearSvg();
+  var cx = 182, cy = 182;
+  for(var i = 0; i < rings; i++){
+    var rx = 148 - i * 24, ry = 108 - i * 17, ccx = cx + i * 7;
+    labEl('ellipse', {cx: ccx, cy: cy, rx: rx, ry: ry, style: 'fill:none;stroke:var(--acc-deep);stroke-width:' + (i === 0 ? 2.2 : 1.3)}, svg);
+    snapSvgText(svg, ccx, cy - ry - 5, String(elev(i)), 12);
+  }
+  var px2 = cx + 2 * 7, py2 = cy - (108 - 2 * 17);
+  labEl('circle', {cx: px2, cy: py2, r: 5, style: 'fill:var(--acc);stroke:var(--ink);stroke-width:1.2'}, svg);
+  snapSvgText(svg, px2 + 14, py2 + 4, 'X', 15, 'middle', 800);
+  var sx = cx + 4 * 7, sy = cy;
+  labEl('path', {d: 'M ' + (sx - 7) + ' ' + sy + ' L ' + (sx + 7) + ' ' + sy + ' M ' + sx + ' ' + (sy - 7) + ' L ' + sx + ' ' + (sy + 7), style: 'stroke:var(--ink);stroke-width:2.2'}, svg);
+  snapSvgText(svg, sx + 16, sy - 8, 'summit ' + summit + ' m', 12, 'start');
+  R.items = [
+    { kind: 'num', answer: elev(2), tol: 0, unit: 'm', q: 'What is the elevation of point X? (It sits on a labelled contour.)', explain: 'X sits on the third ring in from the edge: ' + base + ' + 2 × ' + ci + ' = ' + elev(2) + ' m.' },
+    { kind: 'num', answer: ci, tol: 0, unit: 'm', q: 'What is the contour interval of this map?', explain: 'Neighbouring rings differ by ' + ci + ' m (' + elev(1) + ' − ' + elev(0) + '), so the interval is ' + ci + ' m.' },
+    { kind: 'num', answer: summit - base, tol: 0, unit: 'm', q: 'What is the relief of this area? (highest − lowest elevation shown)', explain: 'Relief = summit ' + summit + ' m − lowest contour ' + base + ' m = ' + (summit - base) + ' m.' },
+    { kind: 'num', answer: grad, tol: Math.max(0.6, grad * 0.06), unit: 'm/km', q: 'Point P is on the ' + base + ' m contour and point Q is on the ' + elev(3) + ' m contour, ' + distKm + ' km apart on the ground. What is the gradient between them?', explain: 'Gradient = elevation change ÷ distance = (' + elev(3) + ' − ' + base + ') ÷ ' + distKm + ' = ' + (3 * ci) + ' ÷ ' + distKm + ' = ' + snapFix(grad) + ' m/km.' }
+  ];
+}
+
+/* ----- Chemistry: titration ----- */
+function snapBuildChem(R, head){
+  var init = snapRi(8, 90) / 10, vol = snapRi(18, 32), fin = Math.round((init + vol) * 10) / 10;
+  var mb = [0.08, 0.1, 0.12, 0.15, 0.2][snapRi(0, 4)], va = 25;
+  var ma = mb * vol / va;
+  var stock = [0.5, 1, 2][snapRi(0, 2)], targetM = [0.05, 0.1, 0.2][snapRi(0, 2)], targetV = [250, 500][snapRi(0, 1)];
+  var stockVol = targetM * targetV / stock;
+  head.innerHTML = 'A titration setup. The burette\'s starting meniscus is drawn and labelled — read it, then work the volumes and concentrations.';
+  snapShowStage(true);
+  snapSetDrawMode(true);
+  $('snapLineRead').hidden = true;
+  var svg = $('snapSvg'); snapClearSvg();
+  labEl('rect', {x:168, y:26, width:26, height:216, style:'fill:var(--surface3);stroke:var(--line-strong);stroke-width:1.4'}, svg);
+  for(var r = 0; r <= 50; r += 5){
+    var y = 40 + r * 3.9;
+    labEl('line', {x1:168, y1:y, x2:r % 10 === 0 ? 182 : 176, y2:y, style:'stroke:var(--mut);stroke-width:1'}, svg);
+    if(r % 10 === 0) snapSvgText(svg, 158, y + 4, String(r), 10.5, 'end');
+  }
+  var my = 40 + init * 3.9;
+  labEl('rect', {x:170, y:42, width:22, height: Math.max(2, my - 42), style:'fill:var(--acc);opacity:.45'}, svg);
+  labEl('line', {x1:166, y1:my, x2:196, y2:my, style:'stroke:var(--acc-deep);stroke-width:2.6'}, svg);
+  snapSvgText(svg, 214, my + 4, 'meniscus: ' + init.toFixed(1) + ' mL', 12.5, 'start');
+  labEl('line', {x1:181, y1:242, x2:181, y2:262, style:'stroke:var(--line-strong);stroke-width:3'}, svg);
+  labEl('polygon', {points: '150,262 212,262 226,318 226,330 136,330 136,318', style:'fill:var(--surface3);stroke:var(--line-strong);stroke-width:1.4'}, svg);
+  labEl('polygon', {points: '141,330 221,330 221,318 145,318', style:'fill:var(--acc);opacity:.35'}, svg);
+  snapSvgText(svg, 181, 350, 'flask: 25.0 mL of acid', 12);
+  R.items = [
+    { kind: 'num', answer: init, tol: 0.15, unit: 'mL', q: 'Read the burette: what is the initial reading at the meniscus?', explain: 'Read the bottom of the meniscus at eye level: ' + init.toFixed(1) + ' mL.' },
+    { kind: 'num', answer: vol, tol: 0.15, unit: 'mL', q: 'At the endpoint the burette reads ' + fin.toFixed(1) + ' mL. What volume was delivered?', explain: 'Delivered = final − initial = ' + fin.toFixed(1) + ' − ' + init.toFixed(1) + ' = ' + vol.toFixed(1) + ' mL.' },
+    { kind: 'num', answer: ma, tol: 0.012, unit: 'M', q: 'The base in the burette is ' + mb + ' M and the acid–base reaction is 1:1. The flask held 25.0 mL of acid. Find the acid\'s concentration.', explain: 'M₁V₁ = M₂V₂ → acid M = ' + mb + ' × ' + vol.toFixed(1) + ' ÷ 25.0 = ' + snapFix(ma) + ' M.' },
+    { kind: 'num', answer: stockVol, tol: Math.max(0.4, stockVol * 0.04), unit: 'mL', q: 'Solution prep: you need ' + targetV + ' mL of ' + targetM + ' M solution, made from a ' + stock + ' M stock. How many mL of stock do you measure out?', explain: 'M₁V₁ = M₂V₂ → V₁ = ' + targetM + ' × ' + targetV + ' ÷ ' + stock + ' = ' + snapFix(stockVol) + ' mL, then top up to ' + targetV + ' mL with water.' }
+  ];
+}
+
+/* ----- Biology: microscope & curves ----- */
+function snapBuildBio(R, head){
+  var fovLow = [1.6, 1.8, 2.0, 2.2][snapRi(0, 3)], fracs = [0.25, 1 / 3, 0.5], frac = fracs[snapRi(0, 2)];
+  var fovHigh = fovLow * 40 / 400, sizeUm = frac * fovLow * 1000;
+  var curves = [
+    [1000, 980, 950, 900, 780, 420],
+    [1000, 800, 620, 480, 370, 290],
+    [1000, 420, 180, 90, 55, 40]
+  ];
+  var curve = curves[snapRi(0, 2)], j = snapRi(2, 4);
+  var pct = (1000 - curve[j]) / 10;
+  head.innerHTML = 'Left: the microscope field of view at low power (total magnification 40×), diameter <b>' + fovLow.toFixed(1) + ' mm</b>, with one specimen crossing it. Below: a survivorship curve starting at 1000 individuals.';
+  snapShowStage(true);
+  snapSetDrawMode(true);
+  $('snapLineRead').hidden = true;
+  var svg = $('snapSvg'); snapClearSvg();
+  labEl('circle', {cx:120, cy:118, r:92, style:'fill:var(--surface2);stroke:var(--line-strong);stroke-width:1.6'}, svg);
+  labEl('ellipse', {cx:120, cy:118, rx: 92 * frac, ry: 92 * frac * 0.42, style:'fill:var(--acc);opacity:.5;stroke:var(--acc-deep);stroke-width:1.6'}, svg);
+  snapSvgText(svg, 120, 226, 'field of view — specimen spans ' + (frac === 0.25 ? '¼' : frac === 0.5 ? '½' : '⅓') + ' of the diameter', 11.5);
+  var gx = 44, gy = 322, gw = 272, gh = 62;
+  labEl('line', {x1:gx, y1:gy - gh - 8, x2:gx, y2:gy, style:'stroke:var(--ink);stroke-width:1.4'}, svg);
+  labEl('line', {x1:gx, y1:gy, x2:gx + gw, y2:gy, style:'stroke:var(--ink);stroke-width:1.4'}, svg);
+  var pts = curve.map(function(s, i){ return (gx + i * (gw / 5)).toFixed(1) + ',' + (gy - s / 1000 * gh).toFixed(1); }).join(' ');
+  labEl('polyline', {points: pts, style:'fill:none;stroke:var(--acc-deep);stroke-width:2.2'}, svg);
+  curve.forEach(function(s, i){
+    labEl('circle', {cx: gx + i * (gw / 5), cy: gy - s / 1000 * gh, r: 3.4, style: 'fill:var(--acc)'}, svg);
+    snapSvgText(svg, gx + i * (gw / 5), gy + 15, String(i), 10.5);
+  });
+  snapSvgText(svg, gx + gw / 2, gy + 30, 'age (years) →', 11);
+  snapSvgText(svg, 238, 240, 'survivors (of 1000)', 11.5);
+  R.items = [
+    { kind: 'num', answer: fovHigh, tol: 0.03, unit: 'mm', q: 'You switch from 40× to 400× total magnification. What is the new field-of-view diameter?', explain: 'Field of view shrinks in proportion: ' + fovLow.toFixed(1) + ' × (40 ÷ 400) = ' + snapFix(fovHigh) + ' mm.' },
+    { kind: 'num', answer: sizeUm, tol: Math.max(25, sizeUm * 0.08), unit: 'µm', q: 'Estimate the specimen\'s length at low power, in micrometres (µm).', explain: 'It spans ' + (frac === 0.25 ? '¼' : frac === 0.5 ? '½' : '⅓') + ' of ' + fovLow.toFixed(1) + ' mm = ' + snapFix(frac * fovLow) + ' mm, and 1 mm = 1000 µm, so about ' + Math.round(sizeUm) + ' µm.' },
+    { kind: 'num', answer: curve[j], tol: 12, unit: '', q: 'From the curve: how many of the 1000 individuals survive to age ' + j + '?', explain: 'Read the dot above age ' + j + ' across to the survivors scale: ' + curve[j] + '.' },
+    { kind: 'num', answer: pct, tol: 1.5, unit: '%', q: 'By age ' + j + ', what percent of the starting 1000 have died?', explain: 'Died = 1000 − ' + curve[j] + ' = ' + (1000 - curve[j]) + ', and ' + (1000 - curve[j]) + ' ÷ 1000 × 100 = ' + snapFix(pct) + '%.' }
+  ];
+}
+
+/* ----- Physics: vectors ----- */
+function snapBuildPhysics(R, head){
+  var L = snapRi(6, 20), th = [25, 30, 35, 40, 50, 55, 60][snapRi(0, 6)], H = snapRi(3, 9);
+  var rad = th * Math.PI / 180, vx = L * Math.cos(rad), vy = L * Math.sin(rad);
+  var rx = vx + H, mag = Math.sqrt(rx * rx + vy * vy), rang = Math.atan2(vy, rx) * 180 / Math.PI;
+  head.innerHTML = 'A vector of length <b>' + L + '</b> units points at <b>' + th + '°</b> above the +x axis. Break it down, then combine it with a second vector of ' + H + ' units pointing straight along +x (dashed).';
+  snapShowStage(true);
+  snapSetDrawMode(true);
+  $('snapLineRead').hidden = true;
+  var svg = $('snapSvg'); snapClearSvg();
+  var ox = 56, oy = 292, sc = 11;
+  for(var gx2 = 0; gx2 <= 300; gx2 += 25) labEl('line', {x1: ox + gx2, y1: 30, x2: ox + gx2, y2: oy, style:'stroke:var(--line);stroke-width:.7;opacity:.5'}, svg);
+  for(var gy2 = 0; gy2 <= 260; gy2 += 25) labEl('line', {x1: ox, y1: oy - gy2, x2: ox + 300, y2: oy - gy2, style:'stroke:var(--line);stroke-width:.7;opacity:.5'}, svg);
+  labEl('line', {x1: ox, y1: oy, x2: ox + 308, y2: oy, style:'stroke:var(--ink);stroke-width:1.8'}, svg);
+  labEl('line', {x1: ox, y1: oy, x2: ox, y2: 24, style:'stroke:var(--ink);stroke-width:1.8'}, svg);
+  snapSvgText(svg, ox + 312, oy + 4, 'x', 13, 'start');
+  snapSvgText(svg, ox - 6, 22, 'y', 13, 'end');
+  var ex = ox + vx * sc, ey = oy - vy * sc;
+  labEl('line', {x1: ox, y1: oy, x2: ex, y2: ey, style:'stroke:var(--acc-deep);stroke-width:3.2'}, svg);
+  labEl('polygon', {points: ex + ',' + ey + ' ' + (ex - 10) + ',' + (ey + 1) + ' ' + (ex - 3) + ',' + (ey + 9), style:'fill:var(--acc-deep)'}, svg);
+  labEl('line', {x1: ex, y1: ey, x2: ex, y2: oy, style:'stroke:var(--mut);stroke-width:1.2;stroke-dasharray:4 4'}, svg);
+  labEl('line', {x1: ox, y1: oy - 34, x2: ox + H * sc, y2: oy - 34, style:'stroke:var(--mut);stroke-width:2.2;stroke-dasharray:6 4'}, svg);
+  snapSvgText(svg, ox + H * sc / 2, oy - 42, '+' + H + ' in x', 11.5);
+  R.items = [
+    { kind: 'num', answer: vx, tol: 0.15, unit: '', q: 'What is the x-component of the ' + L + '-unit vector at ' + th + '°?', explain: 'x = L·cos θ = ' + L + ' × cos ' + th + '° = ' + snapFix(vx) + '.' },
+    { kind: 'num', answer: vy, tol: 0.15, unit: '', q: 'What is its y-component?', explain: 'y = L·sin θ = ' + L + ' × sin ' + th + '° = ' + snapFix(vy) + '.' },
+    { kind: 'num', answer: mag, tol: 0.25, unit: '', q: 'Add the second vector (' + H + ' units along +x). What is the magnitude of the resultant?', explain: 'New x = ' + snapFix(vx) + ' + ' + H + ' = ' + snapFix(rx) + '; y stays ' + snapFix(vy) + '. Magnitude = √(' + snapFix(rx) + '² + ' + snapFix(vy) + '²) = ' + snapFix(mag) + '.' },
+    { kind: 'angle', answer: rang, q: 'What angle does the resultant make with the +x axis?', unit: '°', explain: 'θ = tan⁻¹(y ÷ x) = tan⁻¹(' + snapFix(vy) + ' ÷ ' + snapFix(rx) + ') ≈ ' + snapFix(rang) + '°.' }
+  ];
+}
+
+/* ----- Ecology / data charts ----- */
+function snapBuildData(R, head){
+  var y0 = snapRi(2016, 2021), vals = [snapRi(40, 120)];
+  for(var i = 1; i < 5; i++) vals.push(Math.max(5, vals[i - 1] + snapRi(-8, 26)));
+  var k = snapRi(1, 3), mean = vals.reduce(function(a, b){ return a + b; }, 0) / 5;
+  var rate = (vals[4] - vals[0]) / 4, pct = (vals[4] - vals[0]) / vals[0] * 100;
+  head.innerHTML = 'A field team counts a population once a year for five years. Read the chart, then compute.';
+  snapShowStage(true);
+  snapSetDrawMode(true);
+  $('snapLineRead').hidden = true;
+  var svg = $('snapSvg'); snapClearSvg();
+  var gx = 52, gy = 300, gw = 268, gh = 218, vmax = Math.max.apply(null, vals) * 1.15;
+  labEl('line', {x1: gx, y1: gy - gh - 14, x2: gx, y2: gy, style:'stroke:var(--ink);stroke-width:1.5'}, svg);
+  labEl('line', {x1: gx, y1: gy, x2: gx + gw, y2: gy, style:'stroke:var(--ink);stroke-width:1.5'}, svg);
+  vals.forEach(function(v, i){
+    var bw = 36, bx = gx + 18 + i * (gw / 5), bh = v / vmax * gh;
+    labEl('rect', {x: bx, y: gy - bh, width: bw, height: bh, style:'fill:var(--acc);opacity:.65;stroke:var(--acc-deep);stroke-width:1.2'}, svg);
+    snapSvgText(svg, bx + bw / 2, gy - bh - 6, String(v), 12.5);
+    snapSvgText(svg, bx + bw / 2, gy + 16, String(y0 + i), 11);
+  });
+  snapSvgText(svg, gx + gw / 2, 338, 'population counted each year', 11.5);
+  R.items = [
+    { kind: 'num', answer: vals[k], tol: 0, unit: '', q: 'How many individuals were counted in ' + (y0 + k) + '?', explain: 'Read the top of the ' + (y0 + k) + ' bar: ' + vals[k] + '.' },
+    { kind: 'num', answer: mean, tol: 0.6, unit: '', q: 'What is the mean yearly count over the five years?', explain: 'Mean = (' + vals.join(' + ') + ') ÷ 5 = ' + snapFix(mean) + '.' },
+    { kind: 'num', answer: rate, tol: 0.5, unit: '/yr', q: 'What is the average rate of change, in individuals per year, from ' + y0 + ' to ' + (y0 + 4) + '?', explain: 'Rate = (last − first) ÷ years = (' + vals[4] + ' − ' + vals[0] + ') ÷ 4 = ' + snapFix(rate) + ' per year.' },
+    { kind: 'num', answer: pct, tol: 1.5, unit: '%', q: 'By what percent did the population change from ' + y0 + ' to ' + (y0 + 4) + '?', explain: 'Percent change = (' + vals[4] + ' − ' + vals[0] + ') ÷ ' + vals[0] + ' × 100 = ' + snapFix(pct) + '%.' }
+  ];
+}
+
+function snapItemEl(it, i){
+  var div = document.createElement('div');
+  div.className = 'snap-item';
+  var html = '<p class="snap-q"><b>' + (i + 1) + '.</b> ' + it.q + '</p>';
+  if(it.kind === 'line' || it.kind === 'angle' || it.kind === 'num'){
+    html += '<input class="snap-in" type="number" step="any" inputmode="decimal" data-kind="' + it.kind + '" data-idx="' + i + '" aria-label="Your answer for question ' + (i + 1) + '">' + (it.unit ? ' <span class="mut">' + it.unit + '</span>' : '');
+    if(it.kind === 'line') html += ' <span class="mut">— or drag the line above</span>';
+  } else if(it.kind === 'quad'){
+    html += '<input class="snap-in" type="text" data-kind="quad" data-idx="' + i + '" placeholder="e.g. N40°E" aria-label="Your bearing for question ' + (i + 1) + '" style="width:170px">';
+  } else if(it.kind === 'word'){
+    html += '<input class="snap-in" type="text" data-kind="word" data-idx="' + i + '" placeholder="one word" aria-label="Your answer for question ' + (i + 1) + '" style="width:170px">';
+  } else if(it.kind === 'dip'){
+    html += '<div class="row"><button class="btn plain snap-pick" data-dip="left">Left side</button><button class="btn plain snap-pick" data-dip="right">Right side</button></div>';
+  } else if(it.kind === 'self'){
+    html += '<div class="row"><button class="btn plain" data-reveal="' + i + '">Show the key points</button>' +
+            '<button class="btn plain snap-pick" data-self="got" data-idx="' + i + '" hidden>I had it</button>' +
+            '<button class="btn plain snap-pick" data-self="missed" data-idx="' + i + '" hidden>I missed it</button></div>' +
+            '<div class="snap-fb" data-points="' + i + '" hidden>' + it.points + '</div>';
+  }
+  html += '<div class="snap-fb" data-fb="' + i + '" aria-live="polite"></div>';
+  div.innerHTML = html;
+  div.querySelectorAll('[data-dip]').forEach(function(b){
+    b.addEventListener('click', function(){
+      SNAP.round.dipPick = b.getAttribute('data-dip');
+      div.querySelectorAll('[data-dip]').forEach(function(x){ x.classList.toggle('on', x === b); });
+    });
+  });
+  div.querySelectorAll('[data-reveal]').forEach(function(b){
+    b.addEventListener('click', function(){
+      var pts = div.querySelector('[data-points]'); if(pts) pts.hidden = false;
+      div.querySelectorAll('[data-self]').forEach(function(x){ x.hidden = false; });
+      b.hidden = true;
+    });
+  });
+  div.querySelectorAll('[data-self]').forEach(function(b){
+    b.addEventListener('click', function(){
+      SNAP.round.items[i].got = b.getAttribute('data-self') === 'got';
+      div.querySelectorAll('[data-self]').forEach(function(x){ x.classList.toggle('on', x === b); });
+    });
+  });
+  return div;
+}
+function snapNumTemplates(){
+  function ri(a, b){ return snapRi(a, b); }
+  return [
+    function(){ var m = ri(20, 240), v = ri(5, 60), a = m / v; return { q: 'A rock sample has a mass of ' + m + ' g and a volume of ' + v + ' cm³. Calculate its density.', a: a, tol: 0.06, unit: 'g/cm³', ex: 'Density = mass ÷ volume = ' + m + ' ÷ ' + v + ' = ' + snapFix(a) + ' g/cm³.', givens: [m, v] }; },
+    function(){ var w = ri(200, 900), p = ri(5, Math.floor(w / 4)), a = p / w * 100; return { q: 'A sample of ' + w + ' g contains ' + p + ' g of one mineral. What percent of the sample is that mineral?', a: a, tol: 0.6, unit: '%', ex: 'Percent = part ÷ whole × 100 = ' + p + ' ÷ ' + w + ' × 100 = ' + snapFix(a) + '%.', givens: [w, p] }; },
+    function(){ var x = ri(4, 40), y = ri(4, 40), z = ri(4, 40), a = (x + y + z) / 3; return { q: 'Three trials measure the same length: ' + x + ' cm, ' + y + ' cm and ' + z + ' cm. What is the average of the three?', a: a, tol: 0.4, unit: 'cm', ex: 'Average = (' + x + ' + ' + y + ' + ' + z + ') ÷ 3 = ' + snapFix(a) + ' cm.', givens: [x, y] }; },
+    function(){ var cm = ri(120, 980), a = cm / 100; return { q: 'Convert ' + cm + ' cm to metres.', a: a, tol: 0.02, unit: 'm', ex: 'Metres = centimetres ÷ 100 = ' + cm + ' ÷ 100 = ' + snapFix(a) + ' m.', givens: [cm, 0] }; },
+    function(){ var rise = ri(3, 30), run = ri(4, 40), a = rise / run; return { q: 'A slope rises ' + rise + ' m over a horizontal distance of ' + run + ' m. What is its gradient (rise ÷ run)?', a: a, tol: 0.03, unit: '', ex: 'Gradient = rise ÷ run = ' + rise + ' ÷ ' + run + ' = ' + snapFix(a) + '.', givens: [rise, run] }; },
+    function(){ var cm = ri(2, 12), per = [10, 25, 50][ri(0, 2)], a = cm * per; return { q: 'On a map, two points are ' + cm + ' cm apart, and the scale is 1 cm = ' + per + ' m on the ground. How far apart are they really?', a: a, tol: 1, unit: 'm', ex: 'Real distance = ' + cm + ' × ' + per + ' m = ' + snapFix(a) + ' m.', givens: [cm, per] }; }
+  ];
+}
+function snapConceptBank(){
+  return [
+    { q: 'In your own words, what does a control do in an experiment?', points: 'A control is the unchanged comparison — it shows the effect came from the variable you changed, not from something else.' },
+    { q: 'Why do scientists repeat measurements and average them?', points: 'Repeats expose slips and random error; the average of honest repeats sits closer to the true value.' },
+    { q: 'What is the difference between the independent and dependent variables?', points: 'The independent variable is the one you deliberately change; the dependent variable is the one you measure as it responds.' },
+    { q: 'Precise and accurate are not the same — explain both.', points: 'Precise: repeated measurements agree with each other. Accurate: the measurement is close to the true value. You can be precise and still wrong if the instrument is off.' }
+  ];
+}
+
+/* ---------- grading ---------- */
+function snapNormQuad(s){
+  return String(s || '').toUpperCase().replace(/\s+/g, '').replace(/DEG/g, '°').replace(/^([NSEW])0+/, '$1').replace(/0+°/, '°');
+}
+function snapGrade(){
+  var R = SNAP.round; if(!R) return;
+  var score = 0, total = R.items.length;
+  R.items.forEach(function(it, i){
+    var fb = document.querySelector('[data-fb="' + i + '"]');
+    var inp = document.querySelector('#snapItems input[data-idx="' + i + '"]');
+    function say(ok, msg){ fb.className = 'snap-fb' + (ok ? ' ok' : ''); fb.innerHTML = (ok ? '✓ ' : '') + msg; if(ok) score++; }
+    if(it.kind === 'line'){
+      var got = inp && inp.value !== '' ? parseFloat(inp.value) : (SNAP.line ? SNAP.line.getAz() : NaN);
+      if(isNaN(got)){ say(false, 'No line set yet — spin the line or type the azimuth first.'); return; }
+      var errL = snapLineDiff(got, R.strike);
+      if(errL <= 3) say(true, 'Correct — your line runs ' + labPad(got) + '° / ' + labPad(labOpposite(got)) + '°, within ' + Math.round(errL) + '° of the strike (a line reads the same from both ends).');
+      else { var sg = snapSigned(got, R.strike); if(sg > 90) sg -= 180; if(sg < -90) sg += 180; say(false, 'Off by ' + Math.round(errL) + '° — rotate the line about ' + Math.abs(Math.round(sg)) + '° ' + (sg > 0 ? 'clockwise' : 'counterclockwise') + '. Remember: count clockwise from North, and ' + labPad(R.strike) + '° or ' + labPad(labOpposite(R.strike)) + '° both name this strike line.'); }
+    } else if(it.kind === 'angle'){
+      var g2 = inp ? parseFloat(inp.value) : NaN;
+      if(isNaN(g2)){ say(false, 'No answer typed yet.'); return; }
+      var err = snapAngDiff(g2, it.answer);
+      if(err <= 3) say(true, 'Correct — ' + labPad(it.answer) + '° (you were within ' + Math.round(err) + '°).');
+      else {
+        var hint = '';
+        if(R.type === 'strike' && it.answer === labDipDirection(R.strike) && Math.round(labNorm(g2)) === Math.round(labNorm(R.strike - 90))) hint = ' That\'s strike − 90 — dip is strike + 90, the other way round.';
+        else if(R.type === 'strike' && it.answer === labDipDirection(R.strike) && Math.round(labNorm(g2)) === Math.round(R.strike)) hint = ' That\'s the strike itself — dip points 90° clockwise from it.';
+        else { var s2 = snapSigned(g2, it.answer); hint = ' The target sits ' + Math.round(err) + '° ' + (s2 > 0 ? 'clockwise' : 'counterclockwise') + ' from your answer.'; }
+        say(false, 'Not quite — you put ' + labPad(g2) + '°, the answer is ' + labPad(it.answer) + '°.' + hint + ' ' + (it.explain || ''));
+      }
+    } else if(it.kind === 'num'){
+      var g3 = inp ? parseFloat(inp.value) : NaN;
+      if(isNaN(g3)){ say(false, 'No answer typed yet.'); return; }
+      if(Math.abs(g3 - it.answer) <= it.tol) say(true, 'Correct — ' + snapFix(it.answer) + (it.unit ? ' ' + it.unit : '') + '. ' + it.explain);
+      else say(false, 'Not quite — you put ' + snapFix(g3) + ', the answer is ' + snapFix(it.answer) + (it.unit ? ' ' + it.unit : '') + '. Worked steps: ' + it.explain);
+    } else if(it.kind === 'quad'){
+      var g4 = inp ? inp.value : '';
+      if(!g4 || !g4.trim()){ say(false, 'No bearing typed yet.'); return; }
+      if(snapNormQuad(g4) === snapNormQuad(it.answer)) say(true, 'Correct — ' + it.answer + '.');
+      else say(false, 'Not quite — you wrote “' + esc(g4.trim()) + '”, the bearing is ' + it.answer + '. ' + it.explain);
+    } else if(it.kind === 'dip'){
+      if(!R.dipPick){ say(false, 'Pick a side first — left or right.'); return; }
+      if(R.dipPick === 'right') say(true, 'Correct — rotate the paper so ' + labPad(R.strike) + '° is at the top and the layer\'s downhill direction (' + labPad(labDipDirection(R.strike)) + '°) lands on the right, so the short tick is drawn on the right, perpendicular to the strike line. Then rotate back and write ' + R.dip + ' beside the line.');
+      else say(false, 'Not the left. Step 3 of the method: rotate the paper so the strike direction ' + labPad(R.strike) + '° is at the top — the dip direction is strike + 90° = ' + labPad(labDipDirection(R.strike)) + '°, which lands on the <b>right</b> after that rotation. That is why the tick always goes on the right with this method.');
+    } else if(it.kind === 'tilt'){
+      var tt = SNAP.xsect ? SNAP.xsect.tilt : 0, D = R.dip;
+      if(Math.abs(tt - D) <= 3) say(true, 'Correct — the band dips ' + Math.abs(Math.round(tt)) + '° toward A′, within ' + Math.round(Math.abs(tt - D)) + '° of the ' + D + '° dip. In a section perpendicular to strike, the drawn angle is the true dip.');
+      else if(Math.abs(tt + D) <= 3) say(false, 'The angle is right (' + D + '°) but the direction is wrong — your band dips down to the LEFT. Layers dip toward the dip direction, ' + labPad(labDipDirection(R.strike)) + '°, which is the A′ (right) side of this section. Drag the band so it slopes down to the right.');
+      else if(Math.abs(tt) < 2) say(false, 'The band is still flat (0°). Drag on the section to tilt it down toward A′ until the readout shows about ' + D + '°.');
+      else say(false, 'Off by ' + Math.round(Math.abs(tt - D)) + '° — your band sits at ' + Math.round(tt) + '°, the dip is ' + D + '°. Use the numbered protractor ticks around the pivot: the band should sit ' + D + '° below the dashed horizontal.');
+    } else if(it.kind === 'word'){
+      var w = inp ? inp.value.trim().toLowerCase() : '';
+      if(!w) say(false, 'Nothing typed yet — one word: true or apparent.');
+      else if(w === it.answer) say(true, 'Correct — ' + it.explain);
+      else say(false, 'Not this time. ' + it.explain);
+    } else if(it.kind === 'self'){
+      if(it.got === true){ fb.className = 'snap-fb ok'; fb.textContent = '✓ Marked as known — compare once more with the key points above to be sure.'; score++; }
+      else if(it.got === false){ fb.className = 'snap-fb'; fb.textContent = 'Marked as missed — re-read the key points above, then try the next round.'; }
+      else { fb.className = 'snap-fb'; fb.textContent = 'Reveal the key points and mark yourself first.'; }
+    }
+  });
+  $('snapScore').innerHTML = '<b>Score: ' + score + ' of ' + total + '.</b> ' + (score === total ? 'Clean round — tap “New round” for fresh numbers.' : 'Check the explanations above, then tap “New round” and try a fresh set.');
+}
+function snapStartPractice(){
+  SNAP.text = null; /* extracted text discarded here — it was never persisted */
+  snapBuildRound();
+}
+function snapNewRound(){ snapBuildRound(); }
+
+/* ---------- free-draw canvas ---------- */
+var snapCtx = null, snapDrawing = false, snapLast = null;
+function snapInitCanvas(){
+  var c = $('snapCanvas'); if(!c) return;
+  try{ snapCtx = c.getContext('2d'); }catch(e){ snapCtx = null; }
+  if(snapCtx){ snapCtx.lineWidth = 3.4; snapCtx.lineCap = 'round'; snapCtx.lineJoin = 'round'; snapCtx.strokeStyle = '#c2571b'; }
+  function pos(e){ var r = c.getBoundingClientRect(); if(!r.width) return null; return { x: (e.clientX - r.left) / r.width * c.width, y: (e.clientY - r.top) / r.height * c.height }; }
+  c.addEventListener('pointerdown', function(e){ if(!SNAP.drawMode) return; var p = pos(e); if(!p) return; snapDrawing = true; snapLast = p; SNAP.strokes.push([p]); if(c.setPointerCapture){ try{ c.setPointerCapture(e.pointerId); }catch(err){} } e.preventDefault(); });
+  c.addEventListener('pointermove', function(e){ if(!snapDrawing || !snapCtx) return; var p = pos(e); if(!p) return; var st = SNAP.strokes[SNAP.strokes.length - 1]; if(st) st.push(p); snapCtx.beginPath(); snapCtx.moveTo(snapLast.x, snapLast.y); snapCtx.lineTo(p.x, p.y); snapCtx.stroke(); snapLast = p; });
+  ['pointerup', 'pointercancel'].forEach(function(ev){ c.addEventListener(ev, function(){ snapDrawing = false; }); });
+}
+function snapRedraw(){
+  var c = $('snapCanvas'); if(!c || !snapCtx) return;
+  snapCtx.clearRect(0, 0, c.width, c.height);
+  SNAP.strokes.forEach(function(st){
+    if(st.length < 2) return;
+    snapCtx.beginPath(); snapCtx.moveTo(st[0].x, st[0].y);
+    for(var i = 1; i < st.length; i++) snapCtx.lineTo(st[i].x, st[i].y);
+    snapCtx.stroke();
+  });
+}
+function snapUndoStroke(){ SNAP.strokes.pop(); snapRedraw(); }
+function snapClearDrawing(){ SNAP.strokes = []; snapRedraw(); }
+function snapSetDrawMode(on){
+  SNAP.drawMode = !!on;
+  var c = $('snapCanvas'); if(c) c.style.pointerEvents = on ? 'auto' : 'none';
+  var b = $('snapDrawToggleBtn'); if(b) b.textContent = on ? '✏️ Draw mode — tap to move the line' : '✋ Line mode — tap to draw on it';
+}
+
+/* ---------- notes (the learner's own writing — on-device only) ---------- */
+var SNAP_NOTES_KEY = 'sl-snap-notes-v1';
+var snapNotes = { text: '', strokes: [] };
+var snapNotesCtx = null, snapNotesDrawing = false, snapNotesLast = null;
+function snapNotesSave(){ try{ localStorage.setItem(SNAP_NOTES_KEY, JSON.stringify(snapNotes)); }catch(e){} }
+function snapNotesLoad(){
+  try{ var raw = localStorage.getItem(SNAP_NOTES_KEY); if(raw){ var p = JSON.parse(raw); if(p && typeof p.text === 'string'){ snapNotes.text = p.text; snapNotes.strokes = Array.isArray(p.strokes) ? p.strokes : []; } } }catch(e){}
+}
+function snapNotesRedraw(){
+  var c = $('snapNotesCanvas'); if(!c || !snapNotesCtx) return;
+  snapNotesCtx.clearRect(0, 0, c.width, c.height);
+  snapNotes.strokes.forEach(function(st){
+    if(st.length < 2) return;
+    snapNotesCtx.beginPath(); snapNotesCtx.moveTo(st[0].x, st[0].y);
+    for(var i = 1; i < st.length; i++) snapNotesCtx.lineTo(st[i].x, st[i].y);
+    snapNotesCtx.stroke();
+  });
+}
+function snapNotesInit(){
+  var c = $('snapNotesCanvas'); if(!c) return;
+  snapNotesLoad();
+  $('snapNotesText').value = snapNotes.text;
+  $('snapNotesText').addEventListener('input', function(){ snapNotes.text = this.value; snapNotesSave(); });
+  try{ snapNotesCtx = c.getContext('2d'); }catch(e){ snapNotesCtx = null; }
+  if(snapNotesCtx){ snapNotesCtx.lineWidth = 2.6; snapNotesCtx.lineCap = 'round'; snapNotesCtx.lineJoin = 'round'; snapNotesCtx.strokeStyle = '#c2571b'; }
+  snapNotesRedraw();
+  function pos(e){ var r = c.getBoundingClientRect(); if(!r.width) return null; return { x: (e.clientX - r.left) / r.width * c.width, y: (e.clientY - r.top) / r.height * c.height }; }
+  c.addEventListener('pointerdown', function(e){ var p = pos(e); if(!p) return; snapNotesDrawing = true; snapNotesLast = p; snapNotes.strokes.push([p]); if(c.setPointerCapture){ try{ c.setPointerCapture(e.pointerId); }catch(err){} } e.preventDefault(); });
+  c.addEventListener('pointermove', function(e){ if(!snapNotesDrawing || !snapNotesCtx) return; var p = pos(e); if(!p) return; var st = snapNotes.strokes[snapNotes.strokes.length - 1]; if(st) st.push(p); snapNotesCtx.beginPath(); snapNotesCtx.moveTo(snapNotesLast.x, snapNotesLast.y); snapNotesCtx.lineTo(p.x, p.y); snapNotesCtx.stroke(); snapNotesLast = p; });
+  ['pointerup', 'pointercancel'].forEach(function(ev){ c.addEventListener(ev, function(){ if(snapNotesDrawing){ snapNotesDrawing = false; snapNotesSave(); } }); });
+  $('snapNotesUndoBtn').addEventListener('click', function(){ snapNotes.strokes.pop(); snapNotesRedraw(); snapNotesSave(); });
+  $('snapNotesClearBtn').addEventListener('click', function(){ snapNotes.strokes = []; snapNotesRedraw(); snapNotesSave(); });
+}
+
+/* ---------- research (reference lookup only) ---------- */
+function snapResearchGo(wiki){
+  var inp = $('snapResearchIn');
+  var q = (inp.value || '').trim() || (SNAP_TYPES[SNAP.type] || {}).topic || '';
+  if(!q) return;
+  var url = wiki ? 'https://en.wikipedia.org/w/index.php?search=' + encodeURIComponent(q)
+                 : 'https://www.google.com/search?q=' + encodeURIComponent(q);
+  window.open(url, '_blank', 'noopener');
+}
+
+/* ---------- wiring ---------- */
+if($('snapPickBtn')){
+  $('snapPickBtn').addEventListener('click', function(){ $('snapFile').click(); });
+  $('snapFile').addEventListener('change', function(){
+    var f = this.files && this.files[0]; if(!f) return;
+    try{ var img = $('snapPreview'); img.src = URL.createObjectURL(f); img.hidden = false; }catch(e){}
+    snapStart(f);
+  });
+  $('snapPasteBtn').addEventListener('click', function(){ snapStart($('snapPaste').value); });
+  $('snapGoBtn').addEventListener('click', snapStartPractice);
+  $('snapTypeStrikeBtn').addEventListener('click', function(){ snapSetType('strike'); });
+  $('snapTypeAnglesBtn').addEventListener('click', function(){ snapSetType('angles'); });
+  $('snapTypeNumericBtn').addEventListener('click', function(){ snapSetType('numeric'); });
+  $('snapTypeConceptBtn').addEventListener('click', function(){ snapSetType('concept'); });
+  $('snapCheckBtn').addEventListener('click', snapGrade);
+  $('snapNewBtn').addEventListener('click', snapNewRound);
+  $('snapDrawToggleBtn').addEventListener('click', function(){ snapSetDrawMode(!SNAP.drawMode); });
+  $('snapUndoBtn').addEventListener('click', snapUndoStroke);
+  $('snapClearBtn').addEventListener('click', snapClearDrawing);
+  $('snapTypeLibBtn').addEventListener('click', function(){ snapSetType($('snapTypeLib').value); });
+  $('snapResearchWebBtn').addEventListener('click', function(){ snapResearchGo(false); });
+  $('snapResearchWikiBtn').addEventListener('click', function(){ snapResearchGo(true); });
+  document.querySelectorAll('.snap-tabbtn').forEach(function(b){
+    b.addEventListener('click', function(){
+      document.querySelectorAll('.snap-tabbtn').forEach(function(x){ x.classList.toggle('on', x === b); });
+      var layout = document.querySelector('.snap-layout'), side = b.getAttribute('data-side');
+      layout.classList.toggle('snap-show-notes', side === 'notes');
+      layout.classList.toggle('snap-show-research', side === 'research');
+    });
+  });
+  snapInitCanvas();
+  snapNotesInit();
+  snapRenderGlossary();
+}
 </script>
 </body>
 </html>
