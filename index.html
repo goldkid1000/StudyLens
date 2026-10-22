@@ -453,6 +453,9 @@ mark.stock{background:var(--warn-bg);color:inherit;border-radius:4px;padding:0 3
 .snap-quality{border:1.5px dashed var(--line-strong);border-radius:14px;padding:12px 15px;margin-top:12px;background:var(--surface3);font-size:15px;line-height:1.6}
 .snap-quality ul{margin:6px 0 10px;padding-left:20px}
 .snap-audit{border:1.5px solid var(--line);border-left:5px solid var(--acc);border-radius:12px;padding:11px 14px;margin-top:12px;background:var(--surface3);font-size:14.5px;line-height:1.65}
+.snap-auto{display:flex;align-items:center;gap:10px;flex-wrap:wrap;border:1.5px solid var(--line);border-left:5px solid var(--acc);border-radius:12px;padding:9px 13px;margin-bottom:12px;background:var(--surface3);font-size:14.5px}
+.snap-auto[hidden]{display:none}
+.snap-auto .btn{min-height:44px}
 .snap-example{border:1.5px solid var(--line);border-radius:14px;padding:13px 15px;margin-top:12px;background:var(--surface3);font-size:15px;line-height:1.65}
 .snap-example h4{margin:0 0 6px;font-size:16px}
 .snap-example ol{margin:8px 0 2px;padding-left:22px}
@@ -1074,6 +1077,10 @@ input.snap-in{background:var(--surface3);border:1.5px solid var(--line);border-r
 
       <div class="card" id="snapPracticeCard" hidden>
         <h3>3 · Your practice round</h3>
+        <div id="snapAutoBanner" class="snap-auto" hidden>
+          <span id="snapAutoText"></span>
+          <button class="btn plain" id="snapChangeBtn">Wrong lab? Change</button>
+        </div>
         <div id="snapRoundHead" class="lab-q"></div>
         <div class="snap-side-tabs" role="group" aria-label="Workspace panels">
           <button class="btn plain snap-tabbtn on" data-side="work">Workspace</button>
@@ -3731,8 +3738,12 @@ ssRefresh();
    fetched with no-store caching: when a newer build ships, an already-open or
    home-screen copy of an older build sees the newer version number there and
    offers "Update now" (a reload onto the new build). */
-var APP_VERSION = '2.21.3';
+var APP_VERSION = '2.21.4';
 var CHANGELOG = [
+  { v: '2.21.4', date: 'Oct 22, 2026', notify: true, notes: [
+    'Lab Snapshot is automatic now: snap a photo (or paste a few lines) and, when the read is confident, the matching practice module opens straight away — no confirm step, no library tap. A slim banner at the top of the round names the lab it spotted, with a one-tap “Wrong lab? Change” button if it ever guesses wrong.',
+    'Weak or split reads stay honest: if a photo reads poorly, or two lab types look equally likely, you land on the chooser with the retake tips, exactly as before — the app never forces a guess. Nothing else changed: your photo is still read on-device only to spot the type and dropped when practice starts, and your notes still live on this device only.'
+  ] },
   { v: '2.21.3', date: 'Oct 22, 2026', notify: true, notes: [
     'Worked examples in Lab Snapshot: every module now has a “Show me one worked example” button — it deals fresh numbers (never from your sheet) and walks every answer step by step: given → rule → result. The example round stays live so you can try it yourself.',
     'Feedback names the classic traps now: the dip tick on the strike − 90 side, dip direction mixed up with the opposite strike, a quadrant bearing with E and W flipped, relief ÷ run swapped in a gradient, and swapped volumes in M₁V₁ = M₂V₂. Geology rounds also carry a plain “How this is checked” line — the exact rules the app grades with, so you can audit it against your textbook.',
@@ -5007,7 +5018,7 @@ if($('labCalcBtn')){
    moment practice starts. Every practice question, diagram and answer
    comes from the built-in templates below with fresh random values —
    nothing from the learner's sheet is stored, shown again, or reused. */
-var SNAP = { text: null, detected: null, type: null, banned: ['50,25', '310,60'], round: null, strokes: [], drawMode: true, line: null, ocrConf: null, lowQ: false };
+var SNAP = { text: null, detected: null, type: null, banned: ['50,25', '310,60'], round: null, strokes: [], drawMode: true, line: null, ocrConf: null, lowQ: false, auto: false };
 var SNAP_OCR_SRC = 'https://cdn.jsdelivr.net/npm/tesseract.js@5.0.5/dist/tesseract.min.js';
 var SNAP_TYPES = {
   strike:  { label: 'Geology \u2014 strike & dip worksheet (azimuth method)', topic: 'strike and dip', format: 'Problems give a strike and a dip and ask for the map symbol and its directions. Practice deals a fresh strike/dip pair and checks your line, the dip side, the dip direction, and the bearing.' },
@@ -5048,6 +5059,40 @@ function snapDetectType(text){
   if(snapHits(t, ['protractor', 'bearing', 'measure the angle', 'compass direction', 'degrees']) >= 2) return 'angles';
   if(snapHits(t, ['calculate', 'density', 'volume', 'mass', 'percent', 'concentration', 'trial', 'average', 'data table', 'gradient']) >= 2) return 'numeric';
   return 'concept';
+}
+/* Confidence gate for auto-launch (v2.21.4). Scores the read against the
+   same keyword lists the detector rules use. A read drives the app on its
+   own only when it is NOT a weak read (SNAP.lowQ), the detected type is a
+   real match (not the concept fallback), the winning type's keyword score
+   agrees with the rule-based detection, scores at least 2 hits, and beats
+   the runner-up type outright — a tie means two lab types look equally
+   likely, which is ambiguous and stays with the chooser. */
+var SNAP_KEYWORDS = {
+  strike: ['strike', 'dip ', 'azimuth', 'brunton'],
+  chem: ['titration', 'burette', 'buret', 'molarity', 'titrant', 'endpoint'],
+  bio: ['microscope', 'field of view', 'magnification', 'survivorship', 'ocular', 'objective lens'],
+  physics: ['vector', 'resultant', 'component', 'free-body', 'projectile'],
+  topo: ['topographic', 'contour', 'elevation', 'relief', 'quadrangle'],
+  data: ['population', 'per capita', 'quadrat', 'transect', 'growth rate', 'species richness'],
+  angles: ['protractor', 'bearing', 'measure the angle', 'compass direction', 'degrees'],
+  numeric: ['calculate', 'density', 'volume', 'mass', 'percent', 'concentration', 'trial', 'average', 'data table', 'gradient']
+};
+function snapAssess(text){
+  var type = snapDetectType(text);
+  var res = { type: type, confident: false, top: 0, second: 0 };
+  if(type === 'concept' || SNAP.lowQ) return res;
+  var t = ' ' + String(text || '').toLowerCase().replace(/\s+/g, ' ') + ' ';
+  var topKey = null;
+  Object.keys(SNAP_KEYWORDS).forEach(function(k){
+    var s = snapHits(t, SNAP_KEYWORDS[k]);
+    if(s > res.top){ res.second = res.top; res.top = s; topKey = k; }
+    else if(s > res.second){ res.second = s; }
+  });
+  var xs = snapHits(t, ['cross section', 'cross-section']) * 2;
+  if(xs > res.top){ res.second = res.top; res.top = xs; topKey = 'xsect'; }
+  else if(xs > res.second){ res.second = xs; }
+  res.confident = topKey === type && res.top >= 2 && res.top > res.second;
+  return res;
 }
 function snapExtractPairs(text){
   var out = SNAP.banned.slice();
@@ -5090,7 +5135,18 @@ function snapHandleText(text, conf){
   SNAP.detected = SNAP.type;
   $('snapOcrMsg').textContent = '';
   var q1 = $('snapQuality1'); if(q1) q1.hidden = true;
-  snapShowType();
+  /* v2.21.4 — detection drives: a confident read opens its matching module
+     immediately (no confirm gate, no library tap). A weak or split read
+     stays honest and lands on the chooser with the retake help, as before. */
+  if(snapAssess(text).confident){
+    SNAP.auto = true;
+    $('snapTypeCard').hidden = true;
+    var qual = $('snapQuality'); if(qual) qual.hidden = true;
+    snapStartPractice(); /* drops the extracted text, builds the round, shows the banner */
+  } else {
+    SNAP.auto = false;
+    snapShowType();
+  }
 }
 function snapStart(source){
   if(typeof source === 'string'){ snapHandleText(source); return; }
@@ -5115,6 +5171,7 @@ function snapShowType(){
     '<p class="lab-msg">' + d.format + '</p>' +
     '<p class="lab-msg"><b>Not saved:</b> your photo stays on your device and isn\'t saved — what was read is only used to pick this type, and it is dropped when practice starts.</p>';
   $('snapTypeCard').hidden = false;
+  var lib = $('snapTypeLib'); if(lib) lib.value = SNAP.type;
   var qual = $('snapQuality'); if(qual) qual.hidden = !SNAP.lowQ;
   snapRenderGlossary();
   snapScrollTo($('snapTypeCard'));
@@ -5656,9 +5713,19 @@ function snapGrade(){
   });
   $('snapScore').innerHTML = '<b>Score: ' + score + ' of ' + total + '.</b> ' + (score === total ? 'Clean round — tap “New round” for fresh numbers.' : 'Check the explanations above, then tap “New round” and try a fresh set.');
 }
+/* Slim banner on an auto-launched round: names the spotted TYPE only —
+   never anything read from the sheet — and offers a one-tap way back to
+   the chooser if the guess was wrong. */
+function snapShowAutoBanner(){
+  var b = $('snapAutoBanner'); if(!b) return;
+  var d = SNAP_TYPES[SNAP.type] || SNAP_TYPES.concept;
+  $('snapAutoText').textContent = '📸 Snapped: looks like ' + d.label;
+  b.hidden = false;
+}
 function snapStartPractice(){
   SNAP.text = null; /* extracted text discarded here — it was never persisted */
   snapBuildRound();
+  var b = $('snapAutoBanner'); if(b){ if(SNAP.auto) snapShowAutoBanner(); else b.hidden = true; }
 }
 function snapNewRound(){ snapBuildRound(); }
 
@@ -5744,7 +5811,8 @@ if($('snapPickBtn')){
     snapStart(f);
   });
   $('snapPasteBtn').addEventListener('click', function(){ snapStart($('snapPaste').value); });
-  $('snapGoBtn').addEventListener('click', snapStartPractice);
+  $('snapGoBtn').addEventListener('click', function(){ SNAP.auto = false; snapStartPractice(); });
+  $('snapChangeBtn').addEventListener('click', function(){ snapShowType(); });
   $('snapTypeStrikeBtn').addEventListener('click', function(){ snapSetType('strike'); });
   $('snapTypeAnglesBtn').addEventListener('click', function(){ snapSetType('angles'); });
   $('snapTypeNumericBtn').addEventListener('click', function(){ snapSetType('numeric'); });

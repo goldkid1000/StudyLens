@@ -1,9 +1,9 @@
 {
  "notes": [
-  "Worked examples in every Lab Snapshot module: one tap deals fresh numbers and walks each answer step by step (given, rule, result). Feedback now names the classic traps — strike − 90 tick, dip direction vs opposite strike, flipped E/W bearings, swapped gradient and titration values — and geology rounds show a plain 'how this is checked' audit line.",
-  "Weak photo reads now get retake tips and a one-tap retake on the confirm step instead of a dead end, and the in-round protractor reads out the quadrant bearing live as you drag."
+  "Lab Snapshot goes off what it sees: a confident photo read now opens the matching practice module automatically — no confirm step, no library tap — with a slim 'Snapped: looks like…' banner and a one-tap 'Wrong lab? Change' button. Weak or ambiguous reads still land on the chooser with retake tips, never a forced guess.",
+  "Everything else is unchanged: the photo is read on-device only to detect the type and dropped when practice starts, practice uses fresh numbers only, and notes stay on this device only."
  ],
  "notify": true,
  "updated": "2026-10-22",
- "version": "2.21.3"
+ "version": "2.21.4"
 }
