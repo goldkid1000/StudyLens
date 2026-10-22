@@ -464,6 +464,10 @@ mark.stock{background:var(--warn-bg);color:inherit;border-radius:4px;padding:0 3
 .snap-paper-chip{display:inline-flex;align-items:center;gap:8px;border:1.5px solid var(--line);border-radius:999px;padding:4px 6px 4px 4px;background:var(--surface3);font-size:13.5px;font-weight:600}
 .snap-paper-chip img{width:34px;height:34px;object-fit:cover;border-radius:50%}
 .snap-paper-x{min-width:36px;min-height:36px;border-radius:50%;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);font-size:17px;line-height:1;cursor:pointer}
+#ssTrayChips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+#ssTrayChips:empty{display:none}
+.snap-paper-chip .chip-name{max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.snap-paper-chip .chip-meta{font-weight:400;font-size:12.5px;color:var(--mut)}
 .snap-example{border:1.5px solid var(--line);border-radius:14px;padding:13px 15px;margin-top:12px;background:var(--surface3);font-size:15px;line-height:1.65}
 .snap-example h4{margin:0 0 6px;font-size:16px}
 .snap-example ol{margin:8px 0 2px;padding-left:22px}
@@ -602,6 +606,19 @@ input.snap-in{background:var(--surface3);border:1.5px solid var(--line);border-r
       <div class="card" id="simpleCard">
         <h3>Simple Study</h3>
         <p class="ss-sub">Easy practice, one question at a time, made only from your own material. Add material three ways: paste it above, snap a photo of your notes, or add a file (slides, docs, PDFs, spreadsheets).</p>
+        <div id="ssTray" style="margin-top:14px;border-top:1px solid var(--line);padding-top:14px">
+          <h3 style="font-size:17px;margin:0 0 6px">Build a pack from photos &amp; files</h3>
+          <p class="small">Queue up to 4 photos and up to 6 files (PDF, documents, slides, spreadsheets, text), then tap <strong>Done</strong> when you're ready. Nothing is read until you tap Done — then photos are read, files are read, and everything is combined with whatever you pasted into “Your material” above and built into one study pack. Everything is read right here on this device and never uploaded.</p>
+          <div class="row">
+            <label class="btn ghost filelabel" for="ssTrayPhotoInput">Add photo</label>
+            <input type="file" id="ssTrayPhotoInput" accept="image/*" multiple hidden>
+            <label class="btn ghost filelabel" for="ssTrayFileInput">Add file</label>
+            <input type="file" id="ssTrayFileInput" accept=".pdf,.docx,.pptx,.xlsx,.csv,.txt,.md" multiple hidden>
+            <button class="btn" id="ssTrayDoneBtn">Done — build my pack</button>
+          </div>
+          <div id="ssTrayChips"></div>
+          <p class="small" id="ssTrayStatus" role="status" style="margin-top:8px"></p>
+        </div>
         <div class="row">
           <label class="btn filelabel" for="snapInput">Snap your material</label>
           <input type="file" id="snapInput" accept="image/*" capture="environment" hidden>
@@ -1314,17 +1331,121 @@ function extractTerms(text, sentences){
   terms.forEach(function(x){ var k = x.t.toLowerCase(); if(!used[k] && out.length < 14){ used[k] = 1; out.push(x.t); } });
   return out;
 }
+/* ================= text quality control (v2.21.6) =================
+   Raw photo reads can contain symbol soup and broken fragments ("¥ }",
+   "h LR A ae MR…"). Nothing reaches pack building unfiltered: soup
+   tokens are scrubbed, garbage sentences dropped, and every sentence
+   must pass a readability gate before it can become a card, a quiz
+   question, or a word-bank sentence. Terms are filtered too, so the
+   word bank only ever holds plausible words. The heuristics are
+   deliberately conservative — numbers, bearings (NW, A–A′), degrees,
+   hyphenated words, and ALL-CAPS terms all survive. */
+var STUDY_SOUP_RE = /[¥¦§©®™\\{}[\]"`~^|<>*#+@&_=\/]/;
+var STUDY_OK_SINGLE = { a: 1, A: 1, I: 1 };
+var STUDY_CAPS_OK = { NW:1, NE:1, SW:1, SE:1, NNE:1, NNW:1, SSE:1, SSW:1, ENE:1, ESE:1, WNW:1, WSW:1, DNA:1, RNA:1, ATP:1, USA:1, UK:1, UN:1, BC:1, AD:1, AM:1, PM:1, TV:1, PC:1 };
+var STUDY_TITLES = { Mr:1, Mrs:1, Ms:1, Dr:1, St:1 };
+/* Two-letter tokens are where OCR noise hides ("LR", "MR", "ae", "Ci").
+   A two-letter token is plausible only as a common short word, a unit,
+   a compass/caps abbreviation, or an element symbol in exact case. */
+var STUDY_TWO = { is:1, it:1, in:1, on:1, of:1, to:1, by:1, an:1, as:1, at:1, be:1, do:1, go:1, he:1, if:1, me:1, my:1, no:1, or:1, so:1, up:1, us:1, we:1, am:1, vs:1, eg:1, ie:1, pi:1, cm:1, mm:1, km:1, kg:1, ml:1, oz:1, lb:1, ft:1, yd:1, mi:1, ii:1, iv:1, vi:1, ix:1, xi:1, id:1, ok:1 };
+var STUDY_ELEMENTS = { He:1, Li:1, Be:1, Ne:1, Na:1, Mg:1, Al:1, Si:1, Cl:1, Ar:1, Ca:1, Ti:1, Cr:1, Mn:1, Fe:1, Co:1, Ni:1, Cu:1, Zn:1, Br:1, Kr:1, Sr:1, Ag:1, Sn:1, Ba:1, Pt:1, Au:1, Hg:1, Pb:1, Ra:1 };
+function studyTokenCore(tok){
+  return String(tok).replace(/^["“”‘'(\[$]+/, '').replace(/["“”’')\].,;:!?%]+$/, '');
+}
+function studyTokenOK(tok){
+  var core = studyTokenCore(String(tok).replace(/[–—]/g, '-').replace(/[′’]/g, "'"));
+  if(!core) return false;
+  if(STUDY_SOUP_RE.test(core)) return false;
+  if(STUDY_TITLES[core]) return true;
+  if(!/^[A-Za-z0-9][A-Za-z0-9'.°-]*[A-Za-z0-9°]$/.test(core) && !/^[A-Za-z0-9]$/.test(core)) return false;
+  if(core.length === 1) return !!STUDY_OK_SINGLE[core] || /^[0-9]$/.test(core);
+  if(core.length === 2 && /^[A-Za-z]+$/.test(core)){
+    return !!(STUDY_TWO[core.toLowerCase()] || STUDY_CAPS_OK[core.toUpperCase()] || STUDY_ELEMENTS[core]);
+  }
+  var letters = (core.match(/[A-Za-z]/g) || []).length;
+  if(letters === 0) return true; /* pure numbers / measurements are fine */
+  /* mixed-case fragments with no vowel ("Sra", "vass"-style shards are
+     spared only when they carry a vowel) are classic OCR noise */
+  if(core.length >= 3 && !/[aeiouAEIOU]/.test(core) && !STUDY_CAPS_OK[core.toUpperCase()]) return false;
+  return true;
+}
+function studyRealWord(tok){
+  var core = studyTokenCore(String(tok));
+  return /^[A-Za-z]{3,}$/.test(core) && (/[aeiouAEIOU]/.test(core) || !!STUDY_CAPS_OK[core.toUpperCase()]);
+}
+function studyScrubSentence(s){
+  return s.split(/\s+/).filter(function(tok){
+    var core = studyTokenCore(tok);
+    if(!core) return false;
+    if(STUDY_SOUP_RE.test(core)) return false;
+    if(core.length === 1 && !STUDY_OK_SINGLE[core] && !/^[0-9]$/.test(core)) return false;
+    return true;
+  }).join(' ');
+}
+/* OCR garbage often glues onto the front of a real sentence (the read
+   before it had no full stop). If a sentence doesn't start like a
+   sentence, look a few tokens in for the first capitalised real word;
+   when at least half of what precedes it is implausible, the real
+   sentence starts there. Abbreviation dots ("Mt.", "Dr.") stop the
+   trim cold — real prose is never trimmed. */
+function studyTrimPrefix(s){
+  var toks = s.split(/\s+/);
+  if(toks.length < 6) return s;
+  var c0 = studyTokenCore(toks[0]);
+  if(studyTokenOK(toks[0]) && (studyRealWord(toks[0]) || /^[A-Z]/.test(c0))) return s;
+  for(var i = 1; i <= Math.min(16, toks.length - 4); i++){
+    if(/\.$/.test(toks[i - 1])) return s;
+    if(/^[A-Z]/.test(studyTokenCore(toks[i])) && studyRealWord(toks[i])){
+      var bad = 0;
+      for(var k = 0; k < i; k++) if(!studyTokenOK(toks[k])) bad++;
+      return bad * 2 >= i ? toks.slice(i).join(' ') : s;
+    }
+  }
+  return s;
+}
+function cleanStudyMaterial(text){
+  var units = getSentences(String(text || ''));
+  var kept = [], dropped = 0;
+  units.forEach(function(u){
+    var scrubbed = studyScrubSentence(studyTrimPrefix(u));
+    var toks = scrubbed.split(/\s+/).filter(Boolean);
+    var ok = 0, real = 0;
+    toks.forEach(function(t){ if(studyTokenOK(t)) ok++; if(studyRealWord(t)) real++; });
+    if(toks.length >= 4 && real >= 3 && ok / toks.length >= 0.85) kept.push(scrubbed);
+    else dropped++;
+  });
+  return { text: kept.join(' '), sentences: kept, kept: kept.length, dropped: dropped,
+           share: units.length ? dropped / units.length : 0 };
+}
+function cleanTerms(terms){
+  return (terms || []).filter(function(t){
+    return String(t).split(/\s+/).every(function(tok){ return studyTokenOK(tok); });
+  });
+}
+function cleanNoteText(cl){
+  if(cl.share >= 0.25) return 'That photo read messily — I could only use part of it. The pack below is built from the clean part; a closer, well-lit, straight-on photo reads better.';
+  return 'Tidied the scan up: ' + cl.dropped + ' line' + (cl.dropped === 1 ? '' : 's') + ' that didn\'t read clearly ' + (cl.dropped === 1 ? 'was' : 'were') + ' left out.';
+}
+var SL_CLEAN_NOTE = '';
 function generateStudy(){
-  var text = $('material').value.trim();
-  if(text.length < 120){ showNotice($('studyNotice'), 'Paste a bit more material first — a paragraph or more works best.', 'err'); return; }
+  var raw = $('material').value.trim();
+  if(raw.length < 120){ showNotice($('studyNotice'), 'Paste a bit more material first — a paragraph or more works best.', 'err'); return; }
   hideNotice($('studyNotice'));
+  /* v2.21.6: material passes the quality gate before anything is built,
+     so a messy scan can no longer turn into messy exercises. */
+  var cl = cleanStudyMaterial(raw);
+  if(!cl.sentences.length){
+    showNotice($('studyNotice'), 'That read messily — none of it came through clearly enough to study from. Try a closer, well-lit, straight-on photo, a different file, or paste the text instead.', 'err');
+    return;
+  }
+  var text = cl.text;
   /* A fresh pack invalidates Simple Study state tied to the OLD material:
      spreadsheet formula questions and a Fix-My-Mistakes weak-spot filter
      used to survive into the new pack, mixing in questions — or a filter
      matching nothing — from material the learner has moved on from. */
   if(window.SS){ SS.extraMC = []; SS.filter = null; SS.missed = []; SS.fixItems = []; SS.fixConcepts = []; }
   S.material = text;
-  S.sentences = getSentences(text);
+  S.sentences = cl.sentences;
   var f = wordFreq(text);
   var scored = S.sentences.map(function(s, i){
     var w = 0;
@@ -1334,7 +1455,7 @@ function generateStudy(){
   }).sort(function(a,b){ return b.w - a.w; }).slice(0, 6).sort(function(a,b){ return a.i - b.i; });
   S.summary = scored.map(function(x){ return x.s; });
   $('summaryList').innerHTML = scored.map(function(x){ return '<li>' + esc(x.s) + '</li>'; }).join('');
-  S.terms = extractTerms(text, S.sentences);
+  S.terms = cleanTerms(extractTerms(text, S.sentences));
   $('termsBox').innerHTML = S.terms.map(function(t){ return '<span class="pill">' + esc(t) + '</span>'; }).join('') || '<span class="mut">No clear key terms found — try more material.</span>';
   $('summaryCard').hidden = false;
   buildCards(); buildQuiz();
@@ -1342,6 +1463,7 @@ function generateStudy(){
   $('cardsHint').textContent = S.cards.length + ' flashcards ready. Browse them freely, or hit Review due to grade cards and space the repeats out.';
   $('quizHint').textContent = S.quiz.length + ' quiz questions ready — built from your material.';
   showTab('cards');
+  if(cl.dropped > 0) showNotice($('studyNotice'), cleanNoteText(cl), 'ok');
 }
 var GENERATING = false;
 $('genBtn').addEventListener('click', function(){
@@ -3419,8 +3541,15 @@ function ssFormulaMC(sheetData){
 
 /* ---------- apply material through the same pipeline as the paste flow ---------- */
 function ssApplyMaterial(text){
+  /* v2.21.6: same quality gate as the paste flow — material that still
+     carries scan noise is cleaned before it can seed any exercise. If
+     cleaning would empty it (the confirm step already gated, so this
+     is a belt-and-braces fallback), keep the raw text. */
+  var cl = cleanStudyMaterial(text);
+  if(cl.sentences.length) text = cl.text;
+  SL_CLEAN_NOTE = cl.dropped > 0 ? cleanNoteText(cl) : '';
   S.material = text;
-  S.sentences = getSentences(text);
+  S.sentences = cl.sentences.length ? cl.sentences : getSentences(text);
   var f = wordFreq(text);
   var scored = S.sentences.map(function(s, i){
     var w = 0;
@@ -3430,7 +3559,7 @@ function ssApplyMaterial(text){
   }).sort(function(a, b){ return b.w - a.w; }).slice(0, 6).sort(function(a, b){ return a.i - b.i; });
   S.summary = scored.map(function(x){ return x.s; });
   $('summaryList').innerHTML = scored.map(function(x){ return '<li>' + esc(x.s) + '</li>'; }).join('');
-  S.terms = extractTerms(text, S.sentences);
+  S.terms = cleanTerms(extractTerms(text, S.sentences));
   $('termsBox').innerHTML = S.terms.map(function(t){ return '<span class="pill">' + esc(t) + '</span>'; }).join('') || '<span class="mut">No clear key terms found — try more material.</span>';
   $('summaryCard').hidden = false;
   $('material').value = text;
@@ -3443,6 +3572,7 @@ function ssApplyMaterial(text){
   SS.missed = [];
   $('ssPlay').hidden = true;
   ssRefresh();
+  if(SL_CLEAN_NOTE) ssSetStatus(SL_CLEAN_NOTE);
 }
 /* ---------- confirm / edit step (required before anything is generated) ---------- */
 var SSIN = { kind: 'material', items: [], editing: -1, sheet: null, failKind: 'material' };
@@ -3455,11 +3585,16 @@ function ssShowSimpleUI(which){
 }
 function ssStartConfirm(text, opts){
   opts = opts || {};
-  var sentences = getSentences(text);
-  var terms = ssAllTerms(text, sentences);
+  /* v2.21.6: clean first, so scan garbage never even reaches the
+     confirm list — the learner edits real sentences, not noise. */
+  var cl = cleanStudyMaterial(text);
+  var sentences = cl.sentences;
+  var terms = ssAllTerms(cl.text, sentences);
   if(terms.length < 3 || sentences.length < 2){
     SSIN.sheet = null;
-    ssShowFail('material', 'I couldn\'t read enough from that. A closer, well-lit, straight-on photo works best — or try a different file, or paste the text instead.');
+    ssShowFail('material', String(text || '').trim().length >= 120
+      ? 'That photo read messily — none of it came through clearly enough to use. A closer, well-lit, straight-on photo works best — or try a different file, or paste the text instead.'
+      : 'I couldn\'t read enough from that. A closer, well-lit, straight-on photo works best — or try a different file, or paste the text instead.');
     return false;
   }
   SSIN.kind = 'material';
@@ -3472,6 +3607,7 @@ function ssStartConfirm(text, opts){
   $('ssSheetInfo').innerHTML = SSIN.sheet ? ssSheetInfoHTML(SSIN.sheet) : '';
   ssShowSimpleUI('confirm');
   ssRenderConfirmList();
+  if(cl.dropped > 0) ssSetStatus(cleanNoteText(cl));
   $('simpleCard').scrollIntoView({ block: 'start' });
   return true;
 }
@@ -3552,14 +3688,14 @@ $('ssConfirmBtn').addEventListener('click', function(){
   /* Definition subjects from the confirmed material join the term list, so
      a definitions page still gives every mode a full set of terms. */
   var merged = false;
-  ssDefSubjects(text).forEach(function(t){
+  cleanTerms(ssDefSubjects(text)).forEach(function(t){
     if(!S.terms.some(function(x){ return x.toLowerCase() === t; })){ S.terms.push(t); merged = true; }
   });
   if(merged){
     $('termsBox').innerHTML = S.terms.map(function(t){ return '<span class="pill">' + esc(t) + '</span>'; }).join('');
     ssRefresh();
   }
-  ssSetStatus('Your material is loaded — pick a practice mode below.');
+  ssSetStatus('Your material is loaded — pick a practice mode below.' + (SL_CLEAN_NOTE ? ' ' + SL_CLEAN_NOTE : ''));
   $('simpleCard').scrollIntoView({ block: 'start' });
 });
 
@@ -3768,6 +3904,143 @@ async function ssHandleFile(file, kind){
       : 'I couldn\'t read that (' + e.message + '). Try a closer photo, a different file, or paste the text instead.');
   }
 }
+/* ---------- Simple Study intake tray (v2.21.6) ----------
+   Queue photos (max 4) and files (max 6) as removable chips, then tap
+   Done. Photos are NOT read when added — they sit as thumbnails until
+   Done. Files are parsed when added so each chip can show its
+   character count; that text is held in memory only. On Done, photos
+   are OCR'd on-device (Tesseract, lazy-loaded exactly like Lab), all
+   texts combine with whatever is pasted in "Your material", and the
+   combined material goes through the normal pack generation. An item
+   that fails is named and skipped — never a dead end. Nothing is
+   uploaded; the tray lives in page memory and empties on reload. */
+var SSTRAY = { photos: [], files: [], busy: false };
+var SSTRAY_MAX_PHOTOS = 4, SSTRAY_MAX_FILES = 6;
+function ssTraySetStatus(msg){ var el = $('ssTrayStatus'); if(el) el.textContent = msg; }
+function ssTrayRender(){
+  var wrap = $('ssTrayChips'); if(!wrap) return;
+  wrap.innerHTML = '';
+  SSTRAY.photos.forEach(function(p, i){
+    var chip = document.createElement('span'); chip.className = 'snap-paper-chip';
+    if(p.url){ var img = document.createElement('img'); img.src = p.url; img.alt = 'Photo ' + (i + 1); chip.appendChild(img); }
+    var lab = document.createElement('span'); lab.textContent = 'Photo ' + (i + 1); chip.appendChild(lab);
+    var x = document.createElement('button'); x.className = 'snap-paper-x'; x.textContent = '×';
+    x.setAttribute('aria-label', 'Remove photo ' + (i + 1));
+    x.addEventListener('click', function(){ ssTrayRemovePhoto(i); });
+    chip.appendChild(x);
+    wrap.appendChild(chip);
+  });
+  SSTRAY.files.forEach(function(rec, i){
+    var chip = document.createElement('span'); chip.className = 'snap-paper-chip';
+    var nm = document.createElement('span'); nm.className = 'chip-name'; nm.textContent = rec.name; chip.appendChild(nm);
+    var meta = document.createElement('span'); meta.className = 'chip-meta';
+    meta.textContent = rec.status === 'ready' ? rec.chars.toLocaleString() + ' characters'
+      : rec.status === 'error' ? 'couldn\'t read it'
+      : 'reading…';
+    chip.appendChild(meta);
+    var x = document.createElement('button'); x.className = 'snap-paper-x'; x.textContent = '×';
+    x.setAttribute('aria-label', 'Remove file ' + rec.name);
+    x.addEventListener('click', function(){ ssTrayRemoveFile(i); });
+    chip.appendChild(x);
+    wrap.appendChild(chip);
+  });
+}
+function ssTrayAddPhotos(list){
+  var added = 0;
+  Array.prototype.slice.call(list || []).forEach(function(f){
+    if(SSTRAY.photos.length >= SSTRAY_MAX_PHOTOS) return;
+    var url = ''; try{ url = URL.createObjectURL(f); }catch(e){}
+    SSTRAY.photos.push({ file: f, url: url }); added++;
+  });
+  if(added) ssTraySetStatus('');
+  else if(list && list.length) ssTraySetStatus('Up to ' + SSTRAY_MAX_PHOTOS + ' photos — remove one to add another.');
+  ssTrayRender();
+}
+function ssTrayRemovePhoto(i){
+  var p = SSTRAY.photos[i];
+  if(p && p.url){ try{ URL.revokeObjectURL(p.url); }catch(e){} }
+  SSTRAY.photos.splice(i, 1);
+  ssTrayRender();
+}
+function ssTrayAddFiles(list){
+  var added = 0;
+  Array.prototype.slice.call(list || []).forEach(function(f){
+    if(SSTRAY.files.length >= SSTRAY_MAX_FILES) return;
+    var rec = { file: f, name: f.name || 'file', status: 'reading', chars: 0, text: '', promise: null };
+    SSTRAY.files.push(rec); added++;
+    rec.promise = ssTrayParseFile(rec);
+  });
+  if(added) ssTraySetStatus('');
+  else if(list && list.length) ssTraySetStatus('Up to ' + SSTRAY_MAX_FILES + ' files — remove one to add another.');
+  ssTrayRender();
+}
+function ssTrayRemoveFile(i){ SSTRAY.files.splice(i, 1); ssTrayRender(); }
+function ssTrayParseFile(rec){
+  var name = (rec.name || '').toLowerCase();
+  var p = /\.(xlsx|csv)$/.test(name)
+    ? ssReadSheet(rec.file).then(function(sd){ return ssSheetToMaterial(sd); })
+    : ssExtractText(rec.file);
+  return p.then(function(t){
+    rec.text = t || ''; rec.chars = rec.text.length; rec.status = 'ready'; ssTrayRender();
+  }).catch(function(){
+    rec.status = 'error'; rec.text = ''; rec.chars = 0; ssTrayRender();
+  });
+}
+function ssTrayOCR(file){
+  return ssLoadScript('https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js', function(){ return !!window.Tesseract; })
+    .then(function(){ return window.Tesseract.recognize(file, 'eng'); })
+    .then(function(r){ return (r && r.data && r.data.text) || ''; });
+}
+async function ssTrayDone(){
+  if(SSTRAY.busy) return;
+  if(!SSTRAY.photos.length && !SSTRAY.files.length){ generateStudy(); return; }
+  SSTRAY.busy = true;
+  var doneBtn = $('ssTrayDoneBtn'); if(doneBtn) doneBtn.disabled = true;
+  var failed = [], parts = [];
+  try{
+    for(var i = 0; i < SSTRAY.photos.length; i++){
+      ssTraySetStatus('Reading photo ' + (i + 1) + ' of ' + SSTRAY.photos.length + '…');
+      try{
+        var t = await ssTrayOCR(SSTRAY.photos[i].file);
+        if(t && t.trim()) parts.push(t); else failed.push('Photo ' + (i + 1));
+      }catch(e){ failed.push('Photo ' + (i + 1)); }
+    }
+    for(var j = 0; j < SSTRAY.files.length; j++){
+      var rec = SSTRAY.files[j];
+      ssTraySetStatus('Reading file ' + rec.name + '…');
+      if(rec.status === 'reading' && rec.promise){ try{ await rec.promise; }catch(e){} }
+      if(rec.status === 'ready' && rec.text) parts.push(rec.text);
+      else failed.push(rec.name);
+    }
+  } finally {
+    SSTRAY.busy = false;
+    if(doneBtn) doneBtn.disabled = false;
+  }
+  var pasted = $('material').value.trim();
+  if(pasted) parts.unshift(pasted);
+  var combined = parts.join('\n');
+  var usable = cleanStudyMaterial(combined).text.trim().length;
+  if(usable < 120){
+    ssTraySetStatus((failed.length ? 'Couldn\'t read: ' + failed.join(', ') + '. ' : '') +
+      'I could only get ' + usable + ' usable character' + (usable === 1 ? '' : 's') + ' from that — add about ' +
+      (120 - usable) + ' more characters of material (paste a bit more, or add another photo or file).');
+    return;
+  }
+  $('material').value = combined;
+  ssTraySetStatus('');
+  if(failed.length) ssSetStatus('Couldn\'t read: ' + failed.join(', ') + ' — built the pack from the rest.');
+  generateStudy();
+}
+$('ssTrayPhotoInput').addEventListener('change', function(e){
+  var fs = e.target.files; e.target.value = '';
+  if(fs && fs.length) ssTrayAddPhotos(fs);
+});
+$('ssTrayFileInput').addEventListener('change', function(e){
+  var fs = e.target.files; e.target.value = '';
+  if(fs && fs.length) ssTrayAddFiles(fs);
+});
+$('ssTrayDoneBtn').addEventListener('click', function(){ ssTrayDone(); });
+
 $('snapInput').addEventListener('change', function(e){
   var f = e.target.files[0]; e.target.value = '';
   if(f) ssHandleFile(f, 'material');
@@ -3804,8 +4077,13 @@ ssRefresh();
    fetched with no-store caching: when a newer build ships, an already-open or
    home-screen copy of an older build sees the newer version number there and
    offers "Update now" (a reload onto the new build). */
-var APP_VERSION = '2.21.5';
+var APP_VERSION = '2.21.6';
 var CHANGELOG = [
+  { v: '2.21.6', date: 'Oct 22, 2026', notify: true, notes: [
+    'Simple Study has an intake tray now, like Lab: add up to 4 photos and up to 6 files, watch them queue up as chips (files show their character count once read), remove any of them, and tap “Done — build my pack” when you are ready. Nothing is read until Done — then the photos are read on this device, the file text is added, and everything combines with whatever you pasted into “Your material” to build one pack. If one item can\'t be read, it is named and skipped, never a dead end.',
+    'Messy scans can no longer turn into messy exercises: photo text now passes a quality check before anything is built. Symbol-soup lines and broken fragments from a rough read are dropped, only clear sentences can become flashcards, quiz questions, or word-bank items, and the word bank only ever holds real terms. If a photo read messily, StudyLens says so plainly and builds from the clean part — and if nothing came through clearly, it tells you instead of inventing exercises from noise.',
+    'Everything still happens on this device: photos and files are never uploaded, and the tray holds its items in the page only — reload and it starts empty.'
+  ] },
   { v: '2.21.5', date: 'Oct 22, 2026', notify: true, notes: [
     'New in the Lab tab: Check My Answers — the mode you picked over an answers tab. You do the lab problem on paper first, then type in the values it gave you and the answers you got, and StudyLens checks them with the same maths and classic-trap spotting as practice: the wrong-side tick, dip direction mixed up with the opposite strike, an E/W-mirrored bearing, relief ÷ run swapped, volumes or concentrations swapped in M₁V₁ = M₂V₂.',
     'Miss one and the checker shows the one worked step for that item — only after you have submitted your answers, never before. Seven checkers: strike & dip, cross section (dip direction, tilt angle, lean direction), topo relief & gradient, titration & solution prep, vector resultant magnitude & angle, angles & bearings, and general numeric problems.',
