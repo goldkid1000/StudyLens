@@ -1786,8 +1786,17 @@ function v7Analyze(text){
   var sum = exps.reduce(function(a, b){ return a + b; }, 0);
   var proba = {};
   dm.classes.forEach(function(c, k){ proba[c] = exps[k] / sum; });
+  /* Low-confidence abstention band (v2.19.0): when the model is essentially
+     tied between human and AI, it withholds a verdict instead of flipping a
+     coin. Margin measured on V18's held-out main test (19,961 docs): with
+     |P(human)-P(ai)| < 0.12, ~2.0% of docs fall in the band, those calls are
+     wrong 54% of the time (coin flips), and the residual human false-flag
+     rate on the remaining confident calls drops 4.76% -> 4.28%. The band does
+     not apply to 'mixed' verdicts, which already express uncertainty. */
+  var ABSTAIN_MARGIN = 0.12;
   var verdict;
   if(proba.mixed >= CLF.t_mixed) verdict = 'mixed';
+  else if(Math.abs(proba.human - proba.ai) < ABSTAIN_MARGIN) verdict = 'uncertain';
   else verdict = proba.human >= proba.ai ? 'human' : 'ai';
   return { sents: sents, sentP: sentP, proba: proba, verdict: verdict };
 }
@@ -1845,6 +1854,10 @@ async function runClassifierDetector(){
   var confLabel = confP >= 0.9 ? 'High confidence' : confP >= 0.6 ? 'Medium confidence' : 'Low confidence';
   renderDetectorResults('Trained on-device model (V18) — ' + pA + '% AI probability · ' + confLabel, pct, verdict, sents, scores.map(function(s){ return s.score; }),
     'V18, with probabilities calibrated on held-out data: on held-out writing it never trained on, overall accuracy is <strong>86.2%</strong>, GPT-5 detection is <strong>86.8%</strong>, and the false-flag rate on human writing is <strong>4.8%</strong>. V18 was retrained on AI writing rewritten to sound human and catches <strong>61%</strong> of it on a held-out set (V17 caught 0%) — still the hardest call after Mixed, so a Mixed or borderline result means uncertain, not proof. <strong>A score is a signal to review — never proof of who wrote something.</strong>');
+  if(res.verdict === 'uncertain'){
+    $('detectOut').insertAdjacentHTML('afterbegin',
+      '<div class="flagbox"><strong>Too close to call — no verdict given.</strong> The model is essentially tied between human and AI on this text, so instead of guessing it abstains: on held-out data these coin-flip calls are wrong about half the time. Read the writing yourself and decide; this screen is not evidence either way.</div>');
+  }
   $('detTips').innerHTML = '<h3 style="font-size:16px;margin-bottom:4px">How to strengthen your voice</h3><ul class="list">' +
     clfTips(text, sents).map(function(t){ return '<li>' + esc(t) + '</li>'; }).join('') + '</ul>';
   showSentReason(0);
@@ -3485,8 +3498,12 @@ ssRefresh();
    fetched with no-store caching: when a newer build ships, an already-open or
    home-screen copy of an older build sees the newer version number there and
    offers "Update now" (a reload onto the new build). */
-var APP_VERSION = '2.18.0';
+var APP_VERSION = '2.19.0';
 var CHANGELOG = [
+  { v: '2.19.0', date: 'Oct 22, 2026', notify: true, notes: [
+    'The detector now abstains instead of guessing. When it is essentially tied between human and AI, it shows \u201cToo close to call\u201d with no verdict rather than flipping a coin. On held-out data those coin-flip calls were wrong about half the time; holding them back cut the false-flag rate on human writing from 4.8% to about 4.3%.',
+    'Borderline results are the honest ones now: Mixed or \u201cToo close to call\u201d means the model genuinely cannot tell \u2014 read the writing yourself. A score is a signal to review, never proof of who wrote something.'
+  ] },
   { v: '2.18.0', date: 'Oct 21, 2026', notify: true, notes: [
     'Detector upgraded to V18, retrained against AI writing that was rewritten to sound human — the style that slipped past the old detector. On a held-out set of humanized essays in styles it never trained on, detection rose from 0% to 61%, and the false-flag rate on human writing fell to 4.8% (from 6.0%). Overall held-out accuracy 86.2%.',
     'Honest trade-off: GPT-5 detection eased to 86.8% and one older paraphrase set dipped, so daily training keeps pushing on those next. Borderline scores are still the hardest calls — a score is a signal to review, never proof of who wrote something.'
