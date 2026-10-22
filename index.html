@@ -1170,6 +1170,39 @@ input.snap-in{background:var(--surface3);border:1.5px solid var(--line);border-r
           </aside>
         </div>
       </div>
+
+      <!-- ============ CHECK MY ANSWERS (v2.21.5): he does the work first,
+           then the app checks it. Typed only — no photo input, by design. ============ -->
+      <div class="snap-subhead" id="chkHead">
+        <h3>Check My Answers — you did the work, now check it</h3>
+        <p>Already worked a lab problem on paper? Pick its type, type in the values the problem gave you and the answers you got, and StudyLens checks them with the same maths and classic-trap spotting as practice. Miss one and it shows the one worked step for that item — only after you have submitted yours. <strong>Nothing you type here is stored or sent: it lives on this page only, and there is no photo input — this checker is for work you have already done.</strong></p>
+      </div>
+      <div class="card" id="chkCard">
+        <div class="row" style="margin-top:0">
+          <label for="chkType" style="font-weight:700;font-size:13.5px">Lab type:</label>
+          <select id="chkType" style="min-height:44px">
+            <option value="strike">Geology — strike &amp; dip</option>
+            <option value="xsect">Geology — cross section</option>
+            <option value="topo">Topographic maps &amp; contours</option>
+            <option value="chem">Chemistry — titration &amp; solutions</option>
+            <option value="physics">Physics — vectors</option>
+            <option value="angles">Angles &amp; bearings</option>
+            <option value="numeric">Numeric lab</option>
+          </select>
+          <button class="btn" id="chkBuildBtn">Build my check form</button>
+        </div>
+        <p class="lab-msg" id="chkMsg" aria-live="polite"></p>
+        <div id="chkForm" hidden>
+          <h4 style="margin:14px 0 6px">1 · The values your problem gave you</h4>
+          <div class="lab-grid" id="chkGivens"></div>
+          <h4 style="margin:16px 0 6px">2 · Your answers</h4>
+          <div id="chkItems"></div>
+          <div class="row">
+            <button class="btn" id="chkGradeBtn">Check my answers</button>
+          </div>
+          <div id="chkScore" class="lab-msg" aria-live="polite"></div>
+        </div>
+      </div>
       </div>
     </section>
 
@@ -3771,8 +3804,13 @@ ssRefresh();
    fetched with no-store caching: when a newer build ships, an already-open or
    home-screen copy of an older build sees the newer version number there and
    offers "Update now" (a reload onto the new build). */
-var APP_VERSION = '2.21.4';
+var APP_VERSION = '2.21.5';
 var CHANGELOG = [
+  { v: '2.21.5', date: 'Oct 22, 2026', notify: true, notes: [
+    'New in the Lab tab: Check My Answers — the mode you picked over an answers tab. You do the lab problem on paper first, then type in the values it gave you and the answers you got, and StudyLens checks them with the same maths and classic-trap spotting as practice: the wrong-side tick, dip direction mixed up with the opposite strike, an E/W-mirrored bearing, relief ÷ run swapped, volumes or concentrations swapped in M₁V₁ = M₂V₂.',
+    'Miss one and the checker shows the one worked step for that item — only after you have submitted your answers, never before. Seven checkers: strike & dip, cross section (dip direction, tilt angle, lean direction), topo relief & gradient, titration & solution prep, vector resultant magnitude & angle, angles & bearings, and general numeric problems.',
+    'Nothing you type into the checker is stored or sent — it lives on the page only — and there is no photo input there by design: it checks work you have already done, it does not read your sheet.'
+  ] },
   { v: '2.21.4', date: 'Oct 22, 2026', notify: true, notes: [
     'Lab Snapshot is automatic now: snap a photo (or paste a few lines) and, when the read is confident, the matching practice module opens straight away — no confirm step, no library tap. A slim banner at the top of the round names the lab it spotted, with a one-tap “Wrong lab? Change” button if it ever guesses wrong.',
     'Weak or split reads stay honest: if a photo reads poorly, or two lab types look equally likely, you land on the chooser with the retake tips, exactly as before — the app never forces a guess. Nothing else changed: your photo is still read on-device only to spot the type and dropped when practice starts, and your notes still live on this device only.',
@@ -5896,6 +5934,310 @@ function snapGrade(){
   });
   $('snapScore').innerHTML = '<b>Score: ' + score + ' of ' + total + '.</b> ' + (score === total ? 'Clean round — tap “New round” for fresh numbers.' : 'Check the explanations above, then tap “New round” and try a fresh set.');
 }
+/* ---------- Check My Answers (v2.21.5) ----------
+   The learner did the work on paper first; this grades typed givens and
+   typed answers with the same verified maths (labDipDirection, labOpposite,
+   azToQuad/quadToAz) and trap detection as the practice rounds. Nothing
+   typed here is stored or sent: values live in the form inputs only, and
+   no code path in this section writes to storage or the network. A worked
+   step is rendered only while grading a miss — never before a submit. */
+var CHK = { type: null };
+function chkAzEq(a, b){ return Math.round(labNorm(a)) === Math.round(labNorm(b)); }
+function chkStepPlus(base, add, res){
+  var raw = Math.round(base) + add;
+  return Math.round(base) + ' + ' + add + ' = ' + (raw >= 360 ? raw + ', and ' + raw + ' − 360 = ' : '') + labPad(res) + '°';
+}
+function chkDipDirItem(G){
+  var s = G.strike, dd = labDipDirection(s), opp = labOpposite(s);
+  return {
+    q: 'Which compass direction does the layer dip toward? (an azimuth)', kind: 'angle', unit: '°', answer: dd,
+    step: 'Dip direction = strike + 90° → ' + chkStepPlus(s, 90, dd) + '.',
+    traps: [
+      { test: function(g){ return chkAzEq(g, s - 90); }, name: 'the classic wrong-side tick', msg: 'That is strike − 90° — the dip tick drawn on the wrong side. Dip direction is strike + 90°, a quarter-turn clockwise from the strike.' },
+      { test: function(g){ return chkAzEq(g, s); }, name: 'the strike itself, not a dip direction', msg: 'That is the strike itself — the layer dips 90° clockwise from it, not along it.' },
+      { test: function(g){ return chkAzEq(g, opp); }, name: 'dip direction mixed up with the opposite strike', msg: 'That is the opposite strike (strike + 180°). The dip direction is only a quarter-turn from the strike: strike + 90°.' }
+    ]
+  };
+}
+var CHK_TYPES = {
+  strike: {
+    givens: [
+      { id: 'strike', label: 'Strike azimuth (0–360°)', ph: 'e.g. 310' },
+      { id: 'dip', label: 'Dip (0–90°)', ph: 'e.g. 60' }
+    ],
+    items: function(G){
+      var s = G.strike, opp = labOpposite(s), dd = labDipDirection(s);
+      return [
+        chkDipDirItem(G),
+        { q: 'Read the same strike line from the other end: what is the opposite strike direction?', kind: 'angle', unit: '°', answer: opp,
+          step: 'Opposite strike = strike + 180° → ' + chkStepPlus(s, 180, opp) + '.',
+          traps: [
+            { test: function(g){ return chkAzEq(g, dd); }, name: 'the dip direction, not the opposite strike', msg: 'That is the dip direction (strike + 90°). The opposite strike is the same line read from the other end: strike + 180°.' },
+            { test: function(g){ return chkAzEq(g, s); }, name: 'the strike itself', msg: 'That is the strike you were given — the opposite end is a half-turn further round.' },
+            { test: function(g){ return chkAzEq(g, s - 90); }, name: 'strike − 90°', msg: 'That is strike − 90°, the dip-tick side. The opposite strike is strike + 180°.' }
+          ] },
+        { q: 'Write the strike as a quadrant bearing (or just type its azimuth again).', kind: 'quad', answer: s,
+          step: 'The strike ' + labPad(s) + '° written as a quadrant bearing is ' + azToQuad(s) + ' — name the nearest cardinal direction, the angle away from it, and the side it leans toward.', traps: [] }
+      ];
+    }
+  },
+  xsect: {
+    givens: [
+      { id: 'strike', label: 'Strike azimuth (0–360°)', ph: 'e.g. 310' },
+      { id: 'dip', label: 'Dip (0–90°)', ph: 'e.g. 60' }
+    ],
+    items: function(G){
+      var d = G.dip, dd = labDipDirection(G.strike);
+      return [
+        chkDipDirItem(G),
+        { q: 'At what angle does the layer band tilt below horizontal in the section?', kind: 'num', unit: '°', answer: d, tol: 3,
+          step: 'The section is drawn perpendicular to the strike, so the angle in the drawing is the true dip itself: ' + Math.round(d) + '° below horizontal.',
+          traps: [
+            { test: function(g){ return Math.abs(g - (90 - d)) <= 3; }, name: 'the complement angle', msg: 'That is 90° − dip — the angle from vertical. Dip is measured down from horizontal.' },
+            { test: function(g){ return g < 0 && Math.abs(Math.abs(g) - d) <= 3; }, name: 'the right angle with the sign flipped', msg: 'The size is right. Type the tilt as a positive angle, and put the lean direction in the next answer.' }
+          ] },
+        { q: 'Which way does the layer lean in the section? (type: right / toward A′, or left)', kind: 'word', answerText: 'right (toward A′)',
+          answers: ['right', 'toward a′', "toward a'", 'a′', "a'", 'down to the right', 'to the right', 'toward the right'],
+          step: 'The section A–A′ points toward the dip direction (' + labPad(dd) + '°), so the layers slope down toward A′ — the right side of the section.',
+          trapWords: ['left', 'down to the left', 'to the left', 'toward the left'],
+          trapName: 'the wrong lean', trapMsg: 'Layers dip toward the dip direction — ' + labPad(dd) + '° here — which is the A′ side of this section, the right. A left lean would dip the layer the opposite way.' },
+        { q: 'This section is drawn perpendicular to the strike, so the angle in the drawing is the ____ dip. (one word: true or apparent)', kind: 'word', answerText: 'true',
+          answers: ['true'],
+          step: 'True dip. Only a section perpendicular to the strike shows the real dip; any other cut shows a shallower apparent dip.',
+          trapWords: ['apparent'], trapName: 'true vs apparent dip', trapMsg: 'Apparent dip is what a non-perpendicular cut shows, and it is always shallower. This cut is perpendicular to the strike, so it shows the true dip.' }
+      ];
+    }
+  },
+  topo: {
+    givens: [
+      { id: 'low', label: 'Lowest elevation shown (m)', ph: 'e.g. 200' },
+      { id: 'high', label: 'Highest elevation shown (m)', ph: 'e.g. 300' },
+      { id: 'phi', label: 'Higher point elevation (m)', ph: 'e.g. 300' },
+      { id: 'plo', label: 'Lower point elevation (m)', ph: 'e.g. 200' },
+      { id: 'dist', label: 'Distance between the two points (km)', ph: 'e.g. 2.5' }
+    ],
+    items: function(G){
+      var relief = G.high - G.low, grad = (G.phi - G.plo) / G.dist, swapped = G.dist / (G.phi - G.plo);
+      return [
+        { q: 'What is the relief of the area? (highest − lowest elevation)', kind: 'num', unit: 'm', answer: relief, tol: 0.5,
+          step: 'Relief = highest − lowest = ' + snapFix(G.high) + ' − ' + snapFix(G.low) + ' = ' + snapFix(relief) + ' m.',
+          traps: [
+            { test: function(g){ return Math.abs(g - G.high) <= 0.5; }, name: 'just the highest elevation', msg: 'That is only the highest elevation on its own. Relief is a difference: highest − lowest.' },
+            { test: function(g){ return Math.abs(g - (G.high + G.low)) <= 0.5; }, name: 'the two elevations added', msg: 'That adds the elevations. Relief subtracts: highest − lowest.' }
+          ] },
+        { q: 'What is the gradient between the two points?', kind: 'num', unit: 'm/km', answer: grad, tol: Math.max(0.6, Math.abs(grad) * 0.06),
+          step: 'Gradient = elevation change ÷ distance = (' + snapFix(G.phi) + ' − ' + snapFix(G.plo) + ') ÷ ' + snapFix(G.dist) + ' = ' + snapFix(grad) + ' m/km.',
+          traps: [
+            { test: function(g){ return Math.abs(g - swapped) <= Math.max(0.05, Math.abs(swapped) * 0.3); }, name: 'relief and run swapped', msg: 'That is distance ÷ elevation change — relief and run are swapped. A gradient puts the elevation change on top: (higher − lower) ÷ distance.' },
+            { test: function(g){ return Math.abs(g - (G.phi - G.plo)) <= 0.5; }, name: 'the elevation change alone', msg: 'That is just the elevation change. A gradient divides it by the distance between the points.' }
+          ] }
+      ];
+    }
+  },
+  chem: {
+    givens: [
+      { id: 'baseM', label: 'Base concentration (M)', ph: 'e.g. 0.2' },
+      { id: 'baseV', label: 'Base volume delivered (mL)', ph: 'e.g. 20' },
+      { id: 'acidV', label: 'Acid volume in the flask (mL)', ph: 'e.g. 25' },
+      { id: 'stockM', label: 'Stock concentration (M)', ph: 'e.g. 2' },
+      { id: 'targetM', label: 'Target concentration (M)', ph: 'e.g. 0.1' },
+      { id: 'targetV', label: 'Target volume to make (mL)', ph: 'e.g. 500' }
+    ],
+    items: function(G){
+      var acidM = G.baseM * G.baseV / G.acidV, swapV = G.baseM * G.acidV / G.baseV;
+      var stockV = G.targetM * G.targetV / G.stockM, swapC = G.stockM * G.targetV / G.targetM;
+      return [
+        { q: 'Titration (1:1 reaction): what is the acid concentration?', kind: 'num', unit: 'M', answer: acidM, tol: Math.max(0.012, Math.abs(acidM) * 0.08),
+          step: 'M₁V₁ = M₂V₂ → acid M = base M × base volume ÷ acid volume = ' + snapFix(G.baseM) + ' × ' + snapFix(G.baseV) + ' ÷ ' + snapFix(G.acidV) + ' = ' + snapFix(acidM) + ' M.',
+          traps: [
+            { test: function(g){ return Math.abs(g - swapV) <= Math.max(0.012, Math.abs(swapV) * 0.1); }, name: 'the volumes swapped in M₁V₁ = M₂V₂', msg: 'That pairs the base concentration with the acid volume. The delivered base volume pairs with the base concentration; the flask volume is the acid’s own.' }
+          ] },
+        { q: 'Solution prep: how many mL of the stock do you measure out?', kind: 'num', unit: 'mL', answer: stockV, tol: Math.max(0.4, Math.abs(stockV) * 0.05),
+          step: 'M₁V₁ = M₂V₂ → stock volume = target M × target volume ÷ stock M = ' + snapFix(G.targetM) + ' × ' + snapFix(G.targetV) + ' ÷ ' + snapFix(G.stockM) + ' = ' + snapFix(stockV) + ' mL, then top up to ' + snapFix(G.targetV) + ' mL.',
+          traps: [
+            { test: function(g){ return Math.abs(g - swapC) <= Math.max(0.4, Math.abs(swapC) * 0.08); }, name: 'the concentrations swapped in M₁V₁ = M₂V₂', msg: 'That puts the stock concentration on the target side. The stock’s own concentration belongs with the stock volume you are solving for.' }
+          ] }
+      ];
+    }
+  },
+  physics: {
+    givens: [
+      { id: 'L', label: 'First vector length (units)', ph: 'e.g. 10' },
+      { id: 'th', label: 'Its angle above the +x axis (°)', ph: 'e.g. 30' },
+      { id: 'H', label: 'Second vector, straight along +x (units)', ph: 'e.g. 5' }
+    ],
+    items: function(G){
+      var rad = G.th * Math.PI / 180, vx = G.L * Math.cos(rad), vy = G.L * Math.sin(rad);
+      var rx = vx + G.H, mag = Math.sqrt(rx * rx + vy * vy), ang = Math.atan2(vy, rx) * 180 / Math.PI;
+      return [
+        { q: 'What is the magnitude of the resultant when the two vectors are added?', kind: 'num', unit: '', answer: mag, tol: Math.max(0.25, mag * 0.03),
+          step: 'Components first: x = ' + snapFix(G.L) + ' × cos ' + snapFix(G.th) + '° = ' + snapFix(vx) + ', plus ' + snapFix(G.H) + ' along x → ' + snapFix(rx) + '; y = ' + snapFix(G.L) + ' × sin ' + snapFix(G.th) + '° = ' + snapFix(vy) + '. Magnitude = √(' + snapFix(rx) + '² + ' + snapFix(vy) + '²) = ' + snapFix(mag) + '.',
+          traps: [
+            { test: function(g){ return Math.abs(g - (G.L + G.H)) <= 0.3; }, name: 'the lengths just added', msg: 'That adds the two lengths as if they pointed the same way. Vectors add by components: combine x with x and y with y, then use Pythagoras.' },
+            { test: function(g){ return Math.abs(g - rx) <= 0.25; }, name: 'only the x-component', msg: 'That is the resultant’s x-component alone. The magnitude combines both components: √(x² + y²).' }
+          ] },
+        { q: 'What angle does the resultant make with the +x axis?', kind: 'angle', unit: '°', answer: ang,
+          step: 'θ = tan⁻¹(y ÷ x) = tan⁻¹(' + snapFix(vy) + ' ÷ ' + snapFix(rx) + ') ≈ ' + snapFix(ang) + '°.',
+          traps: [
+            { test: function(g){ return chkAzEq(g, G.th); }, name: 'the original vector’s angle', msg: 'That is the first vector’s own angle. Adding a +x vector pulls the resultant closer to the x axis, so its angle shrinks.' },
+            { test: function(g){ return chkAzEq(g, 90 - ang); }, name: 'the complement angle', msg: 'That is 90° − θ — measured from the y axis. This angle is measured from the +x axis.' }
+          ] }
+      ];
+    }
+  },
+  angles: {
+    givens: [
+      { id: 'az', label: 'Azimuth (0–360°)', ph: 'e.g. 310' }
+    ],
+    items: function(G){
+      var a = G.az, opp = labOpposite(a), cw = labNorm(a + 90);
+      return [
+        { q: 'Write that direction as a quadrant bearing (or type the azimuth again).', kind: 'quad', answer: a,
+          step: 'The direction ' + labPad(a) + '° written as a quadrant bearing is ' + azToQuad(a) + ' — name the nearest cardinal direction, the angle away from it, and the side it leans toward.', traps: [] },
+        { q: 'What is the direction of the same line read from the other end?', kind: 'angle', unit: '°', answer: opp,
+          step: 'Other end = azimuth + 180° → ' + chkStepPlus(a, 180, opp) + '.',
+          traps: [
+            { test: function(g){ return chkAzEq(g, a + 90); }, name: 'a quarter-turn, not the other end', msg: 'That is 90° clockwise — perpendicular. The other end of the same line is a half-turn away: + 180°.' }
+          ] },
+        { q: 'A second line sits exactly 90° clockwise from this one. What is its azimuth?', kind: 'angle', unit: '°', answer: cw,
+          step: 'Clockwise on an azimuth scale means adding: ' + chkStepPlus(a, 90, cw) + '.',
+          traps: [
+            { test: function(g){ return chkAzEq(g, a - 90); }, name: 'counterclockwise instead of clockwise', msg: 'That is 90° counterclockwise. Azimuths count clockwise from North, so a clockwise quarter-turn adds 90°.' }
+          ] }
+      ];
+    }
+  },
+  numeric: {
+    givens: [
+      { id: 'mass', label: 'Sample mass (g)', ph: 'e.g. 100' },
+      { id: 'vol', label: 'Sample volume (cm³)', ph: 'e.g. 25' },
+      { id: 'whole', label: 'Whole amount (g)', ph: 'e.g. 200' },
+      { id: 'part', label: 'Part amount (g)', ph: 'e.g. 50' }
+    ],
+    items: function(G){
+      var dens = G.mass / G.vol, inv = G.vol / G.mass, pct = G.part / G.whole * 100, frac = G.part / G.whole;
+      return [
+        { q: 'What is the sample’s density?', kind: 'num', unit: 'g/cm³', answer: dens, tol: Math.max(0.05, Math.abs(dens) * 0.06),
+          step: 'Density = mass ÷ volume = ' + snapFix(G.mass) + ' ÷ ' + snapFix(G.vol) + ' = ' + snapFix(dens) + ' g/cm³.',
+          traps: [
+            { test: function(g){ return Math.abs(g - inv) <= Math.max(0.05, Math.abs(inv) * 0.1); }, name: 'an inverted division', msg: 'That is volume ÷ mass. Density is mass ÷ volume — the heavier-for-its-size number.' }
+          ] },
+        { q: 'The part is what percent of the whole?', kind: 'num', unit: '%', answer: pct, tol: Math.max(0.6, Math.abs(pct) * 0.06),
+          step: 'Percent = part ÷ whole × 100 = ' + snapFix(G.part) + ' ÷ ' + snapFix(G.whole) + ' × 100 = ' + snapFix(pct) + '%.',
+          traps: [
+            { test: function(g){ return Math.abs(g - frac) <= 0.05 && pct > 2; }, name: 'the × 100 step missed', msg: 'That is the fraction before × 100. A percent multiplies the fraction by 100.' }
+          ] }
+      ];
+    }
+  }
+};
+function chkBuild(){
+  var def = CHK_TYPES[$('chkType').value]; if(!def) return;
+  CHK.type = $('chkType').value;
+  var g = $('chkGivens'); g.innerHTML = '';
+  def.givens.forEach(function(gv){
+    var d = document.createElement('div'); d.className = 'lab-field';
+    d.innerHTML = '<label for="chkG_' + gv.id + '">' + gv.label + '</label><input type="number" step="any" inputmode="decimal" id="chkG_' + gv.id + '" placeholder="' + gv.ph + '">';
+    g.appendChild(d);
+  });
+  /* Questions only at this stage — the expected answers are computed at
+     grading time from the givens he typed, so no worked step (and no
+     answer) exists anywhere on the page before he submits. */
+  var specs = def.items({});
+  var box = $('chkItems'); box.innerHTML = '';
+  specs.forEach(function(it, i){
+    var div = document.createElement('div'); div.className = 'snap-item';
+    var html = '<p class="snap-q"><b>' + (i + 1) + '.</b> ' + it.q + '</p>';
+    if(it.kind === 'angle' || it.kind === 'num'){
+      html += '<input class="snap-in chk-in" type="number" step="any" inputmode="decimal" data-chkidx="' + i + '" aria-label="Your answer for check question ' + (i + 1) + '">' + (it.unit ? ' <span class="mut">' + it.unit + '</span>' : '');
+    } else {
+      html += '<input class="snap-in chk-in" type="text" data-chkidx="' + i + '" aria-label="Your answer for check question ' + (i + 1) + '" style="width:210px">';
+    }
+    html += '<div class="snap-fb" data-chkfb="' + i + '" aria-live="polite"></div>';
+    div.innerHTML = html;
+    box.appendChild(div);
+  });
+  $('chkScore').innerHTML = '';
+  $('chkMsg').textContent = '';
+  $('chkForm').hidden = false;
+}
+function chkGrade(){
+  var def = CHK_TYPES[CHK.type || $('chkType').value];
+  if(!def || $('chkForm').hidden) return;
+  var G = {}, missing = false;
+  def.givens.forEach(function(gv){
+    var el = $('chkG_' + gv.id), v = el ? parseFloat(el.value) : NaN;
+    G[gv.id] = v; if(isNaN(v)) missing = true;
+  });
+  if(missing){ $('chkMsg').textContent = 'Enter all the given values from your problem first (step 1 above), then check.'; $('chkScore').innerHTML = ''; return; }
+  $('chkMsg').textContent = '';
+  var items = def.items(G);
+  var score = 0, missNames = [];
+  items.forEach(function(it, i){
+    var fb = document.querySelector('[data-chkfb="' + i + '"]');
+    var inp = document.querySelector('.chk-in[data-chkidx="' + i + '"]');
+    function say(ok, msg){ fb.className = 'snap-fb' + (ok ? ' ok' : ''); fb.innerHTML = (ok ? '✓ ' : '✗ ') + msg; if(ok) score++; }
+    function trapHit(got){
+      var traps = it.traps || [];
+      for(var k = 0; k < traps.length; k++){ if(traps[k].test(got)) return traps[k]; }
+      return null;
+    }
+    function miss(gotTxt, correctTxt, trap, extra){
+      var m = 'Not quite — you put ' + gotTxt + ', the answer is ' + correctTxt + '.';
+      if(trap){ m += ' <b>Trap: ' + trap.name + '.</b> ' + trap.msg; missNames.push(trap.name); }
+      if(extra) m += ' ' + extra;
+      m += ' <b>Worked step:</b> ' + it.step;
+      say(false, m);
+    }
+    if(it.kind === 'angle'){
+      var ga = inp ? parseFloat(inp.value) : NaN;
+      if(isNaN(ga)){ say(false, 'No answer typed yet.'); return; }
+      var err = snapAngDiff(ga, it.answer);
+      if(err <= 3) say(true, 'Correct — ' + labPad(it.answer) + '° (within ' + Math.round(err) + '°).');
+      else {
+        var tra = trapHit(ga);
+        var extraA = tra ? '' : 'The target sits ' + Math.round(err) + '° ' + (snapSigned(ga, it.answer) > 0 ? 'clockwise' : 'counterclockwise') + ' from your answer.';
+        miss(labPad(ga) + '°', labPad(it.answer) + '°', tra, extraA);
+      }
+    } else if(it.kind === 'num'){
+      var gn = inp ? parseFloat(inp.value) : NaN;
+      if(isNaN(gn)){ say(false, 'No answer typed yet.'); return; }
+      if(Math.abs(gn - it.answer) <= it.tol) say(true, 'Correct — ' + snapFix(it.answer) + (it.unit ? ' ' + it.unit : '') + '.');
+      else {
+        var trn = trapHit(gn);
+        var extraN = trn ? '' : 'Off by ' + snapFix(Math.abs(gn - it.answer)) + (it.unit ? ' ' + it.unit : '') + '.';
+        miss(snapFix(gn) + (it.unit ? ' ' + it.unit : ''), snapFix(it.answer) + (it.unit ? ' ' + it.unit : ''), trn, extraN);
+      }
+    } else if(it.kind === 'quad'){
+      var raw = inp ? inp.value.trim() : '';
+      if(!raw){ say(false, 'No answer typed yet.'); return; }
+      var az = quadToAz(raw);
+      if(az === null && /^[-+\d][\d.° ]*$/.test(raw)) az = parseFloat(raw);
+      if(az === null || isNaN(az)){ say(false, 'That does not read as a bearing (like N50°W) or an azimuth (like 310) — try one of those two forms.'); return; }
+      if(snapAngDiff(az, it.answer) <= 3) say(true, 'Correct — ' + azToQuad(it.answer) + ' (azimuth ' + labPad(it.answer) + '°).');
+      else {
+        var trq = null;
+        if(snapQuadFlipped(raw, azToQuad(it.answer))) trq = { name: 'the quadrant mirror — E and W flipped', msg: 'Same numbers, wrong side: the sideways letter is flipped. This direction leans ' + azToQuad(it.answer).slice(-1) + '.' };
+        else if(chkAzEq(az, 360 - it.answer)) trq = { name: 'a mirrored azimuth', msg: 'That is 360° − the azimuth — the direction mirrored to the other side of North.' };
+        else if(chkAzEq(az, labOpposite(it.answer))) trq = { name: 'the opposite direction', msg: 'That is the same line read from the other end (+ 180°). This question asks for the direction itself.' };
+        miss('“' + esc(raw) + '”', azToQuad(it.answer) + ' (' + labPad(it.answer) + '°)', trq);
+      }
+    } else if(it.kind === 'word'){
+      var w = inp ? inp.value.trim().toLowerCase().replace(/\s+/g, ' ').replace(/\.$/, '') : '';
+      if(!w){ say(false, 'No answer typed yet.'); return; }
+      if(it.answers.indexOf(w) >= 0) say(true, 'Correct — ' + it.answerText + '. ' + it.step);
+      else if((it.trapWords || []).indexOf(w) >= 0) miss('“' + esc(inp.value.trim()) + '”', it.answerText, { name: it.trapName, msg: it.trapMsg });
+      else miss('“' + esc(inp.value.trim()) + '”', it.answerText, null);
+    }
+  });
+  var total = items.length;
+  var line = '<b>Score: ' + score + ' of ' + total + '.</b> ';
+  if(score === total) line += 'Clean check — your worked answers hold up.';
+  else if(total - score === 1 && missNames.length === 1) line += 'The miss was ' + missNames[0] + '.';
+  else if(missNames.length) line += 'Misses to review: ' + missNames.join('; ') + '. The worked steps sit under each miss above.';
+  else line += 'Check the worked steps under each miss above, then re-check.';
+  $('chkScore').innerHTML = line;
+}
 /* Slim banner on an auto-launched round: names the spotted TYPE only —
    never anything read from the sheet — and offers a one-tap way back to
    the chooser if the guess was wrong. */
@@ -6002,6 +6344,8 @@ if($('snapPickBtn')){
   $('snapTypeNumericBtn').addEventListener('click', function(){ snapSetType('numeric'); });
   $('snapTypeConceptBtn').addEventListener('click', function(){ snapSetType('concept'); });
   $('snapCheckBtn').addEventListener('click', snapGrade);
+  $('chkBuildBtn').addEventListener('click', chkBuild);
+  $('chkGradeBtn').addEventListener('click', chkGrade);
   $('snapNewBtn').addEventListener('click', snapNewRound);
   $('snapExampleBtn').addEventListener('click', snapShowExample);
   document.querySelectorAll('.snap-retake').forEach(function(b){ b.addEventListener('click', function(){ SNAP.papers = []; SNAP.weakPaper = 0; snapRenderPapers(); $('snapFile').click(); }); });

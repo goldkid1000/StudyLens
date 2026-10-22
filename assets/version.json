@@ -1,11 +1,1 @@
-{
- "notes": [
-  "Lab Snapshot goes off what it sees: a confident photo read now opens the matching practice module automatically — no confirm step, no library tap — with a slim 'Snapped: looks like…' banner and a one-tap 'Wrong lab? Change' button. Weak or ambiguous reads still land on the chooser with retake tips, never a forced guess.",
-  "Two-paper snap: queue two photos (instructions + worksheet, say) and read them together — the combined read spots the lab type more confidently. Each paper gets a removable chip, and if one reads weakly the app names it and shows its retake tips.",
-  "Geology tools in plain words: readouts say what they describe (the protractor boxes follow the needle; the calculator answers 'For your strike…' with the step maths shown), a 'How to measure on paper' steps card joins the module, and the protractor gains a 'Real tool' style like the clear plastic 360° protractor — inner ring included, remembered on this device.",
-  "Everything else is unchanged: photos are read on-device only to detect the type and dropped when practice starts, practice uses fresh numbers only, and notes stay on this device only."
- ],
- "notify": true,
- "updated": "2026-10-22",
- "version": "2.21.4"
-}
+{"notes":["New in the Lab tab: Check My Answers. Do the lab problem on paper first, then type in the values it gave you and the answers you got — StudyLens checks them with the same maths and classic-trap spotting as practice (wrong-side tick, dip direction vs opposite strike, E/W mirror, swapped volumes), and shows the one worked step for any item you miss, only after you submit.","Seven checkers: strike & dip, cross section, topo relief & gradient, titration & solution prep, vector resultants, angles & bearings, and general numeric problems.","Nothing you type into the checker is stored or sent, and there is no photo input there by design — it checks work you have already done. Everything else is unchanged: photos are still read on-device only to detect the lab type and dropped when practice starts, and notes stay on this device only."],"notify":true,"updated":"2026-10-22","version":"2.21.5"}
