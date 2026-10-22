@@ -456,6 +456,14 @@ mark.stock{background:var(--warn-bg);color:inherit;border-radius:4px;padding:0 3
 .snap-auto{display:flex;align-items:center;gap:10px;flex-wrap:wrap;border:1.5px solid var(--line);border-left:5px solid var(--acc);border-radius:12px;padding:9px 13px;margin-bottom:12px;background:var(--surface3);font-size:14.5px}
 .snap-auto[hidden]{display:none}
 .snap-auto .btn{min-height:44px}
+.lab-style-btn.on{background:var(--acc);border-color:var(--acc);color:var(--acc-ink)}
+.lab-steps{margin:6px 0 2px;padding-left:22px;font-size:15px;line-height:1.65}
+.lab-steps li{margin-bottom:7px}
+.snap-papers{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.snap-papers[hidden]{display:none}
+.snap-paper-chip{display:inline-flex;align-items:center;gap:8px;border:1.5px solid var(--line);border-radius:999px;padding:4px 6px 4px 4px;background:var(--surface3);font-size:13.5px;font-weight:600}
+.snap-paper-chip img{width:34px;height:34px;object-fit:cover;border-radius:50%}
+.snap-paper-x{min-width:36px;min-height:36px;border-radius:50%;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);font-size:17px;line-height:1;cursor:pointer}
 .snap-example{border:1.5px solid var(--line);border-radius:14px;padding:13px 15px;margin-top:12px;background:var(--surface3);font-size:15px;line-height:1.65}
 .snap-example h4{margin:0 0 6px;font-size:16px}
 .snap-example ol{margin:8px 0 2px;padding-left:22px}
@@ -979,7 +987,7 @@ input.snap-in{background:var(--surface3);border:1.5px solid var(--line);border-r
       <div class="snap-subhead">
         <h3>Lab Snapshot — snap a lab sheet, get its practice module</h3>
         <p>Snap a photo of any lab worksheet and StudyLens spots what kind of lab it is, then builds a practice version in the same format — same skills, fresh numbers — drawn out so you can sketch on it and get every answer checked.</p>
-        <p class="snap-type"><strong>Your photo stays on your device and isn't saved — practice uses fresh numbers in the same format.</strong> The photo is read once, right here, only to detect the lab type; the words and numbers on your sheet are never stored, synced, or turned into practice questions.</p>
+        <p class="snap-type"><strong>Your photos stay on your device and aren't saved — practice uses fresh numbers in the same format.</strong> One paper or two, they are read once, right here, only to detect the lab type; the words and numbers on your sheets are never stored, synced, or turned into practice questions.</p>
       </div>
 
       <div class="card">
@@ -989,6 +997,12 @@ input.snap-in{background:var(--surface3);border:1.5px solid var(--line);border-r
         <div class="row"><button class="btn" id="snapPickBtn">Choose a photo</button></div>
         <img id="snapPreview" class="snap-photo" alt="Your lab sheet photo" hidden>
         <div id="snapOcrMsg" class="lab-msg" aria-live="polite"></div>
+        <div id="snapPapers" class="snap-papers" hidden></div>
+        <div id="snapPaperActions" class="row" hidden>
+          <button class="btn" id="snapReadBtn">Read now</button>
+          <button class="btn plain" id="snapAddPaperBtn">＋ Add a second paper</button>
+        </div>
+        <p class="lab-msg" id="snapPaperHint" hidden>Got a two-part lab? Add a second paper — say, the instructions and the worksheet — and both are read together. Both photos stay on this device, are read once to spot the lab type, and are dropped when practice starts.</p>
         <div id="snapQuality1" class="snap-quality" hidden>
           <p style="margin:0"><b>Retake tips</b> — a clearer photo reads far better:</p>
           <ul>
@@ -1053,14 +1067,33 @@ input.snap-in{background:var(--surface3);border:1.5px solid var(--line);border-r
       <div id="snapGeoTools" hidden>
       <div class="card">
         <h3>The 360° protractor</h3>
-        <p>Drag the copper strike line around the center dot. On an azimuth protractor, 0° sits at North and the numbers climb <strong>clockwise</strong>. The readout gives the direction both ways along the line — a strike line always reads two numbers, 180° apart.</p>
+        <p>Drag the copper strike line around the center dot. On an azimuth protractor, 0° sits at North and the numbers climb <strong>clockwise</strong>. The three boxes below follow the <strong>needle</strong> — drag it and watch them change. They describe the needle, not any numbers you type into the calculator.</p>
         <svg id="labProtractor" class="lab-svg" viewBox="0 0 360 360" role="img" aria-label="Interactive 360 degree azimuth protractor"></svg>
         <div class="lab-readout">
-          <div class="lab-chip"><small>One way</small><span id="labAzA">000°</span></div>
-          <div class="lab-chip"><small>Opposite way</small><span id="labAzB">180°</span></div>
-          <div class="lab-chip"><small>Quadrant bearing</small><span id="labAzQ">N0°E</span></div>
+          <div class="lab-chip" title="Azimuth — the direction the needle's solid end points, counted clockwise from North (0°)"><small>Needle at</small><span id="labAzA">000°</span></div>
+          <div class="lab-chip" title="A straight line points two ways at once — this is the direction of the line's other end, always 180° from the needle end"><small>Other end of the line</small><span id="labAzB">180°</span></div>
+          <div class="lab-chip" title="Quadrant bearing — the needle's direction said from the nearest compass point, like N65°E"><small>Said as a bearing</small><span id="labAzQ">N0°E</span></div>
         </div>
         <p class="lab-msg">On paper, you would lay the protractor's center hole on your dot, keep its 0° aimed at the map's North arrow, and read the rim where your line crosses it.</p>
+        <div class="row" style="margin-top:10px">
+          <span style="font-weight:700;font-size:13.5px">Protractor style:</span>
+          <button class="btn plain lab-style-btn" id="labStyleSimple" data-pstyle="simple">Simple</button>
+          <button class="btn plain lab-style-btn" id="labStyleReal" data-pstyle="real">Real tool</button>
+        </div>
+        <p class="lab-msg"><b>Real tool</b> draws it like the clear plastic 360° protractor: an outer ring counting clockwise from North, plus an inner ring shifted half a turn — <b>the inner ring reads the other end of your line, so both ends check at once</b>. Your choice is remembered on this device.</p>
+      </div>
+      <div class="card">
+        <h3>How to measure on paper — with a round protractor</h3>
+        <ol class="lab-steps">
+          <li>Put the protractor's <b>center hole</b> right on the dot.</li>
+          <li>Line the <b>360/0 mark</b> up with the map's <b>north arrow</b> — not the top of the page.</li>
+          <li>Find your <b>strike number</b> on the outer ring and make a small mark there.</li>
+          <li>Mark the number <b>straight across</b> too — the other end of the line (strike + 180°).</li>
+          <li>Connect the two marks with a straight line <b>through the dot</b> — that's your strike line.</li>
+          <li>Turn the paper so the strike line <b>points up</b>.</li>
+          <li>Draw the short <b>dip tick on the right</b>, straight across from the strike line (perpendicular to it).</li>
+          <li>Turn the paper back and <b>write the dip number</b> next to the strike line.</li>
+        </ol>
       </div>
       <div class="card">
         <h3>Strike &amp; dip calculator</h3>
@@ -3742,7 +3775,9 @@ var APP_VERSION = '2.21.4';
 var CHANGELOG = [
   { v: '2.21.4', date: 'Oct 22, 2026', notify: true, notes: [
     'Lab Snapshot is automatic now: snap a photo (or paste a few lines) and, when the read is confident, the matching practice module opens straight away — no confirm step, no library tap. A slim banner at the top of the round names the lab it spotted, with a one-tap “Wrong lab? Change” button if it ever guesses wrong.',
-    'Weak or split reads stay honest: if a photo reads poorly, or two lab types look equally likely, you land on the chooser with the retake tips, exactly as before — the app never forces a guess. Nothing else changed: your photo is still read on-device only to spot the type and dropped when practice starts, and your notes still live on this device only.'
+    'Weak or split reads stay honest: if a photo reads poorly, or two lab types look equally likely, you land on the chooser with the retake tips, exactly as before — the app never forces a guess. Nothing else changed: your photo is still read on-device only to spot the type and dropped when practice starts, and your notes still live on this device only.',
+    'Two-paper snap: a lab spread over two sheets? Queue both photos (each gets a chip you can remove) and tap “Read both papers” — the two reads combine to spot the lab type, which a two-page lab does more confidently than either page alone. If one paper reads weakly, the app says which one and shows its retake tips.',
+    'Geology tools in plain words: every readout now says what it is about — the protractor boxes follow the needle (“Needle at”, “Other end of the line”, “Said as a bearing”) and the calculator answers “For your strike…” with the one-step maths shown. There is a short “How to measure on paper” steps card, and the protractor gains a “Real tool” style drawn like the clear plastic 360° protractor, inner ring and all — the inner ring reads the other end of your line, so both ends check at once. The style is remembered on this device.'
   ] },
   { v: '2.21.3', date: 'Oct 22, 2026', notify: true, notes: [
     'Worked examples in Lab Snapshot: every module now has a “Show me one worked example” button — it deals fresh numbers (never from your sheet) and walks every answer step by step: given → rule → result. The example round stays live so you can try it yourself.',
@@ -4895,8 +4930,64 @@ function labEl(name, attrs, parent){
   if(parent) parent.appendChild(el);
   return el;
 }
+/* Protractor style (v2.21.4): 'simple' (the original face) or 'real'
+   (drawn like the clear plastic 360° tool). Remembered on-device. */
+var LAB_STYLE_KEY = 'sl-protractor-style';
+function labProtractorStyle(){ try{ return localStorage.getItem(LAB_STYLE_KEY) === 'real' ? 'real' : 'simple'; }catch(e){ return 'simple'; } }
+function labSetProtractorStyle(s){ try{ localStorage.setItem(LAB_STYLE_KEY, s === 'real' ? 'real' : 'simple'); }catch(e){} labApplyProtractorStyle(); }
+function labApplyProtractorStyle(){
+  var style = labProtractorStyle();
+  document.querySelectorAll('.lab-style-btn').forEach(function(b){ b.classList.toggle('on', b.getAttribute('data-pstyle') === style); });
+  if(labMain && $('labProtractor')){
+    var az = labMain.getAz(), svg = $('labProtractor');
+    while(svg.firstChild) svg.removeChild(svg.firstChild);
+    labMain = labBuildProtractor(svg, az);
+    labMain.onChange = labRenderMain;
+    labRenderMain();
+  }
+  if(window.SNAP && SNAP.line && $('snapSvg')){
+    var saz = SNAP.line.getAz(), soc = SNAP.line.onChange, ssvg = $('snapSvg');
+    while(ssvg.firstChild) ssvg.removeChild(ssvg.firstChild);
+    SNAP.line = labBuildProtractor(ssvg, saz);
+    SNAP.line.onChange = soc;
+    if(typeof snapRenderLineRead === 'function') snapRenderLineRead();
+  }
+}
+/* The "real tool" face: translucent disc, 1° ticks, labels every 10° on
+   TWO rings. The outer ring is the azimuth at that point of the rim; the
+   inner ring is the same scale shifted half a turn — inner(p) is always
+   (p + 180) mod 360 (shown as 360, never 0) — so it reads the other end
+   of any line laid across the center. Numbers sit radially, like the
+   plastic tool. Both rings are data-tagged (data-ring / data-pos). */
+function labDrawRealFace(svg, cx, cy){
+  labEl('circle', {cx:cx, cy:cy, r:174, style:'fill:var(--surface2);fill-opacity:.38;stroke:var(--line-strong);stroke-width:1.5'}, svg);
+  labEl('circle', {cx:cx, cy:cy, r:110, style:'fill:var(--surface);fill-opacity:.35;stroke:var(--line);stroke-width:1'}, svg);
+  for(var d = 0; d < 360; d++){
+    var len = d % 10 === 0 ? 13 : d % 5 === 0 ? 9 : 5.5;
+    var p1 = labPol(cx, cy, 170, d), p2 = labPol(cx, cy, 170 - len, d);
+    labEl('line', {x1:p1[0].toFixed(1), y1:p1[1].toFixed(1), x2:p2[0].toFixed(1), y2:p2[1].toFixed(1), style:'stroke:var(--ink);stroke-width:' + (d % 10 === 0 ? 1.3 : 0.65) + ';opacity:' + (d % 5 === 0 ? '.8' : '.45')}, svg);
+  }
+  for(var p = 0; p < 360; p += 10){
+    var ov = p === 0 ? 360 : p;
+    var op = labPol(cx, cy, 143, p);
+    var ot = labEl('text', {x:op[0].toFixed(1), y:op[1].toFixed(1), 'text-anchor':'middle', 'dominant-baseline':'central', 'data-ring':'outer', 'data-pos':p, transform:'rotate(' + p + ' ' + op[0].toFixed(1) + ' ' + op[1].toFixed(1) + ')', style:'fill:var(--ink);font-size:11.5px;font-weight:700'}, svg);
+    ot.textContent = ov;
+    var iv = (p + 180) % 360; if(iv === 0) iv = 360;
+    var ip = labPol(cx, cy, 123, p);
+    var it = labEl('text', {x:ip[0].toFixed(1), y:ip[1].toFixed(1), 'text-anchor':'middle', 'dominant-baseline':'central', 'data-ring':'inner', 'data-pos':p, transform:'rotate(' + p + ' ' + ip[0].toFixed(1) + ' ' + ip[1].toFixed(1) + ')', style:'fill:var(--acc-deep);font-size:10px;font-weight:600'}, svg);
+    it.textContent = iv;
+  }
+  [['N', 0], ['E', 90], ['S', 180], ['W', 270]].forEach(function(c){
+    var p = labPol(cx, cy, 97, c[1]);
+    var t = labEl('text', {x:p[0].toFixed(1), y:p[1].toFixed(1), 'text-anchor':'middle', 'dominant-baseline':'central', style:'fill:var(--acc-deep);font-size:13px;font-weight:800'}, svg);
+    t.textContent = c[0];
+  });
+  labEl('polygon', {points: '180,2 172,19 188,19', style:'fill:var(--acc)'}, svg);
+}
 function labBuildProtractor(svg, startAz){
   var cx = 180, cy = 180;
+  if(labProtractorStyle() === 'real'){ labDrawRealFace(svg, cx, cy); }
+  else {
   labEl('circle', {cx:cx, cy:cy, r:172, style:'fill:var(--surface2);stroke:var(--line-strong);stroke-width:1.5'}, svg);
   labEl('circle', {cx:cx, cy:cy, r:118, style:'fill:var(--surface3);stroke:var(--line);stroke-width:1'}, svg);
   var gx = labEl('g', {'aria-hidden':'true'}, svg);
@@ -4920,6 +5011,7 @@ function labBuildProtractor(svg, startAz){
     t.textContent = c[0];
   });
   labEl('polygon', {points: '180,4 173,20 187,20', style:'fill:var(--acc)'}, svg);
+  }
   var g = labEl('g', {}, svg);
   labEl('line', {x1:cx, y1:cy - 128, x2:cx, y2:cy + 128, style:'stroke:transparent;stroke-width:36;pointer-events:none'}, g);
   labEl('line', {x1:cx, y1:cy - 128, x2:cx, y2:cy + 128, style:'stroke:var(--acc);stroke-width:3.5;stroke-linecap:round'}, g);
@@ -4995,13 +5087,22 @@ function labRunCalc(){
   if(dRaw === '' || isNaN(d) || d < 0 || d > 90){ out.innerHTML = '<span class="mut">Enter a dip between 0 and 90.</span>'; return; }
   s = labNorm(s); d = Math.round(d * 10) / 10;
   var dd = labDipDirection(s), opp = labOpposite(s);
+  var oppMath = s > 180 ? labPad(s) + ' − 180 = ' + labPad(opp) : labPad(s) + ' + 180 = ' + labPad(opp);
+  var ddMath = s + 90 >= 360 ? labPad(s) + ' + 90 = ' + (s + 90) + ' − 360 = ' + labPad(dd) : labPad(s) + ' + 90 = ' + labPad(dd);
   out.innerHTML =
-    '<div>Strike line: <b>' + labPad(s) + '°</b> — and the same line read the other way is <b>' + labPad(opp) + '°</b> (the opposite strike direction).</div>' +
-    '<div>Quadrant bearing of the strike: <b>' + azToQuad(s) + '</b> &nbsp;·&nbsp; of the opposite direction: <b>' + azToQuad(opp) + '</b></div>' +
-    '<div>Dip direction (strike + 90°): <b>' + labPad(dd) + '°</b> (' + azToQuad(dd) + ') — the layer tilts down toward ' + labPad(dd) + '°.</div>' +
-    '<div>Dip: <b>' + d + '°</b> — written as the plain number <b>' + d + '</b> beside the strike line, no degree sign, just like on a finished map.</div>' +
-    '<div class="mut">The symbol below is drawn the worksheet way: rotate the paper so ' + labPad(s) + '° is at the top and the short tick falls on the right, at ' + labPad(dd) + '°. The dashed line continues the dip direction.</div>';
+    '<div><b>For your strike ' + labPad(s) + '° and dip ' + d + '°:</b></div>' +
+    '<div>Strike line: <b>' + labPad(s) + '°</b> — a line reads the same from both ends (180° apart), so the other end is <b>' + labPad(opp) + '°</b> (' + oppMath + ' — the opposite strike direction).</div>' +
+    '<div>Said as bearings: your strike is <b>' + azToQuad(s) + '</b>, the other end is <b>' + azToQuad(opp) + '</b>.</div>' +
+    '<div>The way the layer tilts (dip direction): <b>' + ddMath + '°</b> (' + azToQuad(dd) + ') — dip direction is always strike + 90.</div>' +
+    '<div>Dip: <b>' + d + '°</b> — on the map, write the plain number <b>' + d + '</b> beside the strike line, no degree sign, just like on a finished map.</div>' +
+    '<div class="mut">The symbol below is drawn the worksheet way: rotate the paper so ' + labPad(s) + '° is at the top and the short tick falls on the right, toward ' + labPad(dd) + '°. The dashed line continues the dip direction.</div>';
   labDrawSymbol($('labSymbol'), s, d);
+}
+if($('labStyleSimple')){
+  document.querySelectorAll('.lab-style-btn').forEach(function(b){
+    b.classList.toggle('on', b.getAttribute('data-pstyle') === labProtractorStyle());
+    b.addEventListener('click', function(){ labSetProtractorStyle(b.getAttribute('data-pstyle')); });
+  });
 }
 if($('labCalcBtn')){
   $('labCalcBtn').addEventListener('click', labRunCalc);
@@ -5018,7 +5119,7 @@ if($('labCalcBtn')){
    moment practice starts. Every practice question, diagram and answer
    comes from the built-in templates below with fresh random values —
    nothing from the learner's sheet is stored, shown again, or reused. */
-var SNAP = { text: null, detected: null, type: null, banned: ['50,25', '310,60'], round: null, strokes: [], drawMode: true, line: null, ocrConf: null, lowQ: false, auto: false };
+var SNAP = { text: null, detected: null, type: null, banned: ['50,25', '310,60'], round: null, strokes: [], drawMode: true, line: null, ocrConf: null, lowQ: false, auto: false, papers: [], weakPaper: 0 };
 var SNAP_OCR_SRC = 'https://cdn.jsdelivr.net/npm/tesseract.js@5.0.5/dist/tesseract.min.js';
 var SNAP_TYPES = {
   strike:  { label: 'Geology \u2014 strike & dip worksheet (azimuth method)', topic: 'strike and dip', format: 'Problems give a strike and a dip and ask for the map symbol and its directions. Practice deals a fresh strike/dip pair and checks your line, the dip side, the dip direction, and the bearing.' },
@@ -5149,7 +5250,7 @@ function snapHandleText(text, conf){
   }
 }
 function snapStart(source){
-  if(typeof source === 'string'){ snapHandleText(source); return; }
+  if(typeof source === 'string'){ SNAP.weakPaper = 0; snapHandleText(source); return; }
   var q0 = $('snapQuality1'); if(q0) q0.hidden = true;
   $('snapOcrMsg').textContent = 'Reading your photo on this device… first use downloads the reader, which can take a moment.';
   snapLoadTess()
@@ -5161,6 +5262,88 @@ function snapOcrFailed(msg){
   $('snapOcrMsg').textContent = msg;
   $('snapFallback').hidden = false;
   var q1 = $('snapQuality1'); if(q1) q1.hidden = false;
+}
+
+/* ---------- two-paper snap (v2.21.4): queue up to 2 photos, read together ----------
+   Photos live only in SNAP.papers as in-memory file handles + object URLs.
+   Their OCR text is combined into the same single volatile SNAP.text path
+   (via snapHandleText) and dropped when practice starts — nothing stored. */
+function snapQueuePaper(f){
+  if(!f || SNAP.papers.length >= 2) return;
+  var url = ''; try{ url = URL.createObjectURL(f); }catch(e){}
+  SNAP.papers.push({ file: f, url: url });
+  SNAP.weakPaper = 0;
+  $('snapOcrMsg').textContent = '';
+  snapRenderPapers();
+}
+function snapRemovePaper(i){
+  var p = SNAP.papers[i];
+  if(p && p.url){ try{ URL.revokeObjectURL(p.url); }catch(e){} }
+  SNAP.papers.splice(i, 1);
+  snapRenderPapers();
+}
+function snapRenderPapers(){
+  var wrap = $('snapPapers'); if(!wrap) return;
+  wrap.innerHTML = '';
+  SNAP.papers.forEach(function(p, i){
+    var chip = document.createElement('span'); chip.className = 'snap-paper-chip';
+    if(p.url){ var img = document.createElement('img'); img.src = p.url; img.alt = 'Paper ' + (i + 1) + ' photo'; chip.appendChild(img); }
+    var lab = document.createElement('span'); lab.textContent = 'Paper ' + (i + 1); chip.appendChild(lab);
+    var x = document.createElement('button'); x.className = 'snap-paper-x'; x.textContent = '×';
+    x.setAttribute('aria-label', 'Remove paper ' + (i + 1));
+    x.addEventListener('click', function(){ snapRemovePaper(i); });
+    chip.appendChild(x);
+    wrap.appendChild(chip);
+  });
+  wrap.hidden = SNAP.papers.length === 0;
+  var act = $('snapPaperActions'); if(act) act.hidden = SNAP.papers.length === 0;
+  var add = $('snapAddPaperBtn'); if(add) add.hidden = SNAP.papers.length >= 2;
+  var rd = $('snapReadBtn'); if(rd) rd.textContent = SNAP.papers.length >= 2 ? 'Read both papers' : 'Read now';
+  var hint = $('snapPaperHint'); if(hint) hint.hidden = SNAP.papers.length === 0;
+}
+function snapPaperWeak(r){ return !r || !r.text || r.text.trim().length < 60 || (typeof r.conf === 'number' && r.conf < 60); }
+function snapReadPapers(){
+  if(!SNAP.papers.length) return;
+  var act = $('snapPaperActions'); if(act) act.hidden = true;
+  var q0 = $('snapQuality1'); if(q0) q0.hidden = true;
+  $('snapOcrMsg').textContent = 'Reading on this device… first use downloads the reader, which can take a moment.';
+  var files = SNAP.papers.map(function(p){ return p.file; });
+  snapLoadTess()
+    .then(function(){
+      var results = [], chain = Promise.resolve();
+      files.forEach(function(f, idx){
+        chain = chain.then(function(){
+          if(files.length > 1) $('snapOcrMsg').textContent = 'Reading paper ' + (idx + 1) + ' of ' + files.length + ' on this device…';
+          return window.Tesseract.recognize(f, 'eng').then(function(r){
+            results.push({ text: r && r.data ? r.data.text : '', conf: r && r.data && typeof r.data.confidence === 'number' ? r.data.confidence : null });
+          });
+        });
+      });
+      return chain.then(function(){ return results; });
+    })
+    .then(function(results){ snapReadResults(results); })
+    .catch(function(){ snapOcrFailed('The photo reader could not load or finish — check your connection and try again, use the retake tips below, or paste a few lines from the sheet instead.'); });
+}
+/* Decide from per-paper OCR results. One paper: exactly the old path.
+   Two papers: the texts combine, so detection uses the joint evidence.
+   Both weak → the weak-read path (chooser + retake tips). One weak →
+   proceed on the combined text, but say which paper read weakly and
+   show its retake tips. */
+function snapReadResults(results){
+  if(!results || !results.length){ snapOcrFailed('Too little readable text there — try the retake tips below, or paste a few lines from the sheet instead.'); return; }
+  if(results.length === 1){ SNAP.weakPaper = 0; snapHandleText(results[0].text, results[0].conf); return; }
+  var weak = results.map(snapPaperWeak);
+  var combined = results.map(function(r){ return r.text || ''; }).join('\n');
+  if(weak[0] && weak[1]){ SNAP.weakPaper = 0; snapHandleText(combined, 0); return; }
+  if(weak[0] || weak[1]){
+    SNAP.weakPaper = weak[0] ? 1 : 2;
+    snapHandleText(combined, null);
+    $('snapOcrMsg').textContent = 'Paper ' + SNAP.weakPaper + ' read weakly, so this read leans on the other paper. If the module looks wrong, retake paper ' + SNAP.weakPaper + ' using the tips below — or switch any time with “Wrong lab? Change”.';
+    var q1 = $('snapQuality1'); if(q1) q1.hidden = false;
+    return;
+  }
+  SNAP.weakPaper = 0;
+  snapHandleText(combined, null);
 }
 
 /* ---------- step 2: confirm the detected type only ---------- */
@@ -5324,7 +5507,7 @@ function snapShowStage(on){
 function snapRenderLineRead(){
   if(!SNAP.line) return;
   var a = SNAP.line.getAz();
-  $('snapLineRead').textContent = 'Your line reads ' + labPad(a) + '° / ' + labPad(labOpposite(a)) + '° — quadrant bearing ' + azToQuad(a) + ' (for the ' + labPad(a) + '° end).';
+  $('snapLineRead').textContent = 'Your line: needle end ' + labPad(a) + '°, other end ' + labPad(labOpposite(a)) + '° — said as a bearing, ' + azToQuad(a) + ' (for the ' + labPad(a) + '° end).';
   var inp = document.querySelector('#snapItems input[data-kind="line"]');
   if(inp && document.activeElement !== inp) inp.value = Math.round(a) % 360;
 }
@@ -5806,10 +5989,11 @@ function snapResearchGo(wiki){
 if($('snapPickBtn')){
   $('snapPickBtn').addEventListener('click', function(){ $('snapFile').click(); });
   $('snapFile').addEventListener('change', function(){
-    var f = this.files && this.files[0]; if(!f) return;
-    try{ var img = $('snapPreview'); img.src = URL.createObjectURL(f); img.hidden = false; }catch(e){}
-    snapStart(f);
+    var f = this.files && this.files[0]; this.value = ''; if(!f) return;
+    snapQueuePaper(f);
   });
+  $('snapAddPaperBtn').addEventListener('click', function(){ $('snapFile').click(); });
+  $('snapReadBtn').addEventListener('click', snapReadPapers);
   $('snapPasteBtn').addEventListener('click', function(){ snapStart($('snapPaste').value); });
   $('snapGoBtn').addEventListener('click', function(){ SNAP.auto = false; snapStartPractice(); });
   $('snapChangeBtn').addEventListener('click', function(){ snapShowType(); });
@@ -5820,7 +6004,7 @@ if($('snapPickBtn')){
   $('snapCheckBtn').addEventListener('click', snapGrade);
   $('snapNewBtn').addEventListener('click', snapNewRound);
   $('snapExampleBtn').addEventListener('click', snapShowExample);
-  document.querySelectorAll('.snap-retake').forEach(function(b){ b.addEventListener('click', function(){ $('snapFile').click(); }); });
+  document.querySelectorAll('.snap-retake').forEach(function(b){ b.addEventListener('click', function(){ SNAP.papers = []; SNAP.weakPaper = 0; snapRenderPapers(); $('snapFile').click(); }); });
   $('snapDrawToggleBtn').addEventListener('click', function(){ snapSetDrawMode(!SNAP.drawMode); });
   $('snapUndoBtn').addEventListener('click', snapUndoStroke);
   $('snapClearBtn').addEventListener('click', snapClearDrawing);

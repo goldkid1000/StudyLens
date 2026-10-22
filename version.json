@@ -1,7 +1,9 @@
 {
  "notes": [
   "Lab Snapshot goes off what it sees: a confident photo read now opens the matching practice module automatically — no confirm step, no library tap — with a slim 'Snapped: looks like…' banner and a one-tap 'Wrong lab? Change' button. Weak or ambiguous reads still land on the chooser with retake tips, never a forced guess.",
-  "Everything else is unchanged: the photo is read on-device only to detect the type and dropped when practice starts, practice uses fresh numbers only, and notes stay on this device only."
+  "Two-paper snap: queue two photos (instructions + worksheet, say) and read them together — the combined read spots the lab type more confidently. Each paper gets a removable chip, and if one reads weakly the app names it and shows its retake tips.",
+  "Geology tools in plain words: readouts say what they describe (the protractor boxes follow the needle; the calculator answers 'For your strike…' with the step maths shown), a 'How to measure on paper' steps card joins the module, and the protractor gains a 'Real tool' style like the clear plastic 360° protractor — inner ring included, remembered on this device.",
+  "Everything else is unchanged: photos are read on-device only to detect the type and dropped when practice starts, practice uses fresh numbers only, and notes stay on this device only."
  ],
  "notify": true,
  "updated": "2026-10-22",
