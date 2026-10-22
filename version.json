@@ -1,9 +1,9 @@
 {
  "notes": [
-  "Lab Snapshot moved home: it now lives inside the Lab tab, under the protractor, strike & dip calculator and practice mode \u2014 one tab for every lab tool. The separate Snap tab is gone.",
-  "Nothing else changed: the photo is still read on your device only to detect the lab type and is never saved, practice still uses fresh numbers from StudyLens templates, and your notes still live on this device only."
+  "Lab tab tidied: it is Lab Snapshot only now — the standalone protractor, calculator, practice, lesson and video sections that sat above Snapshot are removed.",
+  "Geology keeps its tools inside the module: the strike & dip and cross section rounds carry the 360° protractor and the strike & dip calculator. Bearing conversion now also accepts plain N, E, S and W."
  ],
  "notify": true,
  "updated": "2026-10-22",
- "version": "2.21.1"
+ "version": "2.21.2"
 }

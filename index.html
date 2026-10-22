@@ -439,11 +439,6 @@ mark.stock{background:var(--warn-bg);color:inherit;border-radius:4px;padding:0 3
 .lab-field input[type=number]{width:100%;background:var(--surface3);border:1.5px solid var(--line);border-radius:14px;color:var(--ink);padding:13px 14px;font-size:15.5px;font-family:inherit}
 .lab-out{font-size:15.5px;line-height:1.8;margin-top:12px}
 .lab-mini{width:100%;max-width:330px;height:auto;display:block;margin:12px auto 0}
-.lab-step{display:block;border:1.5px solid var(--line);border-radius:14px;padding:13px 15px;margin-top:10px;background:var(--surface3);font-size:15px;line-height:1.65;width:100%;text-align:left;cursor:pointer;font-family:inherit;color:var(--ink);min-height:44px}
-.lab-step b{color:var(--acc-deep)}
-.lab-vid{margin-top:16px}
-.lab-vid iframe{width:100%;aspect-ratio:16/9;border:0;border-radius:14px;background:#000;display:block}
-.lab-vid p{margin:7px 0 0;font-size:14.5px}
 .lab-msg{margin-top:12px;font-size:15px;line-height:1.65}
 .lab-q{font-size:17px;line-height:1.6;margin-top:6px}
 /* lab snapshot */
@@ -966,88 +961,10 @@ input.snap-in{background:var(--surface3);border:1.5px solid var(--line);border-r
     <section class="tab" id="tab-lab">
       <div class="tabhead">
         <h2>Lab</h2>
-        <p>Every lab tool in one place. Spin the 360° protractor, work the strike &amp; dip calculator and practice mode — then, further down, Lab Snapshot: photograph any lab worksheet and StudyLens loads the matching practice module (cross sections, topo contours, titration, microscope work, vectors, data charts) with your notes and a research panel beside it.</p>
+        <p>Photograph any lab worksheet and StudyLens loads the matching practice module (cross sections, topo contours, titration, microscope work, vectors, data charts) with your notes and a research panel beside it. The geology modules carry their own tools: open strike &amp; dip or cross section and the 360° protractor and strike &amp; dip calculator are right there inside the round.</p>
       </div>
 
-      <div class="card">
-        <h3>The 360° protractor</h3>
-        <p>Drag the copper strike line around the center dot. On an azimuth protractor, 0° sits at North and the numbers climb <strong>clockwise</strong>. The readout gives the direction both ways along the line — a strike line always reads two numbers, 180° apart.</p>
-        <svg id="labProtractor" class="lab-svg" viewBox="0 0 360 360" role="img" aria-label="Interactive 360 degree azimuth protractor"></svg>
-        <div class="lab-readout">
-          <div class="lab-chip"><small>One way</small><span id="labAzA">000°</span></div>
-          <div class="lab-chip"><small>Opposite way</small><span id="labAzB">180°</span></div>
-          <div class="lab-chip"><small>Quadrant bearing</small><span id="labAzQ">N0°E</span></div>
-        </div>
-        <p class="lab-msg">On paper, you would lay the protractor's center hole on your dot, keep its 0° aimed at the map's North arrow, and read the rim where your line crosses it.</p>
-      </div>
-
-      <div class="card">
-        <h3>Strike &amp; dip calculator</h3>
-        <p>Enter a strike and dip — from your own field notes, or any values you want to explore — and see the symbol drawn the worksheet way, with every related direction worked out.</p>
-        <div class="lab-grid">
-          <div class="lab-field"><label for="labStrikeIn">Strike azimuth (0–360°)</label><input type="number" id="labStrikeIn" min="0" max="360" step="1" inputmode="numeric" placeholder="Strike, e.g. 120"></div>
-          <div class="lab-field"><label for="labDipIn">Dip (0–90°)</label><input type="number" id="labDipIn" min="0" max="90" step="1" inputmode="numeric" placeholder="Dip, e.g. 40"></div>
-        </div>
-        <div class="row"><button class="btn" id="labCalcBtn">Draw it</button></div>
-        <div id="labCalcOut" class="lab-out" aria-live="polite"></div>
-        <svg id="labSymbol" class="lab-mini" viewBox="0 0 330 330" role="img" aria-label="Strike and dip symbol drawn on a mini map"></svg>
-      </div>
-
-      <div class="card">
-        <h3>Practice: place the symbol</h3>
-        <p>The app picks a random strike and dip. Spin the line to the strike, then choose which side the short dip tick goes on. Work through it with the same 4 steps you would use on paper.</p>
-        <div class="row" style="margin-top:0"><button class="btn" id="labNewBtn">New practice</button><span class="lab-q" id="labTarget"></span></div>
-        <svg id="labPracticeSvg" class="lab-svg" viewBox="0 0 360 360" role="img" aria-label="Practice protractor"></svg>
-        <div class="lab-readout">
-          <div class="lab-chip"><small>Your line reads</small><span id="labPracRead">000° / 180°</span></div>
-        </div>
-        <div class="row">
-          <button class="btn plain" id="labCheckLineBtn">Check my line</button>
-        </div>
-        <div id="labDipPick" hidden>
-          <p class="lab-q" style="margin-top:14px">Line set. Now picture the paper rotated so the strike direction points at the top. Which side does the short dip tick go on?</p>
-          <div class="row">
-            <button class="btn plain" id="labDipLeftBtn">Left side of the line</button>
-            <button class="btn plain" id="labDipRightBtn">Right side of the line</button>
-          </div>
-        </div>
-        <div id="labPracMsg" class="lab-msg" aria-live="polite"></div>
-        <svg id="labPracticeSymbol" class="lab-mini" viewBox="0 0 330 330" role="img" aria-label="The correct strike and dip symbol for the practice values"></svg>
-        <p class="lab-msg" id="labStreak"></p>
-      </div>
-
-      <div class="card">
-        <h3>Learn it: strike, dip, and the rim</h3>
-        <p>Tap each step to open it.</p>
-        <button class="lab-step" data-step="1"><b>1 · What is strike?</b><span class="lab-step-body" hidden><br>Strike is the compass direction of the horizontal line across a tilted rock layer — picture the line where the layer's surface meets flat water. It is read as an azimuth: a number from 0° to 360°, counted clockwise from North.</span></button>
-        <button class="lab-step" data-step="2"><b>2 · What is dip?</b><span class="lab-step-body" hidden><br>Dip is how steeply the layer tilts down from flat — an angle from 0° (flat) to 90° (vertical). It is always measured at right angles (perpendicular) to the strike, in the downhill direction. With the worksheet method, the dip direction is the strike + 90°.</span></button>
-        <button class="lab-step" data-step="3"><b>3 · Reading the protractor rim</b><span class="lab-step-body" hidden><br>Center the circle on your dot and point 0° at North. Count clockwise around the rim to your line and read the number where the line crosses the rim. A straight line crosses the rim twice — the two numbers are always 180° apart, and either one can name the strike.</span></button>
-        <button class="lab-step" data-step="4"><b>4 · The 4-step symbol method</b><span class="lab-step-body" hidden><br>(1) Make a dot where the measurement was taken. (2) Find the compass direction of the strike and draw the long line of the symbol through the dot in that direction. (3) Rotate the paper so the strike direction is at the top; draw the short dip line on the <em>right</em> side of the strike line, perpendicular to it. (4) Rotate the paper back and write the dip number next to the strike line.</span></button>
-      </div>
-
-      <div class="card">
-        <h3>Confused? Watch</h3>
-        <p>Short tutorials from geology instructors — the concepts first, then the map skills.</p>
-        <div class="lab-vid">
-          <iframe src="https://www.youtube-nocookie.com/embed/K5vsoqDpu5Q" title="Interpreting Strike and Dip" loading="lazy" allow="accelerometer; encrypted-media; picture-in-picture" allowfullscreen></iframe>
-          <p><a href="https://www.youtube.com/watch?v=K5vsoqDpu5Q" target="_blank" rel="noopener">Interpreting Strike and Dip</a> — Juniata College geology: what strike and dip mean, and how the map symbol works.</p>
-        </div>
-        <div class="lab-vid">
-          <iframe src="https://www.youtube-nocookie.com/embed/bTtkU2LPyz8" title="Strike Lines to find Strike and Dip" loading="lazy" allow="accelerometer; encrypted-media; picture-in-picture" allowfullscreen></iframe>
-          <p><a href="https://www.youtube.com/watch?v=bTtkU2LPyz8" target="_blank" rel="noopener">Strike Lines to find Strike and Dip</a> — KC Structural Geology: drawing strike lines on a map to get strike and dip.</p>
-        </div>
-        <div class="lab-vid">
-          <iframe src="https://www.youtube-nocookie.com/embed/aB8m980AsCE" title="Using a Brunton" loading="lazy" allow="accelerometer; encrypted-media; picture-in-picture" allowfullscreen></iframe>
-          <p><a href="https://www.youtube.com/watch?v=aB8m980AsCE" target="_blank" rel="noopener">Using a Brunton</a> — Prof. Katy Johanesen: measuring strike and dip with a compass out in the field.</p>
-        </div>
-        <div class="lab-vid">
-          <iframe src="https://www.youtube-nocookie.com/embed/Bg40zSYCwZk" title="Measurement of Directions and Angles: Bearings, Azimuths and Deflection Angles" loading="lazy" allow="accelerometer; encrypted-media; picture-in-picture" allowfullscreen></iframe>
-          <p><a href="https://www.youtube.com/watch?v=Bg40zSYCwZk" target="_blank" rel="noopener">Bearings, Azimuths &amp; Deflection Angles</a> — GEE141 surveying lesson: how azimuths and quadrant bearings convert back and forth.</p>
-        </div>
-        <p style="margin-top:14px">Still stuck? <a href="https://www.youtube.com/results?search_query=strike+and+dip+protractor+azimuth+tutorial" target="_blank" rel="noopener">Search YouTube for more strike &amp; dip protractor tutorials</a>.</p>
-      </div>
-    
-      <!-- ============ LAB SNAPSHOT (inside Lab tab since v2.21.1) ============ -->
+      <!-- ============ LAB SNAPSHOT (the Lab tab's only content since v2.21.2) ============ -->
       <div id="snapBlock">
       <div class="snap-subhead">
         <h3>Lab Snapshot — snap a lab sheet, get its practice module</h3>
@@ -1096,6 +1013,33 @@ input.snap-in{background:var(--surface3);border:1.5px solid var(--line);border-r
           </select>
           <button class="btn plain" id="snapTypeLibBtn">Load module</button>
         </div>
+      </div>
+
+      <!-- Geology tools (v2.21.2): the 360° protractor and the strike & dip calculator
+           live inside the Lab Snapshot geology modules (strike & dip, cross section). -->
+      <div id="snapGeoTools" hidden>
+      <div class="card">
+        <h3>The 360° protractor</h3>
+        <p>Drag the copper strike line around the center dot. On an azimuth protractor, 0° sits at North and the numbers climb <strong>clockwise</strong>. The readout gives the direction both ways along the line — a strike line always reads two numbers, 180° apart.</p>
+        <svg id="labProtractor" class="lab-svg" viewBox="0 0 360 360" role="img" aria-label="Interactive 360 degree azimuth protractor"></svg>
+        <div class="lab-readout">
+          <div class="lab-chip"><small>One way</small><span id="labAzA">000°</span></div>
+          <div class="lab-chip"><small>Opposite way</small><span id="labAzB">180°</span></div>
+          <div class="lab-chip"><small>Quadrant bearing</small><span id="labAzQ">N0°E</span></div>
+        </div>
+        <p class="lab-msg">On paper, you would lay the protractor's center hole on your dot, keep its 0° aimed at the map's North arrow, and read the rim where your line crosses it.</p>
+      </div>
+      <div class="card">
+        <h3>Strike &amp; dip calculator</h3>
+        <p>Enter a strike and dip — from your own field notes, or any values you want to explore — and see the symbol drawn the worksheet way, with every related direction worked out.</p>
+        <div class="lab-grid">
+          <div class="lab-field"><label for="labStrikeIn">Strike azimuth (0–360°)</label><input type="number" id="labStrikeIn" min="0" max="360" step="1" inputmode="numeric" placeholder="Strike, e.g. 120"></div>
+          <div class="lab-field"><label for="labDipIn">Dip (0–90°)</label><input type="number" id="labDipIn" min="0" max="90" step="1" inputmode="numeric" placeholder="Dip, e.g. 40"></div>
+        </div>
+        <div class="row"><button class="btn" id="labCalcBtn">Draw it</button></div>
+        <div id="labCalcOut" class="lab-out" aria-live="polite"></div>
+        <svg id="labSymbol" class="lab-mini" viewBox="0 0 330 330" role="img" aria-label="Strike and dip symbol drawn on a mini map"></svg>
+      </div>
       </div>
 
       <div class="card" id="snapPracticeCard" hidden>
@@ -3752,8 +3696,12 @@ ssRefresh();
    fetched with no-store caching: when a newer build ships, an already-open or
    home-screen copy of an older build sees the newer version number there and
    offers "Update now" (a reload onto the new build). */
-var APP_VERSION = '2.21.1';
+var APP_VERSION = '2.21.2';
 var CHANGELOG = [
+  { v: '2.21.2', date: 'Oct 22, 2026', notify: true, notes: [
+    'Lab tab tidied: it is Lab Snapshot only now. The standalone protractor, calculator, practice, lesson and video sections that used to sit above Snapshot are gone.',
+    'Geology keeps its tools, inside the module: open the strike & dip or cross section round and the 360° protractor and the strike & dip calculator are right there with it. One accuracy fix rode along: converting a bearing back to an azimuth now accepts plain N, E, S and W too, not just bearings like N50°E.'
+  ] },
   { v: '2.21.1', date: 'Oct 22, 2026', notify: true, notes: [
     'Lab Snapshot moved home: it now lives inside the Lab tab, under the protractor, strike & dip calculator and practice mode — one tab for every lab tool. The separate Snap tab is gone.',
     'Nothing else changed: the photo is still read on your device only to detect the lab type and is never saved, practice still uses fresh numbers from StudyLens templates, and your notes still live on this device only.'
@@ -4849,10 +4797,11 @@ $('batchInput').addEventListener('change', async function(e){
 </script>
 <script>
 'use strict';
-/* ================= Protractor Lab (v2.20.0) =================
-   Azimuths run 0-360, clockwise from North. A strike line is a straight
-   line, so it always reads two azimuths 180 degrees apart. Practice uses
-   random values only — nothing here answers a worksheet for the learner. */
+/* ============ Geology tools for Lab Snapshot (helpers since v2.20.0) ============
+   Shared helpers plus the 360° protractor and strike & dip calculator that
+   live inside the Lab Snapshot geology modules (strike & dip, cross section).
+   Azimuths run 0-360, clockwise from North, written with 3 digits. A strike
+   line is a straight line, so it always reads two azimuths 180 degrees apart. */
 function labNorm(a){ a = a % 360; return a < 0 ? a + 360 : a; }
 function labPad(a){ var n = Math.round(labNorm(a)) % 360; return (n < 10 ? '00' : n < 100 ? '0' : '') + n; }
 function labPol(cx, cy, r, az){ var t = az * Math.PI / 180; return [cx + r * Math.sin(t), cy - r * Math.cos(t)]; }
@@ -4869,7 +4818,12 @@ function azToQuad(az){
 }
 function quadToAz(q){
   if(typeof q !== 'string') return null;
-  var m = q.trim().toUpperCase().replace(/\s+/g, '').match(/^([NS])(\d{1,3})°?([EW])$/);
+  var bare = q.trim().toUpperCase();
+  if(bare === 'N') return 0;
+  if(bare === 'E') return 90;
+  if(bare === 'S') return 180;
+  if(bare === 'W') return 270;
+  var m = bare.replace(/\s+/g, '').match(/^([NS])(\d{1,3})°?([EW])$/);
   if(!m) return null;
   var ang = parseInt(m[2], 10);
   if(ang > 90) return null;
@@ -5003,73 +4957,6 @@ if($('labCalcBtn')){
   ['labStrikeIn', 'labDipIn'].forEach(function(id){ $(id).addEventListener('input', function(){ if($('labStrikeIn').value !== '' && $('labDipIn').value !== '') labRunCalc(); }); });
 }
 
-/* practice mode — random values only, never the learner's worksheet numbers */
-var LABP = { strike: null, dip: null, step: 0, streak: 0 };
-var labPrac = null;
-function labNewPractice(){
-  var s, d;
-  do { s = 5 + Math.floor(Math.random() * 351); } while(s === 50 || s === 310);
-  var dips = [10, 15, 20, 30, 35, 40, 45, 50, 55, 65, 70, 75, 80];
-  d = dips[Math.floor(Math.random() * dips.length)];
-  LABP.strike = s; LABP.dip = d; LABP.step = 1;
-  $('labTarget').innerHTML = 'Strike <b>' + labPad(s) + '°</b> · Dip <b>' + d + '°</b>';
-  $('labDipPick').hidden = true;
-  $('labPracMsg').innerHTML = 'Step 1–2: make your dot (it is the center) and spin the line until it runs along the strike, <b>' + labPad(s) + '°</b>. Then tap “Check my line”.';
-  var ps = $('labPracticeSymbol'); while(ps.firstChild) ps.removeChild(ps.firstChild);
-  labPrac.setAz((s + 137) % 360);
-  labRenderPrac();
-}
-function labRenderPrac(){
-  var a = labPrac.getAz();
-  $('labPracRead').textContent = labPad(a) + '° / ' + labPad(labOpposite(a)) + '°';
-}
-function labCheckLine(){
-  if(LABP.step !== 1) return;
-  var a = labPrac.getAz();
-  var diff = Math.abs(a - LABP.strike) % 180;
-  var err = Math.min(diff, 180 - diff);
-  if(err <= 3){
-    LABP.step = 2;
-    $('labDipPick').hidden = false;
-    $('labPracMsg').innerHTML = '<b>Line correct.</b> Your line runs ' + labPad(a) + '° / ' + labPad(labOpposite(a)) + '° — within ' + Math.round(err) + '° of the strike (either reading names the same line). Now step 3: rotate the paper in your head so ' + labPad(LABP.strike) + '° is at the top, and pick the side for the dip tick.';
-  } else {
-    var signed = ((LABP.strike - a) % 180 + 180) % 180; if(signed > 90) signed -= 180;
-    var hint = signed > 0 ? 'Rotate the line about ' + Math.abs(Math.round(signed)) + '° clockwise.' : 'Rotate the line about ' + Math.abs(Math.round(signed)) + '° counterclockwise.';
-    $('labPracMsg').innerHTML = 'Not yet — your line reads <b>' + labPad(a) + '° / ' + labPad(labOpposite(a)) + '°</b>, about ' + Math.round(err) + '° off the strike of ' + labPad(LABP.strike) + '°. Remember step 2: count <em>clockwise</em> from North (0° at the top) around the rim, and a line reads the same from both ends. ' + hint;
-  }
-}
-function labPickDip(rightSide){
-  if(LABP.step !== 2) return;
-  var s = LABP.strike, d = LABP.dip, dd = labDipDirection(s);
-  labDrawSymbol($('labPracticeSymbol'), s, d);
-  LABP.step = 3;
-  $('labDipPick').hidden = true;
-  if(rightSide){
-    LABP.streak++;
-    $('labPracMsg').innerHTML = '<b>Correct — the tick goes on the right.</b> Rotating the paper so ' + labPad(s) + '° is at the top turns the dip direction (' + labPad(s) + '° + 90° = <b>' + labPad(dd) + '°</b>) to point right, so the short tick is drawn on the right side of the strike line, perpendicular to it. Step 4: rotate back and write <b>' + d + '</b> beside the line — that is the finished symbol below. Tap “New practice” to go again.';
-  } else {
-    LABP.streak = 0;
-    $('labPracMsg').innerHTML = '<b>Not the left.</b> Walk the steps: (1) dot at the point, (2) long line along the strike, (3) rotate the paper so the strike direction ' + labPad(s) + '° is at the top — the layer dips toward ' + labPad(dd) + '° (strike + 90°), which lands on the <b>right</b> after that rotation, so the short tick goes on the right, perpendicular to the line. (4) Rotate back and write <b>' + d + '</b> beside it. The correct symbol is drawn below — tap “New practice” and try another.';
-  }
-  $('labStreak').textContent = LABP.streak > 0 ? 'Practice streak: ' + LABP.streak + ' in a row.' : '';
-}
-if($('labPracticeSvg')){
-  labPrac = labBuildProtractor($('labPracticeSvg'), 20);
-  labPrac.onChange = labRenderPrac;
-  $('labNewBtn').addEventListener('click', labNewPractice);
-  $('labCheckLineBtn').addEventListener('click', labCheckLine);
-  $('labDipLeftBtn').addEventListener('click', function(){ labPickDip(false); });
-  $('labDipRightBtn').addEventListener('click', function(){ labPickDip(true); });
-  labNewPractice();
-}
-
-/* lesson steps */
-document.querySelectorAll('.lab-step').forEach(function(btn){
-  btn.addEventListener('click', function(){
-    var body = btn.querySelector('.lab-step-body');
-    if(body) body.hidden = !body.hidden;
-  });
-});
 </script>
 <script>
 'use strict';
@@ -5202,6 +5089,8 @@ function snapRandStrikeDip(){
 }
 function snapBuildRound(){
   var type = SNAP.type || 'concept';
+  var geoTools = $('snapGeoTools');
+  if(geoTools) geoTools.hidden = !(type === 'strike' || type === 'xsect');
   var R = { type: type, items: [], dipPick: null };
   $('snapScore').textContent = '';
   SNAP.strokes = []; snapRedraw();
