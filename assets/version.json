@@ -1,1 +1,9 @@
-{"notes": ["The detector now abstains instead of guessing. When it is essentially tied between human and AI, it shows \u201cToo close to call\u201d with no verdict rather than flipping a coin. On held-out data those coin-flip calls were wrong about half the time; holding them back cut the false-flag rate on human writing from 4.8% to about 4.3%.", "Borderline results are the honest ones now: Mixed or \u201cToo close to call\u201d means the model genuinely cannot tell \u2014 read the writing yourself. A score is a signal to review, never proof of who wrote something."], "notify": true, "updated": "2026-10-22", "version": "2.19.0"}
+{
+ "notes": [
+  "New: Protractor Lab. The clear 360° circle ruler from geology lab, rebuilt as a tool you can spin: drag the strike line and read its azimuth both ways, with the quadrant bearing (like N50°E) worked out for you.",
+  "Strike & dip calculator: type a strike and dip and see the symbol drawn the worksheet way — dip tick on the right once the strike points up — plus the dip direction (strike + 90°), the opposite strike direction, and azimuth ↔ bearing conversions. Practice mode deals you random strike/dip pairs and checks your line and dip side step by step, and a Confused? Watch section links real instructor videos on strike, dip, and azimuths."
+ ],
+ "notify": true,
+ "updated": "2026-10-22",
+ "version": "2.20.0"
+}

@@ -424,6 +424,25 @@ mark.stock{background:var(--warn-bg);color:inherit;border-radius:4px;padding:0 3
 @keyframes ssModeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 .ss-feed{animation:feedIn .25s var(--ease) both}
 @keyframes feedIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+/* protractor lab */
+.lab-svg{width:100%;max-width:440px;height:auto;display:block;margin:0 auto;touch-action:none;cursor:grab}
+.lab-svg:active{cursor:grabbing}
+.lab-readout{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:12px}
+.lab-chip{background:var(--surface3);border:1px solid var(--line);border-radius:999px;padding:8px 16px;font-weight:700;font-size:16px;text-align:center}
+.lab-chip small{display:block;font-weight:500;font-size:11.5px;color:var(--mut)}
+.lab-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:4px}
+@media (max-width:560px){.lab-grid{grid-template-columns:1fr}}
+.lab-field label{display:block;font-weight:700;font-size:13.5px;margin-bottom:6px}
+.lab-field input[type=number]{width:100%;background:var(--surface3);border:1.5px solid var(--line);border-radius:14px;color:var(--ink);padding:13px 14px;font-size:15.5px;font-family:inherit}
+.lab-out{font-size:15.5px;line-height:1.8;margin-top:12px}
+.lab-mini{width:100%;max-width:330px;height:auto;display:block;margin:12px auto 0}
+.lab-step{display:block;border:1.5px solid var(--line);border-radius:14px;padding:13px 15px;margin-top:10px;background:var(--surface3);font-size:15px;line-height:1.65;width:100%;text-align:left;cursor:pointer;font-family:inherit;color:var(--ink);min-height:44px}
+.lab-step b{color:var(--acc-deep)}
+.lab-vid{margin-top:16px}
+.lab-vid iframe{width:100%;aspect-ratio:16/9;border:0;border-radius:14px;background:#000;display:block}
+.lab-vid p{margin:7px 0 0;font-size:14.5px}
+.lab-msg{margin-top:12px;font-size:15px;line-height:1.65}
+.lab-q{font-size:17px;line-height:1.6;margin-top:6px}
 </style>
 </head>
 <body>
@@ -452,6 +471,10 @@ mark.stock{background:var(--warn-bg);color:inherit;border-radius:4px;padding:0 3
     <button class="navbtn" data-tab="focus">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5"/><path d="M9 2h6"/></svg>
       Focus
+    </button>
+    <button class="navbtn" data-tab="lab">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+      Lab
     </button>
     <button class="navbtn" data-tab="tutor">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
@@ -898,6 +921,92 @@ mark.stock{background:var(--warn-bg);color:inherit;border-radius:4px;padding:0 3
       <div class="card">
         <h3>Session log</h3>
         <ul class="log-list" id="focusLog"><li id="focusLogEmpty" class="mut">No finished sessions yet this visit — completed focus blocks and breaks will show up here.</li></ul>
+      </div>
+    </section>
+
+    <!-- ============ PROTRACTOR LAB ============ -->
+    <section class="tab" id="tab-lab">
+      <div class="tabhead">
+        <h2>Protractor Lab</h2>
+        <p>The clear 360° circle ruler from geology lab, rebuilt as a tool you can spin. Learn strike &amp; dip, read compass directions (azimuths) off a map, and practise the worksheet method until it feels easy.</p>
+      </div>
+
+      <div class="card">
+        <h3>The 360° protractor</h3>
+        <p>Drag the copper strike line around the center dot. On an azimuth protractor, 0° sits at North and the numbers climb <strong>clockwise</strong>. The readout gives the direction both ways along the line — a strike line always reads two numbers, 180° apart.</p>
+        <svg id="labProtractor" class="lab-svg" viewBox="0 0 360 360" role="img" aria-label="Interactive 360 degree azimuth protractor"></svg>
+        <div class="lab-readout">
+          <div class="lab-chip"><small>One way</small><span id="labAzA">000°</span></div>
+          <div class="lab-chip"><small>Opposite way</small><span id="labAzB">180°</span></div>
+          <div class="lab-chip"><small>Quadrant bearing</small><span id="labAzQ">N0°E</span></div>
+        </div>
+        <p class="lab-msg">On paper, you would lay the protractor's center hole on your dot, keep its 0° aimed at the map's North arrow, and read the rim where your line crosses it.</p>
+      </div>
+
+      <div class="card">
+        <h3>Strike &amp; dip calculator</h3>
+        <p>Enter a strike and dip — from your own field notes, or any values you want to explore — and see the symbol drawn the worksheet way, with every related direction worked out.</p>
+        <div class="lab-grid">
+          <div class="lab-field"><label for="labStrikeIn">Strike azimuth (0–360°)</label><input type="number" id="labStrikeIn" min="0" max="360" step="1" inputmode="numeric" placeholder="Strike, e.g. 120"></div>
+          <div class="lab-field"><label for="labDipIn">Dip (0–90°)</label><input type="number" id="labDipIn" min="0" max="90" step="1" inputmode="numeric" placeholder="Dip, e.g. 40"></div>
+        </div>
+        <div class="row"><button class="btn" id="labCalcBtn">Draw it</button></div>
+        <div id="labCalcOut" class="lab-out" aria-live="polite"></div>
+        <svg id="labSymbol" class="lab-mini" viewBox="0 0 330 330" role="img" aria-label="Strike and dip symbol drawn on a mini map"></svg>
+      </div>
+
+      <div class="card">
+        <h3>Practice: place the symbol</h3>
+        <p>The app picks a random strike and dip. Spin the line to the strike, then choose which side the short dip tick goes on. Work through it with the same 4 steps you would use on paper.</p>
+        <div class="row" style="margin-top:0"><button class="btn" id="labNewBtn">New practice</button><span class="lab-q" id="labTarget"></span></div>
+        <svg id="labPracticeSvg" class="lab-svg" viewBox="0 0 360 360" role="img" aria-label="Practice protractor"></svg>
+        <div class="lab-readout">
+          <div class="lab-chip"><small>Your line reads</small><span id="labPracRead">000° / 180°</span></div>
+        </div>
+        <div class="row">
+          <button class="btn plain" id="labCheckLineBtn">Check my line</button>
+        </div>
+        <div id="labDipPick" hidden>
+          <p class="lab-q" style="margin-top:14px">Line set. Now picture the paper rotated so the strike direction points at the top. Which side does the short dip tick go on?</p>
+          <div class="row">
+            <button class="btn plain" id="labDipLeftBtn">Left side of the line</button>
+            <button class="btn plain" id="labDipRightBtn">Right side of the line</button>
+          </div>
+        </div>
+        <div id="labPracMsg" class="lab-msg" aria-live="polite"></div>
+        <svg id="labPracticeSymbol" class="lab-mini" viewBox="0 0 330 330" role="img" aria-label="The correct strike and dip symbol for the practice values"></svg>
+        <p class="lab-msg" id="labStreak"></p>
+      </div>
+
+      <div class="card">
+        <h3>Learn it: strike, dip, and the rim</h3>
+        <p>Tap each step to open it.</p>
+        <button class="lab-step" data-step="1"><b>1 · What is strike?</b><span class="lab-step-body" hidden><br>Strike is the compass direction of the horizontal line across a tilted rock layer — picture the line where the layer's surface meets flat water. It is read as an azimuth: a number from 0° to 360°, counted clockwise from North.</span></button>
+        <button class="lab-step" data-step="2"><b>2 · What is dip?</b><span class="lab-step-body" hidden><br>Dip is how steeply the layer tilts down from flat — an angle from 0° (flat) to 90° (vertical). It is always measured at right angles (perpendicular) to the strike, in the downhill direction. With the worksheet method, the dip direction is the strike + 90°.</span></button>
+        <button class="lab-step" data-step="3"><b>3 · Reading the protractor rim</b><span class="lab-step-body" hidden><br>Center the circle on your dot and point 0° at North. Count clockwise around the rim to your line and read the number where the line crosses the rim. A straight line crosses the rim twice — the two numbers are always 180° apart, and either one can name the strike.</span></button>
+        <button class="lab-step" data-step="4"><b>4 · The 4-step symbol method</b><span class="lab-step-body" hidden><br>(1) Make a dot where the measurement was taken. (2) Find the compass direction of the strike and draw the long line of the symbol through the dot in that direction. (3) Rotate the paper so the strike direction is at the top; draw the short dip line on the <em>right</em> side of the strike line, perpendicular to it. (4) Rotate the paper back and write the dip number next to the strike line.</span></button>
+      </div>
+
+      <div class="card">
+        <h3>Confused? Watch</h3>
+        <p>Short tutorials from geology instructors — the concepts first, then the map skills.</p>
+        <div class="lab-vid">
+          <iframe src="https://www.youtube-nocookie.com/embed/K5vsoqDpu5Q" title="Interpreting Strike and Dip" loading="lazy" allow="accelerometer; encrypted-media; picture-in-picture" allowfullscreen></iframe>
+          <p><a href="https://www.youtube.com/watch?v=K5vsoqDpu5Q" target="_blank" rel="noopener">Interpreting Strike and Dip</a> — Juniata College geology: what strike and dip mean, and how the map symbol works.</p>
+        </div>
+        <div class="lab-vid">
+          <iframe src="https://www.youtube-nocookie.com/embed/bTtkU2LPyz8" title="Strike Lines to find Strike and Dip" loading="lazy" allow="accelerometer; encrypted-media; picture-in-picture" allowfullscreen></iframe>
+          <p><a href="https://www.youtube.com/watch?v=bTtkU2LPyz8" target="_blank" rel="noopener">Strike Lines to find Strike and Dip</a> — KC Structural Geology: drawing strike lines on a map to get strike and dip.</p>
+        </div>
+        <div class="lab-vid">
+          <iframe src="https://www.youtube-nocookie.com/embed/aB8m980AsCE" title="Using a Brunton" loading="lazy" allow="accelerometer; encrypted-media; picture-in-picture" allowfullscreen></iframe>
+          <p><a href="https://www.youtube.com/watch?v=aB8m980AsCE" target="_blank" rel="noopener">Using a Brunton</a> — Prof. Katy Johanesen: measuring strike and dip with a compass out in the field.</p>
+        </div>
+        <div class="lab-vid">
+          <iframe src="https://www.youtube-nocookie.com/embed/Bg40zSYCwZk" title="Measurement of Directions and Angles: Bearings, Azimuths and Deflection Angles" loading="lazy" allow="accelerometer; encrypted-media; picture-in-picture" allowfullscreen></iframe>
+          <p><a href="https://www.youtube.com/watch?v=Bg40zSYCwZk" target="_blank" rel="noopener">Bearings, Azimuths &amp; Deflection Angles</a> — GEE141 surveying lesson: how azimuths and quadrant bearings convert back and forth.</p>
+        </div>
+        <p style="margin-top:14px">Still stuck? <a href="https://www.youtube.com/results?search_query=strike+and+dip+protractor+azimuth+tutorial" target="_blank" rel="noopener">Search YouTube for more strike &amp; dip protractor tutorials</a>.</p>
       </div>
     </section>
   </main>
@@ -3498,8 +3607,12 @@ ssRefresh();
    fetched with no-store caching: when a newer build ships, an already-open or
    home-screen copy of an older build sees the newer version number there and
    offers "Update now" (a reload onto the new build). */
-var APP_VERSION = '2.19.0';
+var APP_VERSION = '2.20.0';
 var CHANGELOG = [
+  { v: '2.20.0', date: 'Oct 22, 2026', notify: true, notes: [
+    'New: Protractor Lab. The clear 360\u00b0 circle ruler from geology lab, rebuilt as a tool you can spin: drag the strike line and read its azimuth both ways, with the quadrant bearing (like N50\u00b0E) worked out for you.',
+    'Strike \u0026 dip calculator: type a strike and dip and see the symbol drawn the worksheet way \u2014 dip tick on the right once the strike points up \u2014 plus the dip direction (strike + 90\u00b0), the opposite strike direction, and azimuth \u2194 bearing conversions. Practice mode deals you random strike/dip pairs and checks your line and dip side step by step, and a Confused? Watch section links real instructor videos on strike, dip, and azimuths.'
+  ] },
   { v: '2.19.0', date: 'Oct 22, 2026', notify: true, notes: [
     'The detector now abstains instead of guessing. When it is essentially tied between human and AI, it shows \u201cToo close to call\u201d with no verdict rather than flipping a coin. On held-out data those coin-flip calls were wrong about half the time; holding them back cut the false-flag rate on human writing from 4.8% to about 4.3%.',
     'Borderline results are the honest ones now: Mixed or \u201cToo close to call\u201d means the model genuinely cannot tell \u2014 read the writing yourself. A score is a signal to review, never proof of who wrote something.'
@@ -4579,6 +4692,230 @@ $('batchInput').addEventListener('change', async function(e){
   }
   status.textContent = 'Done — ' + files.length + ' file' + (files.length === 1 ? '' : 's') + ' scanned on-device.';
   BATCH.running = false;
+});
+</script>
+<script>
+'use strict';
+/* ================= Protractor Lab (v2.20.0) =================
+   Azimuths run 0-360, clockwise from North. A strike line is a straight
+   line, so it always reads two azimuths 180 degrees apart. Practice uses
+   random values only — nothing here answers a worksheet for the learner. */
+function labNorm(a){ a = a % 360; return a < 0 ? a + 360 : a; }
+function labPad(a){ var n = Math.round(labNorm(a)) % 360; return (n < 10 ? '00' : n < 100 ? '0' : '') + n; }
+function labPol(cx, cy, r, az){ var t = az * Math.PI / 180; return [cx + r * Math.sin(t), cy - r * Math.cos(t)]; }
+function azToQuad(az){
+  az = Math.round(labNorm(az)) % 360;
+  if(az === 0) return 'N';
+  if(az === 90) return 'E';
+  if(az === 180) return 'S';
+  if(az === 270) return 'W';
+  if(az < 90) return 'N' + az + '°E';
+  if(az < 180) return 'S' + (180 - az) + '°E';
+  if(az < 270) return 'S' + (az - 180) + '°W';
+  return 'N' + (360 - az) + '°W';
+}
+function quadToAz(q){
+  if(typeof q !== 'string') return null;
+  var m = q.trim().toUpperCase().replace(/\s+/g, '').match(/^([NS])(\d{1,3})°?([EW])$/);
+  if(!m) return null;
+  var ang = parseInt(m[2], 10);
+  if(ang > 90) return null;
+  if(ang === 0) return m[1] === 'N' ? 0 : 180;
+  if(ang === 90) return m[3] === 'E' ? 90 : 270;
+  if(m[1] === 'N' && m[3] === 'E') return ang;
+  if(m[1] === 'S' && m[3] === 'E') return 180 - ang;
+  if(m[1] === 'S' && m[3] === 'W') return 180 + ang;
+  return 360 - ang; /* N x W */
+}
+function labDipDirection(strike){ return labNorm(strike + 90); }
+function labOpposite(az){ return labNorm(az + 180); }
+
+var SVGNS = 'http://www.w3.org/2000/svg';
+function labEl(name, attrs, parent){
+  var el = document.createElementNS(SVGNS, name);
+  for(var k in attrs) el.setAttribute(k, attrs[k]);
+  if(parent) parent.appendChild(el);
+  return el;
+}
+function labBuildProtractor(svg, startAz){
+  var cx = 180, cy = 180;
+  labEl('circle', {cx:cx, cy:cy, r:172, style:'fill:var(--surface2);stroke:var(--line-strong);stroke-width:1.5'}, svg);
+  labEl('circle', {cx:cx, cy:cy, r:118, style:'fill:var(--surface3);stroke:var(--line);stroke-width:1'}, svg);
+  var gx = labEl('g', {'aria-hidden':'true'}, svg);
+  [-60, 0, 60].forEach(function(off){
+    labEl('line', {x1:cx + off, y1:cy - 118, x2:cx + off, y2:cy + 118, style:'stroke:var(--line);stroke-width:1;opacity:.55'}, gx);
+    labEl('line', {x1:cx - 118, y1:cy + off, x2:cx + 118, y2:cy + off, style:'stroke:var(--line);stroke-width:1;opacity:.55'}, gx);
+  });
+  for(var d = 0; d < 360; d++){
+    var len = d % 30 === 0 ? 17 : d % 10 === 0 ? 12 : d % 5 === 0 ? 8 : 5;
+    var p1 = labPol(cx, cy, 168, d), p2 = labPol(cx, cy, 168 - len, d);
+    labEl('line', {x1:p1[0].toFixed(1), y1:p1[1].toFixed(1), x2:p2[0].toFixed(1), y2:p2[1].toFixed(1), style:'stroke:var(--ink);stroke-width:' + (d % 10 === 0 ? 1.4 : 0.7) + ';opacity:' + (d % 5 === 0 ? '.8' : '.45')}, svg);
+    if(d % 10 === 0){
+      var lp = labPol(cx, cy, 141, d);
+      var t = labEl('text', {x:lp[0].toFixed(1), y:lp[1].toFixed(1), 'text-anchor':'middle', 'dominant-baseline':'central', style:'fill:var(--ink);font-size:11px;font-weight:600'}, svg);
+      t.textContent = d;
+    }
+  }
+  [['N', 0], ['E', 90], ['S', 180], ['W', 270]].forEach(function(c){
+    var p = labPol(cx, cy, 126, c[1]);
+    var t = labEl('text', {x:p[0].toFixed(1), y:p[1].toFixed(1), 'text-anchor':'middle', 'dominant-baseline':'central', style:'fill:var(--acc-deep);font-size:15px;font-weight:800'}, svg);
+    t.textContent = c[0];
+  });
+  labEl('polygon', {points: '180,4 173,20 187,20', style:'fill:var(--acc)'}, svg);
+  var g = labEl('g', {}, svg);
+  labEl('line', {x1:cx, y1:cy - 128, x2:cx, y2:cy + 128, style:'stroke:transparent;stroke-width:36;pointer-events:none'}, g);
+  labEl('line', {x1:cx, y1:cy - 128, x2:cx, y2:cy + 128, style:'stroke:var(--acc);stroke-width:3.5;stroke-linecap:round'}, g);
+  labEl('circle', {cx:cx, cy:cy - 128, r:5.5, style:'fill:var(--acc)'}, g);
+  labEl('circle', {cx:cx, cy:cy + 128, r:5.5, style:'fill:var(--acc);opacity:.55'}, g);
+  labEl('circle', {cx:cx, cy:cy, r:5, style:'fill:var(--ink);stroke:var(--surface);stroke-width:1.6'}, svg);
+  var api = { az: labNorm(startAz || 0), g: g,
+    setAz: function(a){ api.az = labNorm(a); g.setAttribute('transform', 'rotate(' + api.az.toFixed(1) + ' 180 180)'); },
+    getAz: function(){ return api.az; } };
+  api.setAz(api.az);
+  var dragging = false;
+  function angleFromEvent(e){
+    var rect = svg.getBoundingClientRect();
+    if(!rect.width || !rect.height) return null;
+    var x = (e.clientX - rect.left) / rect.width * 360;
+    var y = (e.clientY - rect.top) / rect.height * 360;
+    return labNorm(Math.atan2(x - 180, -(y - 180)) * 180 / Math.PI);
+  }
+  svg.addEventListener('pointerdown', function(e){
+    dragging = true;
+    if(svg.setPointerCapture && e.pointerId !== undefined){ try{ svg.setPointerCapture(e.pointerId); }catch(err){} }
+    var a = angleFromEvent(e); if(a !== null){ api.setAz(a); if(api.onChange) api.onChange(); }
+    e.preventDefault();
+  });
+  svg.addEventListener('pointermove', function(e){
+    if(!dragging) return;
+    var a = angleFromEvent(e); if(a !== null){ api.setAz(a); if(api.onChange) api.onChange(); }
+  });
+  ['pointerup', 'pointercancel'].forEach(function(ev){ svg.addEventListener(ev, function(){ dragging = false; }); });
+  return api;
+}
+function labDrawSymbol(svg, strike, dip){
+  while(svg.firstChild) svg.removeChild(svg.firstChild);
+  var cx = 165, cy = 165;
+  labEl('rect', {x:12, y:12, width:306, height:306, rx:10, style:'fill:var(--surface3);stroke:var(--line);stroke-width:1.2'}, svg);
+  labEl('line', {x1:292, y1:58, x2:292, y2:30, style:'stroke:var(--ink);stroke-width:2'}, svg);
+  labEl('polygon', {points: '292,22 287,34 297,34', style:'fill:var(--ink)'}, svg);
+  var nt = labEl('text', {x:292, y:74, 'text-anchor':'middle', style:'fill:var(--ink);font-size:13px;font-weight:700'}, svg);
+  nt.textContent = 'N';
+  var a = labPol(cx, cy, 104, strike), b = labPol(cx, cy, 104, labOpposite(strike));
+  labEl('line', {x1:a[0].toFixed(1), y1:a[1].toFixed(1), x2:b[0].toFixed(1), y2:b[1].toFixed(1), style:'stroke:var(--ink);stroke-width:3;stroke-linecap:round'}, svg);
+  var dd = labDipDirection(strike);
+  var t1 = labPol(cx, cy, 46, dd);
+  labEl('line', {x1:cx, y1:cy, x2:t1[0].toFixed(1), y2:t1[1].toFixed(1), style:'stroke:var(--acc-deep);stroke-width:3.5;stroke-linecap:round'}, svg);
+  var t2 = labPol(cx, cy, 108, dd);
+  labEl('line', {x1:t1[0].toFixed(1), y1:t1[1].toFixed(1), x2:t2[0].toFixed(1), y2:t2[1].toFixed(1), style:'stroke:var(--acc-deep);stroke-width:1.4;stroke-dasharray:4 4;opacity:.6'}, svg);
+  labEl('circle', {cx:cx, cy:cy, r:4.5, style:'fill:var(--ink)'}, svg);
+  var lp = labPol(cx, cy, 92, strike);
+  var dt = labEl('text', {x:lp[0].toFixed(1), y:(lp[1] - 10).toFixed(1), 'text-anchor':'middle', style:'fill:var(--ink);font-size:19px;font-weight:800'}, svg);
+  dt.textContent = dip;
+}
+
+/* main protractor */
+var labMain = null;
+function labRenderMain(){
+  var a = labMain.getAz(), o = labOpposite(a);
+  $('labAzA').textContent = labPad(a) + '°';
+  $('labAzB').textContent = labPad(o) + '°';
+  $('labAzQ').textContent = azToQuad(a);
+}
+if($('labProtractor')){
+  labMain = labBuildProtractor($('labProtractor'), 65);
+  labMain.onChange = labRenderMain;
+  labRenderMain();
+}
+
+/* strike & dip calculator */
+function labRunCalc(){
+  var out = $('labCalcOut');
+  var sRaw = $('labStrikeIn').value, dRaw = $('labDipIn').value;
+  var s = parseFloat(sRaw), d = parseFloat(dRaw);
+  if(sRaw === '' || isNaN(s) || s < 0 || s > 360){ out.innerHTML = '<span class="mut">Enter a strike between 0 and 360.</span>'; return; }
+  if(dRaw === '' || isNaN(d) || d < 0 || d > 90){ out.innerHTML = '<span class="mut">Enter a dip between 0 and 90.</span>'; return; }
+  s = labNorm(s); d = Math.round(d * 10) / 10;
+  var dd = labDipDirection(s), opp = labOpposite(s);
+  out.innerHTML =
+    '<div>Strike line: <b>' + labPad(s) + '°</b> — and the same line read the other way is <b>' + labPad(opp) + '°</b> (the opposite strike direction).</div>' +
+    '<div>Quadrant bearing of the strike: <b>' + azToQuad(s) + '</b> &nbsp;·&nbsp; of the opposite direction: <b>' + azToQuad(opp) + '</b></div>' +
+    '<div>Dip direction (strike + 90°): <b>' + labPad(dd) + '°</b> (' + azToQuad(dd) + ') — the layer tilts down toward ' + labPad(dd) + '°.</div>' +
+    '<div>Dip: <b>' + d + '°</b> — written as the plain number <b>' + d + '</b> beside the strike line, no degree sign, just like on a finished map.</div>' +
+    '<div class="mut">The symbol below is drawn the worksheet way: rotate the paper so ' + labPad(s) + '° is at the top and the short tick falls on the right, at ' + labPad(dd) + '°. The dashed line continues the dip direction.</div>';
+  labDrawSymbol($('labSymbol'), s, d);
+}
+if($('labCalcBtn')){
+  $('labCalcBtn').addEventListener('click', labRunCalc);
+  ['labStrikeIn', 'labDipIn'].forEach(function(id){ $(id).addEventListener('input', function(){ if($('labStrikeIn').value !== '' && $('labDipIn').value !== '') labRunCalc(); }); });
+}
+
+/* practice mode — random values only, never the learner's worksheet numbers */
+var LABP = { strike: null, dip: null, step: 0, streak: 0 };
+var labPrac = null;
+function labNewPractice(){
+  var s, d;
+  do { s = 5 + Math.floor(Math.random() * 351); } while(s === 50 || s === 310);
+  var dips = [10, 15, 20, 30, 35, 40, 45, 50, 55, 65, 70, 75, 80];
+  d = dips[Math.floor(Math.random() * dips.length)];
+  LABP.strike = s; LABP.dip = d; LABP.step = 1;
+  $('labTarget').innerHTML = 'Strike <b>' + labPad(s) + '°</b> · Dip <b>' + d + '°</b>';
+  $('labDipPick').hidden = true;
+  $('labPracMsg').innerHTML = 'Step 1–2: make your dot (it is the center) and spin the line until it runs along the strike, <b>' + labPad(s) + '°</b>. Then tap “Check my line”.';
+  var ps = $('labPracticeSymbol'); while(ps.firstChild) ps.removeChild(ps.firstChild);
+  labPrac.setAz((s + 137) % 360);
+  labRenderPrac();
+}
+function labRenderPrac(){
+  var a = labPrac.getAz();
+  $('labPracRead').textContent = labPad(a) + '° / ' + labPad(labOpposite(a)) + '°';
+}
+function labCheckLine(){
+  if(LABP.step !== 1) return;
+  var a = labPrac.getAz();
+  var diff = Math.abs(a - LABP.strike) % 180;
+  var err = Math.min(diff, 180 - diff);
+  if(err <= 3){
+    LABP.step = 2;
+    $('labDipPick').hidden = false;
+    $('labPracMsg').innerHTML = '<b>Line correct.</b> Your line runs ' + labPad(a) + '° / ' + labPad(labOpposite(a)) + '° — within ' + Math.round(err) + '° of the strike (either reading names the same line). Now step 3: rotate the paper in your head so ' + labPad(LABP.strike) + '° is at the top, and pick the side for the dip tick.';
+  } else {
+    var signed = ((LABP.strike - a) % 180 + 180) % 180; if(signed > 90) signed -= 180;
+    var hint = signed > 0 ? 'Rotate the line about ' + Math.abs(Math.round(signed)) + '° clockwise.' : 'Rotate the line about ' + Math.abs(Math.round(signed)) + '° counterclockwise.';
+    $('labPracMsg').innerHTML = 'Not yet — your line reads <b>' + labPad(a) + '° / ' + labPad(labOpposite(a)) + '°</b>, about ' + Math.round(err) + '° off the strike of ' + labPad(LABP.strike) + '°. Remember step 2: count <em>clockwise</em> from North (0° at the top) around the rim, and a line reads the same from both ends. ' + hint;
+  }
+}
+function labPickDip(rightSide){
+  if(LABP.step !== 2) return;
+  var s = LABP.strike, d = LABP.dip, dd = labDipDirection(s);
+  labDrawSymbol($('labPracticeSymbol'), s, d);
+  LABP.step = 3;
+  $('labDipPick').hidden = true;
+  if(rightSide){
+    LABP.streak++;
+    $('labPracMsg').innerHTML = '<b>Correct — the tick goes on the right.</b> Rotating the paper so ' + labPad(s) + '° is at the top turns the dip direction (' + labPad(s) + '° + 90° = <b>' + labPad(dd) + '°</b>) to point right, so the short tick is drawn on the right side of the strike line, perpendicular to it. Step 4: rotate back and write <b>' + d + '</b> beside the line — that is the finished symbol below. Tap “New practice” to go again.';
+  } else {
+    LABP.streak = 0;
+    $('labPracMsg').innerHTML = '<b>Not the left.</b> Walk the steps: (1) dot at the point, (2) long line along the strike, (3) rotate the paper so the strike direction ' + labPad(s) + '° is at the top — the layer dips toward ' + labPad(dd) + '° (strike + 90°), which lands on the <b>right</b> after that rotation, so the short tick goes on the right, perpendicular to the line. (4) Rotate back and write <b>' + d + '</b> beside it. The correct symbol is drawn below — tap “New practice” and try another.';
+  }
+  $('labStreak').textContent = LABP.streak > 0 ? 'Practice streak: ' + LABP.streak + ' in a row.' : '';
+}
+if($('labPracticeSvg')){
+  labPrac = labBuildProtractor($('labPracticeSvg'), 20);
+  labPrac.onChange = labRenderPrac;
+  $('labNewBtn').addEventListener('click', labNewPractice);
+  $('labCheckLineBtn').addEventListener('click', labCheckLine);
+  $('labDipLeftBtn').addEventListener('click', function(){ labPickDip(false); });
+  $('labDipRightBtn').addEventListener('click', function(){ labPickDip(true); });
+  labNewPractice();
+}
+
+/* lesson steps */
+document.querySelectorAll('.lab-step').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    var body = btn.querySelector('.lab-step-body');
+    if(body) body.hidden = !body.hidden;
+  });
 });
 </script>
 </body>
