@@ -196,6 +196,9 @@ video.cap,img.cap{width:100%;border-radius:16px;border:1px solid var(--line);bac
 .amb-ring{width:92px;height:92px;margin:4px auto 0;border-radius:50%;background:radial-gradient(circle at 50% 42%,var(--acc-tint),var(--acc) 130%);box-shadow:0 0 42px var(--acc-glow);animation:slBreathe 8s ease-in-out infinite}
 @keyframes slBreathe{0%,100%{transform:scale(1)}50%{transform:scale(1.16)}}
 .sl-shimmer{border-radius:14px;background:var(--surface3);min-height:54px;position:relative;overflow:hidden}
+.lec-meter{flex:1;min-width:140px;height:10px;border-radius:6px;background:var(--surface3);overflow:hidden}
+#lecMeter{height:100%;width:0%;background:#3fb27f;transition:width .12s linear}
+@media (prefers-reduced-motion: reduce){ #lecMeter{transition:none} }
 .sl-shimmer::after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 30%,color-mix(in srgb,var(--ink) 7%,transparent) 50%,transparent 70%);animation:slShim 1.3s linear infinite}
 @keyframes slShim{from{transform:translateX(-100%)}to{transform:translateX(100%)}}
 @media (prefers-reduced-motion: reduce){
@@ -806,6 +809,28 @@ input.snap-in{background:var(--surface3);border:1.5px solid var(--line);border-r
       <div class="card" id="lectureCard">
         <h3>Lecture notes <span class="small mut">— with Iris</span></h3>
         <p class="small">Record a lecture (or upload its audio) and Iris builds structured notes from the transcript: topic sections, key terms with your professor's own definitions, their examples, and anything they flagged for the exam. <strong>Before you record:</strong> check your professor's recording policy — some classes don't allow it.</p>
+        <div class="row" style="margin-top:10px">
+          <label class="small" for="lecProfile" style="font-weight:700">Capture profile</label>
+          <select id="lecProfile" style="min-height:44px">
+            <option value="lecture" selected>Lecture hall — professor across the room</option>
+            <option value="closeup">My own voice — close mic</option>
+            <option value="noisy">Noisy room — every cleanup on</option>
+          </select>
+        </div>
+        <p class="small" id="lecProfileHelp" style="margin-top:4px"></p>
+        <div class="row" style="margin-top:6px">
+          <label class="small" for="lecMic" style="font-weight:700">Microphone</label>
+          <select id="lecMic" style="min-height:44px">
+            <option value="">Default microphone</option>
+          </select>
+          <button class="btn ghost small" id="lecTestBtn">Test my mic</button>
+        </div>
+        <p class="small" id="lecTrackInfo" hidden style="margin-top:4px"></p>
+        <div class="row" id="lecMeterWrap" hidden style="margin-top:6px">
+          <div class="lec-meter"><div id="lecMeter"></div></div>
+          <span class="small" id="lecMeterLabel" style="font-weight:700"></span>
+        </div>
+        <p class="small" style="margin-top:6px">Your recording is kept <strong>only on this device</strong> as you record — never uploaded — so a crash or a closed tab won’t lose the lecture. Remove it any time with “Delete saved audio” below.</p>
         <div class="row">
           <button class="btn" id="lecRecordBtn">Record lecture</button>
           <button class="btn ghost" id="lecPauseBtn" hidden>Pause</button>
@@ -818,9 +843,18 @@ input.snap-in{background:var(--surface3);border:1.5px solid var(--line);border-r
         </div>
         <p class="small" id="lecRecStatus" role="status" style="margin-top:8px"></p>
         <div id="lecAudioWrap" hidden style="margin-top:8px"></div>
+        <div class="row" style="margin-top:6px"><button class="btn plain small" id="lecDeleteAudioBtn" hidden>Delete saved audio</button></div>
         <h4 style="margin:14px 0 6px">Transcript</h4>
         <p class="small" id="lecCaptionNote">Live captions while recording use your browser's own speech service where it offers one — in Chrome, audio is sent to Google to transcribe. The on-device Whisper option keeps everything on this device.</p>
+        <p class="small" id="lecLiveLine" aria-live="polite" style="min-height:1.1em;margin:4px 0"></p>
         <textarea id="lecTranscript" style="min-height:120px" placeholder="Your transcript lands here with [mm:ss] timestamps — or paste one in."></textarea>
+        <div class="row" style="margin-top:8px">
+          <label class="small" for="lecModel" style="font-weight:700">Whisper model</label>
+          <select id="lecModel" style="min-height:44px">
+            <option value="Xenova/whisper-tiny.en" selected>Tiny — fast, smaller one-time download</option>
+            <option value="Xenova/whisper-base.en">Base — clearer, bigger one-time download</option>
+          </select>
+        </div>
         <div class="row" style="margin-top:8px">
           <button class="btn ghost" id="lecWhisperBtn">Transcribe on-device (Whisper)</button>
           <button class="btn" id="lecNotesBtn">Make my notes</button>
@@ -4328,8 +4362,14 @@ ssRefresh();
    fetched with no-store caching: when a newer build ships, an already-open or
    home-screen copy of an older build sees the newer version number there and
    offers "Update now" (a reload onto the new build). */
-var APP_VERSION = '2.22.0';
+var APP_VERSION = '2.23.0';
 var CHANGELOG = [
+ { v:'2.23.0', date:'Oct 23, 2026', notify:true, notes:[
+   'Lecture Notes captures audio properly now: pick a capture profile — lecture hall (no processing to smear a far-away professor), close mic, or noisy room — choose your microphone, and watch a live level meter while you record. Iris warns you mid-recording if she can barely hear anything.',
+   'Crash-safe recordings: your lecture audio is saved on this device as you record, so a closed tab, a crash, or a dead battery no longer loses it. It is never uploaded, and “Delete saved audio” removes it whenever you want.',
+   'Whisper hears better: your audio is level-checked and boosted to a healthy volume before transcribing, long lectures transcribe in parts so one rough stretch no longer sinks the whole thing, silent audio is called out before any model download, and a clearer Base model joins Tiny.',
+   'Live captions are steadier: words appear as they’re heard (only finished lines join your transcript), restarts back off politely, and if captions are blocked or drop, Iris tells you instead of going quiet.',
+   'Small fixes with real names: downloads now use the true file type your browser recorded (.webm, .m4a, or .ogg) with the size shown, and uploaded audio shows its length.' ]},
  { v:'2.22.0', date:'Oct 23, 2026', notify:true, notes:[
    'Meet Iris — StudyLens’s tutor now has a name and one voice everywhere: she teaches, quizzes, and checks your work, and never does it for you.',
    'NEW study modes: Simple, Guided (teach-first steps + explain-it-back), Challenge (bigger rounds, reverse cards), and Exam Prep (timed, mixed questions, weak spots at the end) — switch any time.',
@@ -8144,10 +8184,281 @@ $('matchNewBtn').addEventListener('click', matchStart);
    Whisper (transformers.js) — one-time model download, audio stays on
    the device, (c) paste/upload a transcript.
    ===================================================================== */
-var LEC = { rec: null, chunks: [], stream: null, t0: 0, elapsed: 0, timer: null, paused: false, sr: null, audioBlob: null, audioFile: null };
+var LEC = { rec: null, chunks: [], stream: null, t0: 0, elapsed: 0, timer: null, paused: false, sr: null, audioBlob: null, audioFile: null,
+  meterCtx: null, analyser: null, meterRaf: null, meterBuf: null, meterLast: 0, quietFor: 0, quietWarned: false, testing: false,
+  srErrShown: false, srBackoff: 400, srRestartTimer: null, srDead: false, idbOff: false };
 var LEC_KEY = 'studylens.lecture.v1';
 function lecFmt(sec){ sec = Math.max(0, Math.floor(sec)); var m = Math.floor(sec / 60), s = sec % 60; return (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s; }
 function lecStatus(t){ var el = $('lecRecStatus'); if(el) el.textContent = t || ''; }
+/* ---- capture quality helpers (v2.23): pure, and exposed for tests ---- */
+var LEC_MIC_KEY = 'studylens.lecMic.v1';
+var LEC_MODEL_KEY = 'studylens.lecModel.v1';
+var LEC_MIME_CANDIDATES = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4', 'audio/ogg;codecs=opus', 'audio/ogg', ''];
+var LEC_PROFILES = {
+  lecture: { echoCancellation: false, noiseSuppression: false, autoGainControl: false },
+  closeup: { echoCancellation: true, noiseSuppression: true, autoGainControl: false },
+  noisy: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }
+};
+var LEC_PROFILE_HELP = {
+  lecture: 'For your professor across the room: echo cancel, noise suppression and auto gain all OFF — that processing can smear a far-away voice. Sit as close as you reasonably can.',
+  closeup: 'For your own voice at a close mic: echo cancel and noise suppression ON (they clean up a near voice), auto gain OFF so your level stays honest.',
+  noisy: 'For a loud room: every cleanup ON. Voices can sound a little processed, but speech stays understandable.'
+};
+function lecConstraintsFor(profile, deviceId){
+  var p = LEC_PROFILES[profile] || LEC_PROFILES.lecture;
+  var a = {
+    echoCancellation: p.echoCancellation,
+    noiseSuppression: p.noiseSuppression,
+    autoGainControl: p.autoGainControl,
+    channelCount: { ideal: 1 },
+    sampleRate: { ideal: 48000 }
+  };
+  if(deviceId) a.deviceId = { exact: deviceId };
+  return { audio: a };
+}
+function lecPickMimeType(supportedFn){
+  var sup = supportedFn || function(t){ try{ return !!(window.MediaRecorder && window.MediaRecorder.isTypeSupported(t)); }catch(e){ return false; } };
+  for(var i = 0; i < LEC_MIME_CANDIDATES.length; i++){
+    var t = LEC_MIME_CANDIDATES[i];
+    if(t === '') return '';
+    if(sup(t)) return t;
+  }
+  return '';
+}
+function lecExtensionFor(mime){
+  var m = String(mime || '').toLowerCase();
+  if(m.indexOf('mp4') >= 0) return 'm4a';
+  if(m.indexOf('ogg') >= 0) return 'ogg';
+  return 'webm';
+}
+function lecAudioStats(samples){
+  var n = samples ? samples.length : 0, peak = 0, sum = 0, i, v;
+  for(i = 0; i < n; i++){ v = Math.abs(samples[i]); if(v > peak) peak = v; sum += samples[i] * samples[i]; }
+  var rms = n ? Math.sqrt(sum / n) : 0;
+  return { peak: peak, rms: rms, dbfs: rms > 0 ? 20 * Math.log10(rms) : -Infinity };
+}
+function lecNormalize(samples){
+  var st = lecAudioStats(samples);
+  if(st.peak < 0.01) return { data: samples, gain: 1, silent: true };
+  var gain = 0.95 / st.peak;
+  if(gain > 4) gain = 4;
+  if(gain < 0.5) gain = 0.5;
+  var out = new Float32Array(samples.length);
+  for(var i = 0; i < samples.length; i++) out[i] = samples[i] * gain;
+  return { data: out, gain: gain, silent: false };
+}
+function lecPlanSegments(durationSec, segSec){
+  var seg = segSec > 0 ? segSec : 240;
+  var d = Math.max(0, Number(durationSec) || 0);
+  if(d === 0) return [{ start: 0, end: 0 }];
+  var segs = [], t = 0;
+  while(t < d){ var e = Math.min(d, t + seg); segs.push({ start: t, end: e }); t = e; }
+  return segs;
+}
+function lecFmtBytes(b){
+  if(b === null || b === undefined) return '';
+  if(b < 1024) return b + ' B';
+  if(b < 1024 * 1024) return (b / 1024).toFixed(1) + ' KB';
+  return (b / (1024 * 1024)).toFixed(1) + ' MB';
+}
+window.slLectureAudio = {
+  constraintsFor: lecConstraintsFor,
+  pickMimeType: lecPickMimeType,
+  extensionFor: lecExtensionFor,
+  stats: lecAudioStats,
+  normalize: lecNormalize,
+  planSegments: lecPlanSegments
+};
+/* ---- crash-safe audio store: IndexedDB, on-device only, fully guarded ---- */
+function lecIdbOpen(){
+  return new Promise(function(res){
+    try{
+      if(!window.indexedDB) return res(null);
+      var req = window.indexedDB.open('studylens-lecture-audio', 1);
+      req.onupgradeneeded = function(){ try{ req.result.createObjectStore('lec'); }catch(e){} };
+      req.onsuccess = function(){ res(req.result); };
+      req.onerror = function(){ res(null); };
+    }catch(e){ res(null); }
+  });
+}
+function lecIdbTx(mode, fn){
+  return lecIdbOpen().then(function(db){
+    if(!db) return false;
+    return new Promise(function(res){
+      try{
+        var tx = db.transaction('lec', mode);
+        fn(tx.objectStore('lec'));
+        tx.oncomplete = function(){ try{ db.close(); }catch(e){} res(true); };
+        tx.onerror = function(){ try{ db.close(); }catch(e){} res(false); };
+        tx.onabort = function(){ try{ db.close(); }catch(e){} res(false); };
+      }catch(e){ res(false); }
+    });
+  }).catch(function(){ return false; });
+}
+async function lecIdbPut(key, val){ return lecIdbTx('readwrite', function(os){ os.put(val, key); }); }
+async function lecIdbGet(key){
+  var got;
+  await lecIdbTx('readonly', function(os){ var r = os.get(key); r.onsuccess = function(){ got = r.result; }; });
+  return got;
+}
+async function lecIdbClear(){ return lecIdbTx('readwrite', function(os){ os.clear(); }); }
+function lecPersistProgress(){
+  if(LEC.idbOff) return;
+  var idx = LEC.chunks.length - 1;
+  if(idx < 0) return;
+  var blob = LEC.chunks[idx];
+  var meta = { mime: (LEC.rec && LEC.rec.mimeType) || '', savedAt: Date.now(), chunks: LEC.chunks.length };
+  lecIdbTx('readwrite', function(os){ os.put(blob, 'chunk:' + idx); os.put(meta, 'meta'); })
+    .then(function(ok){ if(!ok) LEC.idbOff = true; });
+}
+async function lecRecoverAudio(){
+  try{
+    var meta = await lecIdbGet('meta');
+    if(!meta || !meta.chunks) return;
+    var parts = [];
+    for(var i = 0; i < meta.chunks; i++){
+      var c = await lecIdbGet('chunk:' + i);
+      if(c) parts.push(c);
+    }
+    if(!parts.length) return;
+    LEC.audioBlob = new Blob(parts, { type: meta.mime || (parts[0] && parts[0].type) || 'audio/webm' });
+    LEC.audioFile = null;
+    lecShowAudio(URL.createObjectURL(LEC.audioBlob), 'Recovered recording', LEC.audioBlob);
+    var db = $('lecDeleteAudioBtn'); if(db) db.hidden = false;
+    lecStatus('Recovered your last recording (saved only on this device).');
+  }catch(e){}
+}
+async function lecDeleteAudio(){
+  await lecIdbClear();
+  LEC.audioBlob = null; LEC.audioFile = null; LEC.chunks = [];
+  var w = $('lecAudioWrap'); if(w){ w.hidden = true; w.innerHTML = ''; }
+  var b = $('lecDeleteAudioBtn'); if(b) b.hidden = true;
+  lecStatus('Saved audio deleted from this device.');
+}
+/* ---- microphone picker, track readout, live level meter, mic test ---- */
+function lecProfileVal(){ var s = $('lecProfile'); return s ? s.value : 'lecture'; }
+function lecMicVal(){ var s = $('lecMic'); return s ? s.value : ''; }
+function lecProfileHelp(){ var el = $('lecProfileHelp'); if(el) el.textContent = LEC_PROFILE_HELP[lecProfileVal()] || LEC_PROFILE_HELP.lecture; }
+async function lecRefreshMics(){
+  var sel = $('lecMic'); if(!sel) return;
+  try{
+    if(!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) return;
+    var devs = await navigator.mediaDevices.enumerateDevices();
+    var saved = '';
+    try{ saved = localStorage.getItem(LEC_MIC_KEY) || ''; }catch(e){}
+    var want = sel.value || saved;
+    sel.innerHTML = '';
+    var o0 = document.createElement('option'); o0.value = ''; o0.textContent = 'Default microphone'; sel.appendChild(o0);
+    var n = 0;
+    devs.forEach(function(d){
+      if(d.kind !== 'audioinput') return;
+      n++;
+      var o = document.createElement('option');
+      o.value = d.deviceId || '';
+      o.textContent = d.label || ('Microphone ' + n);
+      sel.appendChild(o);
+    });
+    if(want) sel.value = want;
+  }catch(e){}
+}
+function lecShowTrackInfo(){
+  var el = $('lecTrackInfo'); if(!el || !LEC.stream) return;
+  var tr = LEC.stream.getAudioTracks ? LEC.stream.getAudioTracks()[0] : null;
+  if(!tr) return;
+  var s = {};
+  try{ s = tr.getSettings ? tr.getSettings() : {}; }catch(e){}
+  var parts = [];
+  if(tr.label) parts.push(tr.label);
+  if(s.sampleRate) parts.push(s.sampleRate + ' Hz');
+  if(typeof s.echoCancellation === 'boolean') parts.push('echo cancel ' + (s.echoCancellation ? 'on' : 'off'));
+  if(typeof s.noiseSuppression === 'boolean') parts.push('noise suppression ' + (s.noiseSuppression ? 'on' : 'off'));
+  if(typeof s.autoGainControl === 'boolean') parts.push('auto gain ' + (s.autoGainControl ? 'on' : 'off'));
+  if(parts.length){ el.textContent = 'Now capturing: ' + parts.join(' · '); el.hidden = false; }
+}
+function lecMeterPaint(st){
+  var bar = $('lecMeter'), lab = $('lecMeterLabel');
+  if(!bar || !lab) return;
+  var db = st.dbfs;
+  var pct = isFinite(db) ? Math.max(0, Math.min(100, (db + 60) / 60 * 100)) : 0;
+  bar.style.width = pct.toFixed(0) + '%';
+  var word, col;
+  if(st.peak >= 0.99){ word = 'Clipping'; col = '#e5484d'; }
+  else if(db > -14){ word = 'Loud'; col = '#e5a13d'; }
+  else if(db >= -45){ word = 'Good'; col = '#3fb27f'; }
+  else { word = 'Too quiet'; col = '#e5a13d'; }
+  bar.style.background = col;
+  lab.textContent = word + (isFinite(db) ? ' · ' + db.toFixed(0) + ' dB' : '');
+}
+function lecMeterStart(stream){
+  lecMeterStop();
+  try{
+    var AC = window.AudioContext || window.webkitAudioContext;
+    if(!AC || !stream) return;
+    var ctx = new AC();
+    if(ctx.state === 'suspended' && ctx.resume) ctx.resume();
+    var srcNode = ctx.createMediaStreamSource(stream);
+    var an = ctx.createAnalyser();
+    an.fftSize = 2048;
+    srcNode.connect(an);
+    LEC.meterCtx = ctx; LEC.analyser = an;
+    LEC.meterBuf = new Float32Array(an.fftSize);
+    LEC.quietFor = 0; LEC.quietWarned = false; LEC.meterLast = 0;
+    var wrap = $('lecMeterWrap'); if(wrap) wrap.hidden = false;
+    var step = function(){
+      if(!LEC.analyser) return;
+      LEC.analyser.getFloatTimeDomainData(LEC.meterBuf);
+      var st = lecAudioStats(LEC.meterBuf);
+      lecMeterPaint(st);
+      var now = performance.now();
+      if(LEC.rec && LEC.rec.state === 'recording' && LEC.meterLast){
+        var dt = (now - LEC.meterLast) / 1000;
+        if(st.dbfs < -50){
+          LEC.quietFor += dt;
+          if(LEC.quietFor >= 10 && !LEC.quietWarned){
+            LEC.quietWarned = true;
+            lecStatus('Iris can barely hear anything — check the mic or move closer.');
+          }
+        } else LEC.quietFor = 0;
+      }
+      LEC.meterLast = now;
+      LEC.meterRaf = requestAnimationFrame(step);
+    };
+    LEC.meterRaf = requestAnimationFrame(step);
+  }catch(e){}
+}
+function lecMeterStop(){
+  if(LEC.meterRaf){ try{ cancelAnimationFrame(LEC.meterRaf); }catch(e){} LEC.meterRaf = null; }
+  LEC.analyser = null;
+  if(LEC.meterCtx){ try{ LEC.meterCtx.close(); }catch(e){} LEC.meterCtx = null; }
+  var wrap = $('lecMeterWrap'); if(wrap) wrap.hidden = true;
+}
+async function lecTestMic(){
+  if(LEC.testing) return;
+  if(LEC.rec && LEC.rec.state !== 'inactive'){ lecStatus('Stop the recording first if you want to test the mic.'); return; }
+  if(!lecSupported()){ lecStatus('Mic test is not available in this browser.'); return; }
+  var stream;
+  try{
+    stream = await navigator.mediaDevices.getUserMedia(lecConstraintsFor(lecProfileVal(), lecMicVal()));
+  }catch(e){
+    lecStatus('Microphone permission was not given, so Iris can’t test the mic.');
+    return;
+  }
+  LEC.testing = true;
+  var btn = $('lecTestBtn');
+  if(btn){ btn.disabled = true; btn.textContent = 'Listening — talk now…'; }
+  lecStatus('Testing your mic for a few seconds — talk from the distance you’ll record at, and watch the level bar.');
+  lecMeterStart(stream);
+  setTimeout(function(){
+    try{ stream.getTracks().forEach(function(t){ t.stop(); }); }catch(e){}
+    lecMeterStop();
+    LEC.testing = false;
+    var b2 = $('lecTestBtn');
+    if(b2){ b2.disabled = false; b2.textContent = 'Test my mic'; }
+    lecStatus('Mic test done — the bar should have sat in “Good” while you talked. Nothing was recorded or saved.');
+    lecRefreshMics();
+  }, 6000);
+}
+
 function lecSupported(){ return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia && window.MediaRecorder); }
 function lecTick(){
   var el = $('lecTimer'); if(!el) return;
@@ -8161,21 +8472,41 @@ async function lecRecord(){
     lecStatus('Recording is not available in this browser (no microphone recording support). You can still upload an audio file or paste a transcript below.');
     return;
   }
+  var lecDeviceId = lecMicVal();
   try{
-    LEC.stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    LEC.stream = await navigator.mediaDevices.getUserMedia(lecConstraintsFor(lecProfileVal(), lecDeviceId));
   }catch(e){
+    if(lecDeviceId){
+      try{ LEC.stream = await navigator.mediaDevices.getUserMedia(lecConstraintsFor(lecProfileVal(), '')); }
+      catch(e2){ lecStatus('Microphone permission was not given, so Iris can\u2019t record. You can still upload an audio file or paste a transcript below.'); return; }
+    } else {
     lecStatus('Microphone permission was not given, so Iris can\u2019t record. You can still upload an audio file or paste a transcript below.');
     return;
+    }
   }
+  LEC.idbOff = false;
+  await lecIdbClear();
   LEC.chunks = []; LEC.elapsed = 0; LEC.paused = false;
-  LEC.rec = new MediaRecorder(LEC.stream);
-  LEC.rec.ondataavailable = function(e){ if(e.data && e.data.size) LEC.chunks.push(e.data); };
+  var lecMime = lecPickMimeType();
+  var lecOpts = {};
+  if(lecMime){ lecOpts.mimeType = lecMime; lecOpts.audioBitsPerSecond = 128000; }
+  try{ LEC.rec = new MediaRecorder(LEC.stream, lecOpts); }
+  catch(e){ LEC.rec = new MediaRecorder(LEC.stream); }
+  LEC.rec.ondataavailable = function(e){
+    if(e.data && e.data.size){
+      LEC.chunks.push(e.data);
+      lecPersistProgress();
+    }
+  };
   LEC.rec.onstop = lecFinishRecording;
-  LEC.rec.start(1000);
+  LEC.rec.start(5000);
   LEC.t0 = Date.now(); lecStartTimer();
   $('lecRecordBtn').hidden = true; $('lecPauseBtn').hidden = false; $('lecStopBtn').hidden = false;
   $('lecPauseBtn').textContent = 'Pause';
   lecStatus('Recording… live captions are on if this browser offers them (see the note under the transcript).');
+  lecShowTrackInfo();
+  lecRefreshMics();
+  lecMeterStart(LEC.stream);
   lecStartCaptions();
 }
 function lecPause(){
@@ -8184,6 +8515,7 @@ function lecPause(){
     LEC.rec.pause(); LEC.elapsed += (Date.now() - LEC.t0) / 1000; LEC.t0 = 0; LEC.paused = true;
     $('lecPauseBtn').textContent = 'Resume'; lecStatus('Paused.');
     if(LEC.sr){ try{ LEC.sr.stop(); }catch(e){} }
+    var llP = $('lecLiveLine'); if(llP) llP.textContent = '';
   } else if(LEC.rec.state === 'paused'){
     LEC.rec.resume(); LEC.t0 = Date.now(); LEC.paused = false;
     $('lecPauseBtn').textContent = 'Pause'; lecStatus('Recording…');
@@ -8195,46 +8527,82 @@ function lecStop(){
 }
 function lecFinishRecording(){
   lecStopTimer();
+  lecMeterStop();
+  if(LEC.srRestartTimer){ clearTimeout(LEC.srRestartTimer); LEC.srRestartTimer = null; }
   if(LEC.t0) LEC.elapsed += (Date.now() - LEC.t0) / 1000;
   LEC.t0 = 0;
   if(LEC.stream){ LEC.stream.getTracks().forEach(function(t){ t.stop(); }); LEC.stream = null; }
   if(LEC.sr){ try{ LEC.sr.stop(); }catch(e){} LEC.sr = null; }
-  LEC.audioBlob = new Blob(LEC.chunks, { type: (LEC.rec && LEC.rec.mimeType) || 'audio/webm' });
+  var lecType = (LEC.rec && LEC.rec.mimeType) || (LEC.chunks[0] && LEC.chunks[0].type) || 'audio/webm';
+  LEC.audioBlob = new Blob(LEC.chunks, { type: lecType });
   LEC.audioFile = null;
   $('lecRecordBtn').hidden = false; $('lecPauseBtn').hidden = true; $('lecStopBtn').hidden = true;
-  lecShowAudio(URL.createObjectURL(LEC.audioBlob), 'Your recording (' + lecFmt(LEC.elapsed) + ')');
-  lecStatus('Recording saved on this device for this session. Transcribe it on-device with Whisper below, download it, or type/paste the transcript.');
+  var ti = $('lecTrackInfo'); if(ti) ti.hidden = true;
+  lecShowAudio(URL.createObjectURL(LEC.audioBlob), 'Your recording (' + lecFmt(LEC.elapsed) + ')', LEC.audioBlob);
+  var db = $('lecDeleteAudioBtn'); if(db) db.hidden = false;
+  lecStatus('Recording saved only on this device — a crash or a closed tab won’t lose it, and it is never uploaded. Transcribe it on-device with Whisper below, download it, or type/paste the transcript.');
   lecSave();
 }
-function lecShowAudio(url, label){
+
+function lecShowAudio(url, label, blob){
   var w = $('lecAudioWrap'); if(!w) return;
   w.hidden = false;
-  w.innerHTML = '<p class="small" style="margin:0 0 6px"><strong>' + esc(label) + '</strong></p>' +
+  var ext = lecExtensionFor(blob ? blob.type : '');
+  var sizeNote = (blob && blob.size) ? ' · ' + lecFmtBytes(blob.size) : '';
+  w.innerHTML = '<p class="small" style="margin:0 0 6px"><strong>' + esc(label) + '</strong>' + esc(sizeNote) + '</p>' +
     '<audio controls src="' + url + '" style="width:100%"></audio>' +
-    '<div class="row" style="margin-top:6px"><a class="btn ghost small" href="' + url + '" download="studylens-lecture.webm">Download audio</a></div>';
+    '<div class="row" style="margin-top:6px"><a class="btn ghost small" href="' + url + '" download="studylens-lecture.' + ext + '">Download audio (.' + ext + ')</a></div>';
 }
+
 /* ---- live captions: the BROWSER's speech service, labeled honestly ---- */
 function lecStartCaptions(){
   var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   var note = $('lecCaptionNote');
   if(!SR){ if(note) note.textContent = 'Live captions are not offered by this browser, so nothing is captioned while you record. Use on-device Whisper after recording, or paste a transcript.'; return; }
-  if(note) note.textContent = 'Live captions are running through your browser\u2019s own speech service — in Chrome, that means the audio is sent to Google to transcribe. Prefer fully private? Skip captions and use on-device Whisper below; your audio never leaves this device there.';
+  if(note) note.textContent = 'Live captions are running through your browser’s own speech service — in Chrome, that means the audio is sent to Google to transcribe. Prefer fully private? Skip captions and use on-device Whisper below; your audio never leaves this device there.';
   try{
     var sr = new SR();
-    sr.continuous = true; sr.interimResults = false; sr.lang = 'en-US';
+    sr.continuous = true; sr.interimResults = true; sr.lang = 'en-US';
     sr.onresult = function(ev){
+      LEC.srBackoff = 400;
+      var interim = '';
       for(var i = ev.resultIndex; i < ev.results.length; i++){
-        if(ev.results[i].isFinal){
-          var txt = ev.results[i][0].transcript.trim();
+        var r = ev.results[i];
+        if(r.isFinal){
+          var txt = r[0].transcript.trim();
           if(txt) lecAppendTranscript(LEC.elapsed + (LEC.t0 ? (Date.now() - LEC.t0) / 1000 : 0), txt);
-        }
+        } else interim += r[0].transcript;
+      }
+      var ll = $('lecLiveLine');
+      if(ll) ll.textContent = interim ? ('Hearing: ' + interim) : '';
+    };
+    sr.onerror = function(ev){
+      var e = ev && ev.error;
+      if(e === 'not-allowed' || e === 'service-not-allowed') LEC.srDead = true;
+      if((e === 'network' || e === 'not-allowed' || e === 'service-not-allowed') && !LEC.srErrShown){
+        LEC.srErrShown = true;
+        lecStatus(e === 'not-allowed'
+          ? 'Live captions were blocked (browser permission) — the recording itself continues. Whisper below still works after you stop.'
+          : 'Live captions hit a snag (' + e + ') — the recording itself continues. Whisper below still works after you stop.');
       }
     };
-    sr.onend = function(){ if(LEC.rec && LEC.rec.state === 'recording' && !LEC.paused){ try{ sr.start(); }catch(e){} } };
-    sr.onerror = function(){};
-    LEC.sr = sr; sr.start();
+    sr.onend = function(){
+      var ll = $('lecLiveLine'); if(ll) ll.textContent = '';
+      if(LEC.srDead) return;
+      if(LEC.rec && LEC.rec.state === 'recording' && !LEC.paused && LEC.sr === sr){
+        var delay = LEC.srBackoff || 400;
+        LEC.srBackoff = Math.min(5000, delay * 2);
+        if(LEC.srRestartTimer) clearTimeout(LEC.srRestartTimer);
+        LEC.srRestartTimer = setTimeout(function(){
+          if(LEC.rec && LEC.rec.state === 'recording' && !LEC.paused && LEC.sr === sr && !LEC.srDead){ try{ sr.start(); }catch(e){} }
+        }, delay);
+      }
+    };
+    LEC.sr = sr; LEC.srBackoff = 400; LEC.srDead = false;
+    sr.start();
   }catch(e){}
 }
+
 function lecAppendTranscript(sec, text){
   var ta = $('lecTranscript'); if(!ta) return;
   var line = '[' + lecFmt(sec) + '] ' + text;
@@ -8246,34 +8614,65 @@ async function lecWhisper(){
   var st = $('lecWhisperStatus');
   var blob = LEC.audioFile || LEC.audioBlob;
   if(!blob){ st.textContent = 'Record a lecture or upload an audio file first — then Whisper can transcribe it on this device.'; return; }
-  st.textContent = 'Loading the on-device transcription tools (one-time download)…';
+  var modelEl = $('lecModel');
+  var model = (modelEl && modelEl.value) || 'Xenova/whisper-tiny.en';
+  var modelName = model.indexOf('base') >= 0 ? 'Base' : 'Tiny';
   try{
-    var mod = await import('https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2/dist/transformers.min.js');
-    st.textContent = 'Downloading the Whisper speech model (one time, then it works offline)…';
-    var pipe = await mod.pipeline('automatic-speech-recognition', 'Xenova/whisper-tiny.en', {
-      progress_callback: function(p){ if(p && p.status === 'progress' && p.file) st.textContent = 'Downloading model file ' + p.file + ' — ' + Math.round(p.progress || 0) + '%'; }
-    });
     st.textContent = 'Reading your audio…';
     var buf = await blob.arrayBuffer();
     var AC = window.AudioContext || window.webkitAudioContext;
+    var OAC = window.OfflineAudioContext || window.webkitOfflineAudioContext;
+    if(!AC || !OAC) throw new Error('Web Audio is not available in this browser');
     var actx = new AC();
-    var decoded = await actx.decodeAudioData(buf);
-    var off = new OfflineAudioContext(1, Math.ceil(decoded.duration * 16000), 16000);
+    var decoded;
+    try{ decoded = await actx.decodeAudioData(buf); }
+    finally{ try{ actx.close(); }catch(e){} }
+    var off = new OAC(1, Math.ceil(decoded.duration * 16000), 16000);
     var srcNode = off.createBufferSource(); srcNode.buffer = decoded; srcNode.connect(off.destination); srcNode.start();
     var rendered = await off.startRendering();
-    var audio = rendered.getChannelData(0);
-    st.textContent = 'Transcribing on this device — long lectures take a while; keep this tab open…';
-    var out = await pipe(audio, { chunk_length_s: 30, stride_length_s: 5, return_timestamps: true });
+    var rawSamples = rendered.getChannelData(0);
+    var preStats = lecAudioStats(rawSamples);
+    if(preStats.peak < 0.01){
+      st.textContent = 'That audio looks silent — Iris can’t hear anything in it, so there’s nothing to transcribe. Check that the right mic was picked, or re-record closer to the speaker.';
+      return;
+    }
+    var norm = lecNormalize(rawSamples);
+    var audio = norm.data;
+    var quiet = lecAudioStats(audio).dbfs < -35;
+    if(quiet) st.textContent = 'Heads up: this audio is very quiet even after a boost, so Whisper may miss words. Transcribing anyway…';
+    st.textContent = 'Loading the on-device transcription tools (one-time download)…';
+    var mod = await import('https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2/dist/transformers.min.js');
+    st.textContent = 'Downloading the Whisper ' + modelName + ' model (one time, then it works offline)…';
+    var pipe = await mod.pipeline('automatic-speech-recognition', model, {
+      progress_callback: function(p){ if(p && p.status === 'progress' && p.file) st.textContent = 'Downloading model file ' + p.file + ' — ' + Math.round(p.progress || 0) + '%'; }
+    });
+    var durSec = audio.length / 16000;
+    var segs = lecPlanSegments(durSec, 240);
+    var lines = [];
+    for(var si = 0; si < segs.length; si++){
+      var seg = segs[si];
+      st.textContent = segs.length > 1
+        ? ('Transcribing part ' + (si + 1) + ' of ' + segs.length + ' on this device — keep this tab open…')
+        : 'Transcribing on this device — long lectures take a while; keep this tab open…';
+      var slice = audio.subarray(Math.floor(seg.start * 16000), Math.floor(seg.end * 16000));
+      try{
+        var out = await pipe(slice, { chunk_length_s: 30, stride_length_s: 5, return_timestamps: true });
+        var segLines = (out.chunks || []).map(function(c){ return '[' + lecFmt(seg.start + ((c.timestamp && c.timestamp[0]) || 0)) + '] ' + (c.text || '').trim(); }).filter(function(l){ return l.length > 8; });
+        if(!segLines.length && out.text) segLines = ['[' + lecFmt(seg.start) + '] ' + out.text.trim()];
+        lines = lines.concat(segLines);
+      }catch(segErr){
+        lines.push('[' + lecFmt(seg.start) + '] [Iris couldn’t transcribe this part — try the other model size]');
+      }
+    }
     var ta = $('lecTranscript');
-    var lines = (out.chunks || []).map(function(c){ return '[' + lecFmt(c.timestamp[0] || 0) + '] ' + (c.text || '').trim(); }).filter(function(l){ return l.length > 8; });
-    if(!lines.length && out.text) lines = ['[00:00] ' + out.text.trim()];
     ta.value = lines.join('\n') + '\n';
-    st.textContent = 'Done — transcript is in the box below, made entirely on this device. Now hit “Make my notes”.';
+    st.textContent = 'Done — transcript is in the box below, made entirely on this device. Now hit “Make my notes”.' + (quiet ? ' (The audio was very quiet, so check any gaps against your memory.)' : '');
     lecSave();
   }catch(e){
-    st.textContent = 'On-device transcription couldn\u2019t run in this browser just now (' + (e && e.message ? e.message.slice(0, 90) : 'error') + '). Nothing was uploaded. Live captions while recording, or pasting a transcript, still work.';
+    st.textContent = 'On-device transcription couldn’t run in this browser just now (' + (e && e.message ? e.message.slice(0, 90) : 'error') + '). Nothing was uploaded. Live captions while recording, or pasting a transcript, still work.';
   }
 }
+
 /* ---- Iris notes: ONLY what the transcript says ---- */
 function lecSentences(text){
   var clean = String(text || '').replace(/\[(\d+):(\d+)\]/g, function(m, a, b){ return '\u0001' + a + ':' + b + '\u0002'; });
@@ -8403,9 +8802,22 @@ function lecSave(){
   up.addEventListener('change', function(e){
     var f = e.target.files[0]; if(!f) return;
     LEC.audioFile = f; LEC.audioBlob = null;
-    lecShowAudio(URL.createObjectURL(f), 'Uploaded audio: ' + f.name);
+    var lecUrl = URL.createObjectURL(f);
+    lecShowAudio(lecUrl, 'Uploaded audio: ' + f.name, f);
+    var dbU = $('lecDeleteAudioBtn'); if(dbU) dbU.hidden = false;
     lecStatus('Audio loaded on this device (not uploaded anywhere). Transcribe it on-device with Whisper, or paste a transcript.');
+    try{
+      var probe = document.createElement('audio');
+      var probeUrl = URL.createObjectURL(f);
+      probe.preload = 'metadata';
+      probe.onloadedmetadata = function(){
+        if(isFinite(probe.duration) && probe.duration > 0) lecShowAudio(lecUrl, 'Uploaded audio: ' + f.name + ' (' + lecFmt(probe.duration) + ')', f);
+        try{ URL.revokeObjectURL(probeUrl); }catch(e){}
+      };
+      probe.src = probeUrl;
+    }catch(e){}
   });
+
   var tf = $('lecTextInput');
   tf.addEventListener('change', function(e){
     var f = e.target.files[0]; if(!f) return;
@@ -8415,6 +8827,27 @@ function lecSave(){
   });
   $('lecWhisperBtn').addEventListener('click', lecWhisper);
   $('lecNotesBtn').addEventListener('click', lecBuild);
+  var profSel = $('lecProfile');
+  if(profSel) profSel.addEventListener('change', lecProfileHelp);
+  lecProfileHelp();
+  var micSel = $('lecMic');
+  if(micSel) micSel.addEventListener('change', function(){
+    try{
+      if(micSel.value) localStorage.setItem(LEC_MIC_KEY, micSel.value);
+      else localStorage.removeItem(LEC_MIC_KEY);
+    }catch(e){}
+  });
+  lecRefreshMics();
+  var testBtn = $('lecTestBtn');
+  if(testBtn) testBtn.addEventListener('click', lecTestMic);
+  var delBtn = $('lecDeleteAudioBtn');
+  if(delBtn) delBtn.addEventListener('click', lecDeleteAudio);
+  var modelSel = $('lecModel');
+  if(modelSel){
+    try{ var savedModel = localStorage.getItem(LEC_MODEL_KEY); if(savedModel) modelSel.value = savedModel; }catch(e){}
+    modelSel.addEventListener('change', function(){ try{ localStorage.setItem(LEC_MODEL_KEY, modelSel.value); }catch(e){} });
+  }
+  lecRecoverAudio();
   $('lecTranscript').addEventListener('input', lecSave);
   $('lecNotes').addEventListener('input', lecSave);
   $('lecCardsBtn').addEventListener('click', function(){ lecNotesToMaterial(false); });

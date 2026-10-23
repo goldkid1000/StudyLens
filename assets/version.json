@@ -1,9 +1,9 @@
 {
-  "version": "2.22.0",
+  "version": "2.23.0",
   "updated": "2026-10-23",
   "notify": true,
   "notes": [
-    "Meet Iris, your tutor \u2014 plus new study modes (Simple, Guided, Challenge, Exam Prep), a spaced review queue, and Iris spotting what kind of material you pasted.",
-    "Subject knowledge packs for 7 core subjects with fresh-numbered practice (never your assignment's numbers), focus music built in, and a smarter, better-polished Screen tab."
+    "Lecture Notes captures audio properly now: capture profiles (lecture hall / close mic / noisy room), a microphone picker with a live level meter and mic test, and crash-safe on-device saving \u2014 a crash or closed tab no longer loses your lecture, and it is never uploaded.",
+    "Whisper transcribes better: audio is level-checked and boosted first, silent audio is called out before any download, long lectures transcribe in parts, and a clearer Base model joins Tiny. Live captions show words as they\u2019re heard and say so when they hiccup."
   ]
 }
