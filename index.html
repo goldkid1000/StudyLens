@@ -180,6 +180,47 @@ video.cap,img.cap{width:100%;border-radius:16px;border:1px solid var(--line);bac
 .screen-side .chat{max-height:300px}
 .stage{position:relative}
 .stage .cap{display:block}
+.screen-empty{border:1.5px dashed var(--line);border-radius:16px;padding:26px 18px;text-align:center;color:var(--mut);font-size:14.5px;line-height:1.55;background:var(--surface3)}
+/* ===== v2.22 design system: grouped nav, subnav, motion, today, ambience ===== */
+.rail-group{font-size:10.5px;font-weight:800;letter-spacing:.12em;color:var(--mut-2);padding:14px 12px 4px}
+.grail{display:none}
+#subNav{position:sticky;top:0;z-index:20;display:flex;gap:8px;flex-wrap:wrap;padding:10px 2px;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+#subNav[hidden]{display:none}
+#subNav .slm-btn.on{background:var(--acc);color:var(--acc-ink);border-color:var(--acc)}
+.tab.active{animation:slTabIn .26s var(--ease)}
+@keyframes slTabIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.tab.active .card{animation:slCardIn .34s var(--ease) both}
+@keyframes slCardIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+#todayCard{background:linear-gradient(135deg,var(--acc-tint),var(--surface) 65%)}
+#focusAmbience{padding:8px 0 2px}
+.amb-ring{width:92px;height:92px;margin:4px auto 0;border-radius:50%;background:radial-gradient(circle at 50% 42%,var(--acc-tint),var(--acc) 130%);box-shadow:0 0 42px var(--acc-glow);animation:slBreathe 8s ease-in-out infinite}
+@keyframes slBreathe{0%,100%{transform:scale(1)}50%{transform:scale(1.16)}}
+.sl-shimmer{border-radius:14px;background:var(--surface3);min-height:54px;position:relative;overflow:hidden}
+.sl-shimmer::after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 30%,color-mix(in srgb,var(--ink) 7%,transparent) 50%,transparent 70%);animation:slShim 1.3s linear infinite}
+@keyframes slShim{from{transform:translateX(-100%)}to{transform:translateX(100%)}}
+@media (prefers-reduced-motion: reduce){
+  .tab.active,.tab.active .card{animation:none}
+  .amb-ring{animation:none}
+  .sl-shimmer::after{animation:none}
+}
+@media (max-width:760px){
+  .rail .navbtn,.rail .rail-group{display:none}
+  .grail{display:flex;width:100%;justify-content:space-around;gap:2px}
+  .gnavbtn{flex:1;background:none;border:0;border-radius:12px;padding:9px 2px 7px;font-size:11px;font-weight:700;color:var(--mut);cursor:pointer;min-height:52px;font-family:inherit}
+  .gnavbtn.on{color:var(--acc);box-shadow:inset 0 3px 0 var(--acc)}
+}
+
+  .mboard{display:grid;grid-template-columns:1fr 1.35fr;gap:10px;margin-top:12px}
+  .mcol{display:flex;flex-direction:column;gap:8px;min-width:0}
+  .mhead{font-size:11.5px;font-weight:800;color:var(--mut);text-transform:uppercase;letter-spacing:.07em;margin:0 2px}
+  .mtile{display:block;width:100%;text-align:left;background:var(--surface3);border:1.5px solid var(--line);border-radius:12px;padding:12px 13px;font-size:14px;cursor:pointer;color:var(--ink);line-height:1.45;min-height:48px;font-family:inherit;transition:border-color .15s var(--ease),background .15s var(--ease),box-shadow .15s var(--ease),opacity .2s var(--ease)}
+  .mtile.mdef{font-size:13.5px}
+  .mtile.msel{border-color:var(--acc);background:var(--surface);box-shadow:0 0 0 2px color-mix(in srgb,var(--acc) 32%,transparent)}
+  .mtile.mlocked{border-color:var(--good);background:var(--good-bg);cursor:default;opacity:.62}
+  .mtile.mwrong{border-color:var(--bad);background:var(--bad-bg);animation:mshake .32s}
+  @keyframes mshake{25%{transform:translateX(-5px)}50%{transform:translateX(5px)}75%{transform:translateX(-3px)}}
+  @media (prefers-reduced-motion:reduce){.mtile.mwrong{animation:none}}
+  @media (max-width:560px){.mboard{grid-template-columns:1fr 1.25fr;gap:8px}.mtile{padding:10px 11px;font-size:13.5px}.mtile.mdef{font-size:13px}}
 .pointer{position:absolute;z-index:6;pointer-events:none;width:0;height:0}
 .pointer .ring{position:absolute;left:0;top:0;width:46px;height:46px;margin:-23px 0 0 -23px;border:3px solid var(--acc);border-radius:50%;animation:pointpulse 1.6s ease-out infinite}
 .pointer .dot{position:absolute;left:-4px;top:-4px;width:8px;height:8px;border-radius:50%;background:var(--acc)}
@@ -216,6 +257,8 @@ video.cap,img.cap{width:100%;border-radius:16px;border:1px solid var(--line);bac
   .det-text{overflow-wrap:anywhere}
   .card{overflow-wrap:break-word}
   pre{white-space:pre-wrap;word-break:break-word}
+  textarea,input[type=text],input[type=url]{font-size:16px}
+  video.cap,img.cap{max-height:58vh}
   .flash{padding:30px 18px 24px;min-height:200px}
   .flash .q{font-size:18.5px}
 }
@@ -230,6 +273,16 @@ video.cap,img.cap{width:100%;border-radius:16px;border:1px solid var(--line);bac
 .mode-btn{background:var(--surface);border:1.5px solid var(--line);color:var(--mut);border-radius:999px;padding:8px 16px;font-size:13.5px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .18s var(--ease);min-height:38px}
 .mode-btn:hover{color:var(--ink);border-color:var(--line-strong)}
 .mode-btn:active{transform:scale(.97)}
+.sl-teach{background:var(--surface3);border-left:3px solid var(--acc);border-radius:10px;padding:10px 12px;margin:0 0 12px;font-size:14px;line-height:1.55}
+.pack-concept{border-top:1px solid var(--line);padding:9px 0}
+.pack-practice{border:1.5px solid var(--line);border-radius:14px;padding:14px;background:var(--surface);margin-top:12px}
+.srq-stage{border:1.5px solid var(--line);border-radius:14px;padding:14px;background:var(--surface)}
+#miniPlayer{position:fixed;left:50%;transform:translateX(-50%);bottom:14px;z-index:60;display:flex;gap:10px;align-items:center;background:var(--surface);border:1.5px solid var(--line);border-radius:999px;padding:8px 14px;box-shadow:var(--shadow);max-width:94vw}
+#miniPlayer[hidden]{display:none}
+#mpLabel{font-weight:700;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:36vw}
+@media (max-width:760px){#miniPlayer{bottom:calc(78px + env(safe-area-inset-bottom))}}
+input[type=range]{accent-color:var(--acc);min-height:32px}
+
 .mode-btn.on{background:var(--acc);border-color:var(--acc);color:var(--acc-ink);box-shadow:0 6px 16px var(--acc-glow)}
 .grade-row{display:flex;gap:9px;justify-content:center;flex-wrap:wrap;margin-top:14px}
 .grade{border-radius:14px;padding:12px 20px;font-weight:700;font-size:15px;cursor:pointer;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);font-family:inherit;transition:all .16s var(--ease);box-shadow:var(--shadow-sm)}
@@ -503,6 +556,7 @@ input.snap-in{background:var(--surface3);border:1.5px solid var(--line);border-r
 <body>
 <div class="app">
   <nav class="rail" aria-label="StudyLens sections">
+    <div class="rail-group">STUDY</div>
     <button class="navbtn on" data-tab="study">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
       Study
@@ -515,35 +569,51 @@ input.snap-in{background:var(--surface3);border:1.5px solid var(--line);border-r
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
       Quiz
     </button>
-    <button class="navbtn" data-tab="detect">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
-      Detect
-    </button>
-    <button class="navbtn" data-tab="coach">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"/><line x1="16" y1="8" x2="2" y2="22"/><line x1="17.5" y1="15" x2="9" y2="15"/></svg>
-      Coach
-    </button>
-    <button class="navbtn" data-tab="focus">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5"/><path d="M9 2h6"/></svg>
-      Focus
-    </button>
     <button class="navbtn" data-tab="lab">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
       Lab
+    </button>
+    <div class="rail-group">LECTURE</div>
+    <button class="navbtn" data-tab="lecture">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg>
+      Lecture
+    </button>
+    <div class="rail-group">IRIS</div>
+    <button class="navbtn" data-tab="detect">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      Detect
     </button>
     <button class="navbtn" data-tab="tutor">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
       Tutor
     </button>
+    <button class="navbtn" data-tab="coach">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"/><line x1="16" y1="8" x2="2" y2="22"/><line x1="17.5" y1="15" x2="9" y2="15"/></svg>
+      Coach
+    </button>
+    <div class="rail-group">SCREEN</div>
     <button class="navbtn" data-tab="screen">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
       Screen
     </button>
+    <div class="rail-group">FOCUS</div>
+    <button class="navbtn" data-tab="focus">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5"/><path d="M9 2h6"/></svg>
+      Focus
+    </button>
+    <div class="grail">
+      <button class="gnavbtn on" data-group="study">Study</button>
+      <button class="gnavbtn" data-group="lecture">Lecture</button>
+      <button class="gnavbtn" data-group="iris">Iris</button>
+      <button class="gnavbtn" data-group="screen">Screen</button>
+      <button class="gnavbtn" data-group="focus">Focus</button>
+    </div>
     <div class="rail-ver">Version <b id="railVer"></b></div>
     <p class="rail-note">Everything runs in this tab — your text is never uploaded by StudyLens. Optional scans you start yourself (GPTZero, Hugging Face, Ollama) go only to the service you picked.</p>
   </nav>
 
   <main>
+    <div id="subNav" hidden></div>
     <div class="update-banner" id="updateBanner" hidden>
       <div class="ub-text"><strong id="ubTitle">A new version of StudyLens is available.</strong><br><span id="ubText">Tap Update now to load the latest version — this tab will refresh.</span><ul class="ub-notes" id="ubNotes" hidden></ul></div>
       <button class="btn" id="updateNowBtn">Update now</button>
@@ -554,7 +624,16 @@ input.snap-in{background:var(--surface3);border:1.5px solid var(--line);border-r
     <section class="tab active" id="tab-study">
       <div class="tabhead">
         <h2>Study pack</h2>
-        <p>Paste notes, a chapter, or a lecture transcript. StudyLens builds a summary, key terms, flashcards, and a quiz from your own material — TurboLearn-style, right here on the page.</p>
+        <p>Paste notes, a chapter, or a lecture transcript. StudyLens builds a summary, key terms, flashcards, and a quiz from your own material — TurboLearn-style, right here on the page. Meet <strong>Iris</strong>, your tutor: she teaches, quizzes, and checks your work — she never does it for you.</p>
+      </div>
+      <div class="card" id="todayCard">
+        <p id="todayGreet" style="font-family:var(--serif);font-size:21px;font-weight:700;margin:0">Hi, I'm Iris.</p>
+        <p class="small" id="todayLine" style="margin:6px 0 0"></p>
+        <div class="row" style="margin-top:10px">
+          <button class="btn small" id="todayDueBtn" hidden>Review what's due</button>
+          <button class="btn small ghost" id="todayContinueBtn" hidden>Continue</button>
+          <span class="small" id="todayStreak"></span>
+        </div>
       </div>
       <div class="card" id="newsCard">
         <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between">
@@ -576,6 +655,19 @@ input.snap-in{background:var(--surface3);border:1.5px solid var(--line);border-r
         <p id="streakLine" style="font-size:15px;margin:0">No streak yet — generate a study pack or review flashcards today to start one.</p>
         <div class="srs-stats" id="sessionStats"></div>
         <p class="small" style="margin-top:8px">This session so far — these counts reset when you reload the page. Your streak is kept on this device only, so it is still here next visit.</p>
+        <p class="small" id="srqDueLine" style="margin-top:8px"></p>
+      </div>
+      <div class="card" id="slModeCard">
+        <h3>How do you want to study?</h3>
+        <p class="small">Modes change how every pack, flashcard set and Simple Study round teaches you — and you can switch any time, even mid-session.</p>
+        <div class="mode-row" id="slModeRow" role="group" aria-label="Study mode" style="margin-top:10px">
+          <button class="mode-btn slm-btn" data-slmode="simple">Simple</button>
+          <button class="mode-btn slm-btn" data-slmode="guided">Guided</button>
+          <button class="mode-btn slm-btn" data-slmode="challenge">Challenge</button>
+          <button class="mode-btn slm-btn" data-slmode="exam">Exam Prep</button>
+        </div>
+        <p class="small" id="slModeDesc" style="margin:0"></p>
+        <div id="slRoute" hidden style="margin-top:10px"></div>
       </div>
       <div class="card">
         <h3>Your material</h3>
@@ -679,11 +771,81 @@ input.snap-in{background:var(--surface3);border:1.5px solid var(--line);border-r
             <button class="ss-mode-btn" data-ssmode="matching"><b>Matching</b><span>Pair each term with its meaning</span></button>
             <button class="ss-mode-btn" data-ssmode="tf"><b>True / False</b><span>Is the statement right? Two big buttons</span></button>
             <button class="ss-mode-btn" data-ssmode="mc"><b>Multiple Choice</b><span>One question, four answers</span></button>
+            <button class="ss-mode-btn" data-ssmode="examround"><b>Exam Round</b><span>Mixed questions against the clock — score and weak spots at the end</span></button>
           </div>
           <p class="small" id="ssPackInfo" style="margin-top:10px"></p>
         </div>
 
         <div id="ssPlay" hidden></div>
+      </div>
+
+      <div class="card" id="srqCard" hidden>
+        <h3>Due for review</h3>
+        <p class="small">Questions you missed anywhere in StudyLens, kept <strong>on this device only</strong>. They come back at growing gaps — right away, tomorrow, in 3 days, in 7 days — because answering from memory at the edge of forgetting is what makes it stick.</p>
+        <div id="srqBody"></div>
+      </div>
+
+      <div class="card" id="packsCard">
+        <h3>Subject knowledge packs</h3>
+        <p class="small">Built-in reference packs for core college subjects: the key concepts, the canonical formulas, and practice with <strong>fresh numbers every time</strong>. Packs teach methods with their own examples — they never work your actual assignment numbers; that part stays yours. Open a pack, or ask the open pack about a topic.</p>
+        <div class="row" id="packBtns" style="margin-top:10px"></div>
+        <div class="row" style="margin-top:10px">
+          <input type="text" id="packAskIn" placeholder="Ask the open pack about a topic — e.g. carrying capacity" style="flex:1;min-width:200px">
+          <button class="btn ghost small" id="packAskBtn">Ask</button>
+        </div>
+        <div id="packBody" style="margin-top:12px"></div>
+      </div>
+    </section>
+
+    <!-- ============ LECTURE ============ -->
+    <section class="tab" id="tab-lecture">
+      <div class="tabhead">
+        <h2>Lecture notes</h2>
+        <p>Record a lecture or upload its audio. Iris transcribes it, builds structured notes from only what was said, and can look up outside sources that back it up.</p>
+      </div>
+      <div class="card" id="lectureCard">
+        <h3>Lecture notes <span class="small mut">— with Iris</span></h3>
+        <p class="small">Record a lecture (or upload its audio) and Iris builds structured notes from the transcript: topic sections, key terms with your professor's own definitions, their examples, and anything they flagged for the exam. <strong>Before you record:</strong> check your professor's recording policy — some classes don't allow it.</p>
+        <div class="row">
+          <button class="btn" id="lecRecordBtn">Record lecture</button>
+          <button class="btn ghost" id="lecPauseBtn" hidden>Pause</button>
+          <button class="btn plain" id="lecStopBtn" hidden>Stop</button>
+          <span class="small" id="lecTimer" style="align-self:center;font-weight:700">00:00</span>
+          <label class="btn ghost filelabel" for="lecAudioInput">Upload audio</label>
+          <input type="file" id="lecAudioInput" accept="audio/*" hidden>
+          <label class="btn ghost filelabel" for="lecTextInput">Upload transcript</label>
+          <input type="file" id="lecTextInput" accept=".txt,.md,text/plain" hidden>
+        </div>
+        <p class="small" id="lecRecStatus" role="status" style="margin-top:8px"></p>
+        <div id="lecAudioWrap" hidden style="margin-top:8px"></div>
+        <h4 style="margin:14px 0 6px">Transcript</h4>
+        <p class="small" id="lecCaptionNote">Live captions while recording use your browser's own speech service where it offers one — in Chrome, audio is sent to Google to transcribe. The on-device Whisper option keeps everything on this device.</p>
+        <textarea id="lecTranscript" style="min-height:120px" placeholder="Your transcript lands here with [mm:ss] timestamps — or paste one in."></textarea>
+        <div class="row" style="margin-top:8px">
+          <button class="btn ghost" id="lecWhisperBtn">Transcribe on-device (Whisper)</button>
+          <button class="btn" id="lecNotesBtn">Make my notes</button>
+        </div>
+        <p class="small" id="lecWhisperStatus" role="status"></p>
+        <div id="lecNotesCard" hidden>
+          <h4 style="margin:14px 0 6px">Your notes (editable — they're yours)</h4>
+          <textarea id="lecNotes" style="min-height:180px"></textarea>
+          <div class="row" style="margin-top:8px">
+            <button class="btn small" id="lecCardsBtn">Make flashcards</button>
+            <button class="btn small ghost" id="lecQuizBtn">Quiz me</button>
+            <button class="btn small ghost" id="lecQueueBtn">Add terms to review queue</button>
+            <button class="btn small plain" id="lecListenBtn">Listen to my notes</button>
+          </div>
+          <h4 style="margin:14px 0 6px">Ask Iris about this lecture</h4>
+          <div class="row">
+            <input type="text" id="lecAskInput" placeholder="Ask about this lecture — answers quote the transcript, with timestamps…" aria-label="Ask about this lecture" style="flex:1;min-width:200px">
+            <button class="btn" id="lecAskBtn">Ask</button>
+          </div>
+          <p class="small" id="lecAskOut" role="status" style="margin-top:8px;white-space:pre-wrap"></p>
+          <h4 style="margin:16px 0 6px">Proof &amp; resources</h4>
+          <p class="small">Iris can look up outside sources that back up (or expand) what your professor said — your lecture notes stay the primary source. Only the key terms and topics are searched, never your transcript.</p>
+          <div class="row"><button class="btn ghost" id="lecProofBtn">Look up proof &amp; resources</button></div>
+          <div id="lecProof" style="margin-top:10px"></div>
+        </div>
       </div>
     </section>
 
@@ -705,6 +867,7 @@ input.snap-in{background:var(--surface3);border:1.5px solid var(--line);border-r
           <div class="a" id="flashA" hidden></div>
           <div class="hint" id="flashHint">Tap to reveal the answer</div>
         </div>
+        <p class="small" id="flashModeHint" hidden style="margin-top:10px"></p>
         <div class="row" id="flashControls" hidden style="justify-content:center">
           <button class="btn ghost small" id="prevCardBtn">← Prev</button>
           <span class="pill" id="flashPos"></span>
@@ -742,6 +905,16 @@ input.snap-in{background:var(--surface3);border:1.5px solid var(--line);border-r
           <button class="btn ghost small" id="retakeQuizBtn">Retake quiz</button>
         </div>
       </div>
+          <div class="card" id="matchCard">
+        <h3>Match pairs</h3>
+        <p class="mut" id="matchHint">A quick warm-up: tap a term, then tap what it means. Every pair comes from your study pack.</p>
+        <div id="matchBoard"></div>
+        <div class="row" style="margin-top:12px">
+          <button class="btn small" id="matchStartBtn">Start matching</button>
+          <button class="btn ghost small" id="matchNewBtn" hidden>New round</button>
+          <span class="small mut" id="matchStatus" role="status" style="align-self:center"></span>
+        </div>
+      </div>
     </section>
 
     <!-- ============ DETECT ============ -->
@@ -759,7 +932,7 @@ input.snap-in{background:var(--surface3);border:1.5px solid var(--line);border-r
           <button class="btn ghost" id="hfBtn">Run Hugging Face scan</button>
           <button class="btn plain small" id="detSampleBtn">Try sample writing</button>
         </div>
-        <p class="small" style="margin-top:8px">Three ways to check: the <strong>on-device check</strong> runs the trained V18 classifier right here in the tab — word + character-pattern TF-IDF models with learned weights, trained on real human-vs-AI writing (HC3 plus modern GPT-4/ChatGPT samples). It's instant, free, needs no key, and nothing is uploaded; its measured accuracy and honest limits are printed next to every score. The <strong>GPTZero scan</strong> and <strong>Hugging Face scan</strong> run other trained models using your own free keys (below). No score from any of them proves authorship — use them to strengthen your own voice.</p>
+        <p class="small" style="margin-top:8px">Three ways to check: the <strong>on-device check</strong> runs the trained V20 classifier right here in the tab — word + character-pattern TF-IDF models with learned weights, trained on real human-vs-AI writing (HC3 plus modern GPT-4/ChatGPT samples). It's instant, free, needs no key, and nothing is uploaded; its measured accuracy and honest limits are printed next to every score. The <strong>GPTZero scan</strong> and <strong>Hugging Face scan</strong> run other trained models using your own free keys (below). No score from any of them proves authorship — use them to strengthen your own voice.</p>
         <details>
           <summary>Free API keys (optional) — which ones work here</summary>
           <div class="inner">
@@ -832,7 +1005,7 @@ input.snap-in{background:var(--surface3);border:1.5px solid var(--line);border-r
     <section class="tab" id="tab-tutor">
       <div class="tabhead">
         <h2>Tutor</h2>
-        <p>Ask about your study material. The tutor explains, quizzes you, and walks through problems step by step — Socratically. It won't write your assignments or hand over quiz answers.</p>
+        <p>Ask Iris about your study material. She explains, quizzes you, and walks through problems step by step — Socratically. She won't write your assignments or hand over quiz answers.</p>
       </div>
       <div class="card">
         <div class="chat" id="chatBox">
@@ -889,7 +1062,9 @@ input.snap-in{background:var(--surface3);border:1.5px solid var(--line);border-r
       <div class="screen-layout">
         <div class="screen-main">
           <div class="card">
-            <p class="small"><strong>PC:</strong> Share Screen works in Chrome/Edge. <strong>iPhone:</strong> iOS doesn't let web pages see other apps, so use the camera button to photograph your notes or screen instead. Captures are processed on this page and never uploaded. When sharing stops, the capture area clears itself — hit <strong>Save capture</strong> first if you want to keep a frame: it downloads the image and sends the capture into your study material.</p>
+            <p class="small" style="margin:0 0 4px"><strong>On PC:</strong> tap <strong>Share screen</strong> (Chrome or Edge) and pick a window or tab.</p>
+            <p class="small" style="margin:0 0 4px"><strong>On iPhone:</strong> web pages can't see other apps, so tap <strong>Camera / photo</strong> and photograph your notes or screen instead.</p>
+            <p class="small" style="margin:0">Everything is read right here on this page and never uploaded. Stopping a share clears the stage, so save a frame first if you want to keep it.</p>
             <div class="row">
               <button class="btn" id="shareBtn">Share screen (PC)</button>
               <label class="btn ghost filelabel" for="camInput">Camera / photo</label>
@@ -899,6 +1074,7 @@ input.snap-in{background:var(--surface3);border:1.5px solid var(--line);border-r
             </div>
             <div class="notice" id="screenNotice" role="status"></div>
             <div class="stage" style="margin-top:12px">
+              <div class="screen-empty" id="screenEmpty">Nothing here yet — share your screen or take a photo, and it appears in this space.</div>
               <video class="cap" id="screenVideo" autoplay playsinline muted hidden></video>
               <img class="cap" id="capImg" hidden alt="Captured screen or photo">
               <div class="pointer" id="pointer" hidden><span class="ring"></span><span class="dot"></span><span class="tag" id="pointerTag"></span></div>
@@ -912,15 +1088,16 @@ input.snap-in{background:var(--surface3);border:1.5px solid var(--line);border-r
           </div>
           <div class="card" id="ocrCard" hidden>
             <h3>Text found in capture</h3>
+            <div id="screenTypeBox" class="ss-feed info" hidden style="margin:0 0 10px"></div>
             <p class="small" id="ocrStatus"></p>
             <textarea id="ocrText" style="min-height:110px"></textarea>
           </div>
         </div>
         <aside class="card screen-side" id="screenSide" hidden aria-label="Chat about your screen">
           <h3>Ask about your screen</h3>
-          <p class="small">Ask where something is — “Where is the Calvin cycle?” — and I'll circle it right on your capture and tell you about it. Or ask for help with anything on screen.</p>
+          <p class="small">I'm Iris — ask where something is (“Where is the Calvin cycle?”) and I'll circle it right on your capture and explain it. Or ask for help with anything on screen.</p>
           <div class="chat" id="screenChatBox" style="margin-top:10px">
-            <div class="msg ai">Share your screen (or snap a photo of it), then ask me about anything on it. Try “Where is…?” and I'll point right at it.</div>
+            <div class="msg ai">I'm Iris. Share your screen (or snap a photo of it), then ask me about anything on it. Try “Where is…?” and I'll point right at it.</div>
           </div>
           <div class="chatrow">
             <input type="text" id="screenChatInput" placeholder="Ask about your screen…" aria-label="Ask about your screen">
@@ -967,6 +1144,7 @@ input.snap-in{background:var(--surface3);border:1.5px solid var(--line);border-r
               <div class="timer-state" id="timerState">Ready when you are</div>
             </div>
           </div>
+          <div id="focusAmbience" hidden aria-hidden="true"><div class="amb-ring"></div><p class="small" style="text-align:center;margin:6px 0 0">Breathe with the circle — in as it grows, out as it settles.</p></div>
           <div class="preset-row">
             <button class="mode-btn preset" data-min="15">15 min</button>
             <button class="mode-btn preset on" data-min="25">25 min</button>
@@ -985,6 +1163,34 @@ input.snap-in{background:var(--surface3);border:1.5px solid var(--line);border-r
             <button class="btn ghost" id="breakBtn" hidden>Start 5-min break</button>
           </div>
         </div>
+      </div>
+      <div class="card" id="musicCard">
+        <h3>Focus music</h3>
+        <p class="small">Iris's built-in soundscapes are made right on your device — no account, no downloads, they work offline and can run under your studying for as long as you like.</p>
+        <div class="slm-row" id="muChips" role="group" aria-label="Built-in focus sounds">
+          <button class="slm-btn on" data-mu="rain">Rain</button>
+          <button class="slm-btn" data-mu="cafe">Café murmur</button>
+          <button class="slm-btn" data-mu="brown">Brown noise</button>
+          <button class="slm-btn" data-mu="pink">Pink noise</button>
+        </div>
+        <div class="row" style="margin-top:10px;align-items:center">
+          <button class="btn" id="muPlayBtn">Play sound</button>
+          <label class="small" for="muVol">Volume</label>
+          <input type="range" id="muVol" min="0" max="100" value="70" style="flex:1;min-width:110px" aria-label="Built-in sound volume">
+        </div>
+        <div class="row" style="margin-top:10px">
+          <button class="btn ghost" id="muFocusBtn">Start focus session (sound + timer)</button>
+        </div>
+        <p class="small" id="muNote" role="status"></p>
+        <h4 style="margin:16px 0 6px">Your music</h4>
+        <p class="small">Paste a YouTube or Spotify link — a playlist, video, or album — and it plays here in that service's own official player. Spotify plays full songs only when you're signed in to Spotify in this browser with Premium; that's Spotify's rule, not StudyLens's. Only youtube.com and spotify.com links are accepted.</p>
+        <div class="row">
+          <input type="url" id="muUrl" placeholder="Paste a YouTube or Spotify link…" aria-label="YouTube or Spotify link" style="flex:1;min-width:200px">
+          <button class="btn" id="muLoadBtn">Load player</button>
+        </div>
+        <p class="small" id="muEmbedMsg" role="status"></p>
+        <div id="muEmbedWrap" hidden style="margin-top:10px"></div>
+        <p class="small" style="margin-top:8px">The volume slider controls the built-in sounds; embedded players keep their own volume.</p>
       </div>
       <div class="card">
         <h3>Session log</h3>
@@ -1224,6 +1430,12 @@ input.snap-in{background:var(--surface3);border:1.5px solid var(--line);border-r
     </section>
 
   </main>
+<div id="miniPlayer" hidden role="region" aria-label="Music mini-player">
+  <span id="mpLabel">Focus music</span>
+  <button class="btn plain small" id="mpToggle">Play</button>
+  <input type="range" id="mpVol" min="0" max="100" value="70" aria-label="Music volume" style="width:90px">
+  <button class="btn plain small" id="mpStop">Stop</button>
+</div>
 </div>
 <script>
 'use strict';
@@ -1301,6 +1513,7 @@ function showTab(id){
   document.querySelectorAll('.tab').forEach(function(t){ t.classList.toggle('active', t.id === 'tab-' + id); });
   document.querySelectorAll('.navbtn').forEach(function(b){ b.classList.toggle('on', b.getAttribute('data-tab') === id); });
   window.scrollTo(0, 0);
+  if(window.slNavSync) slNavSync(id);
 }
 document.querySelectorAll('.navbtn').forEach(function(b){
   b.addEventListener('click', function(){ showTab(b.getAttribute('data-tab')); });
@@ -1439,6 +1652,7 @@ function generateStudy(){
     return;
   }
   var text = cl.text;
+  try{ slIntakeRoute(text); }catch(e){}
   /* A fresh pack invalidates Simple Study state tied to the OLD material:
      spreadsheet formula questions and a Fix-My-Mistakes weak-spot filter
      used to survive into the new pack, mixing in questions — or a filter
@@ -1542,6 +1756,7 @@ function buildCards(){
   if(!S.cards.length && S.sentences.length){
     S.sentences.slice(0, 8).forEach(function(s){ S.cards.push({ q: 'Explain this in your own words:', a: s }); });
   }
+  try{ slModeCards(); }catch(e){}
   S.cardMode = 'browse'; S.reviewQueue = []; S.reviewPos = 0; S.drillWeak = false; AGAIN = {};
   srsInit();
   renderCard();
@@ -1582,6 +1797,8 @@ function renderCard(){
   $('flashA').textContent = c.a;
   $('flashA').hidden = !S.cardFlipped;
   $('flashHint').textContent = S.cardFlipped ? (inReview ? 'Grade yourself honestly below' : 'Tap to hide the answer') : 'Tap to reveal the answer';
+  var fh = $('flashModeHint');
+  if(fh){ var cc = S.cards[currentCardIdx()]; var showHint = (typeof SLM !== 'undefined' && SLM === 'guided' && cc && cc.hint && !S.cardFlipped && !reviewDone); fh.hidden = !showHint; fh.textContent = showHint ? 'Hint: ' + cc.hint : ''; }
   $('flashBox').setAttribute('aria-pressed', S.cardFlipped ? 'true' : 'false');
   $('flashPos').textContent = (S.cardIdx + 1) + ' / ' + S.cards.length;
   if(inReview) $('reviewMsg').textContent = S.drillWeak
@@ -2059,7 +2276,7 @@ function runHeuristicDetector(){
 }
 /* ---- Trained on-device classifier (two-block TF-IDF + logistic regression) ----
    A real trained model, not scoring rules: learned weights shipped in
-   assets/classifier.json (format studylens-classifier-v18, fetched from this
+   assets/classifier.json (format studylens-classifier-v20, fetched from this
    app's own files on first use). A sentence model scores every sentence from
    two TF-IDF blocks — word uni+bigrams and char_wb 3–5 grams — each
    L2-normalized separately, then concatenated. A document model combines
@@ -2085,7 +2302,7 @@ function loadClassifier(){
     if(!r.ok) throw new Error('HTTP ' + r.status);
     return r.json();
   }).then(function(o){
-    if(!o || o.format !== 'studylens-classifier-v18') throw new Error('unexpected model format');
+    if(!o || o.format !== 'studylens-classifier-v20') throw new Error('unexpected model format');
     CLF = o;
     function idxOf(vocab){ var m = new Map(); vocab.forEach(function(v, i){ m.set(v, i); }); return m; }
     CLF_IDX = { sw: idxOf(o.sentence_model.word.vocabulary), sc: idxOf(o.sentence_model.char_wb.vocabulary), doc: idxOf(o.doc_model.vocabulary) };
@@ -2565,6 +2782,7 @@ async function startScreen(){
     S.stream = stream;
     var v = $('screenVideo');
     v.srcObject = stream; v.hidden = false;
+    var se = $('screenEmpty'); if(se) se.hidden = true;
     $('capBtn').hidden = false;
     $('stopBtn').hidden = false;
     openScreenChat();
@@ -2574,6 +2792,7 @@ async function startScreen(){
   }
 }
 function clearCapture(){
+  var se = $('screenEmpty'); if(se) se.hidden = false;
   var img = $('capImg');
   img.removeAttribute('src');
   img.hidden = true;
@@ -2600,6 +2819,7 @@ function stopScreen(){
   showNotice($('screenNotice'), 'Screen sharing stopped — the capture area was cleared so no stale frame is left behind. Save a capture before stopping if you want to keep it.', 'ok');
 }
 function showCapture(dataUrl){
+  var se = $('screenEmpty'); if(se) se.hidden = true;
   var img = $('capImg');
   img.src = dataUrl; img.hidden = false;
   $('ocrBtn').hidden = false;
@@ -2645,14 +2865,32 @@ function saveCapture(){
 }
 $('saveCaptureBtn').addEventListener('click', saveCapture);
 $('shareBtn').addEventListener('click', startScreen);
+(function(){
+  /* Honest device fit: where this browser cannot share a screen at all
+     (iPhone Safari, in-app browsers), say so on the button itself and
+     make the camera the primary action instead of dressing a dead end
+     up as the main button. PC browsers that can share keep the original
+     styling. */
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia){
+    var sb = $('shareBtn');
+    sb.textContent = 'Share screen (needs a PC browser)';
+    sb.classList.remove('btn'); sb.classList.add('btn', 'ghost');
+    var cam = document.querySelector('label[for="camInput"]');
+    if(cam){ cam.classList.remove('ghost'); }
+  }
+})();
 $('stopBtn').addEventListener('click', stopScreen);
 function captureFrame(){
   var v = $('screenVideo');
   if(v && v.videoWidth){
+    /* Cap the frame at 1600px wide and store JPEG: a full-screen PNG can
+       be a 10MB+ string that slows the page and the OCR read for no gain
+       in legibility. */
+    var scale = Math.min(1, 1600 / v.videoWidth);
     var c = document.createElement('canvas');
-    c.width = v.videoWidth; c.height = v.videoHeight;
-    c.getContext('2d').drawImage(v, 0, 0);
-    showCapture(c.toDataURL('image/png'));
+    c.width = Math.round(v.videoWidth * scale); c.height = Math.round(v.videoHeight * scale);
+    c.getContext('2d').drawImage(v, 0, 0, c.width, c.height);
+    showCapture(c.toDataURL('image/jpeg', 0.92));
     return true;
   }
   return false;
@@ -2662,6 +2900,7 @@ $('camInput').addEventListener('change', function(e){
   var f = e.target.files[0]; if(!f) return;
   var r = new FileReader();
   r.onload = function(){ showCapture(r.result); openScreenChat(); };
+  r.onerror = function(){ showNotice($('screenNotice'), 'That photo could not be read on this device. Try taking it again, or pick a different photo.', 'err'); };
   r.readAsDataURL(f);
 });
 async function runOCR(silent){
@@ -2690,6 +2929,7 @@ async function runOCR(silent){
     }).filter(function(w){ return w.text && w.text.trim().length > 1; });
     status.textContent = found ? 'Done — review the text, fix anything misread, then send it to your study material.' : 'No clear text found in this capture. Try a closer, well-lit shot.';
     $('useBtn').hidden = false;
+    try{ slScreenShowType(); }catch(e){}
     return found.length > 0;
   }catch(e){
     status.textContent = 'Could not load the text reader (it needs internet on first use). You can still view the capture and type out the key points manually.';
@@ -2719,7 +2959,10 @@ $('sideChatBtn').addEventListener('click', function(){
   var opening = side.hidden;
   side.hidden = !opening;
   $('sideChatBtn').setAttribute('aria-expanded', String(opening));
-  if(opening) $('screenChatInput').focus();
+  if(opening){
+    if(window.innerWidth && window.innerWidth <= 900) side.scrollIntoView({ block: 'start' });
+    $('screenChatInput').focus();
+  }
 });
 function screenChatAdd(text, who){
   var box = $('screenChatBox');
@@ -2968,7 +3211,7 @@ function ssBuildWordBank(){
       if(!used[S.sentences[i]] && ssTermCount(S.sentences[i], term) === 1){ sent = S.sentences[i]; break; }
     }
     if(!sent) return;
-    var distract = shuffleArr(S.terms.filter(function(t){ return t !== term && !sentenceHasTerm(sent, t); })).slice(0, 4);
+    var distract = shuffleArr(S.terms.filter(function(t){ return t !== term && !sentenceHasTerm(sent, t); })).slice(0, slQCap(4));
     if(distract.length < 2) return;
     used[sent] = 1;
     var parts = sent.replace(termRegex(term), '$1\u0001').split('\u0001');
@@ -2983,7 +3226,7 @@ function ssBuildMatching(){
     var target = ssTargetFor(term);
     if(target && !seenT[target]){ seenT[target] = 1; pairs.push({ term: term, target: target }); }
   });
-  return pairs.slice(0, 6);
+  return pairs.slice(0, slQCap(6));
 }
 function ssBuildTF(){
   var terms = ssPoolTerms(), used = {}, qs = [];
@@ -3011,7 +3254,7 @@ function ssBuildTF(){
     if(swapped) qs.push({ statement: swapped, isTrue: false, correct: sent, swapTerm: swapTerm, term: term });
     else qs.push({ statement: sent, isTrue: true, correct: sent, term: term });
   });
-  return qs.slice(0, 8);
+  return qs.slice(0, slQCap(8));
 }
 function ssBuildMC(){
   var terms = ssPoolTerms(), asked = {}, qs = [];
@@ -3029,7 +3272,7 @@ function ssBuildMC(){
               answer: d.def, explain: 'From your material: “' + d.sentence + '”' });
   });
   terms.forEach(function(term){
-    if(asked[term] || qs.length >= 8) return;
+    if(asked[term] || qs.length >= slQCap(8)) return;
     var sent = ssSingleSentFor(term);
     if(!sent) return;
     var others = shuffleArr(S.terms.filter(function(t){ return t !== term && !sentenceHasTerm(sent, t); })).slice(0, 3);
@@ -3040,7 +3283,7 @@ function ssBuildMC(){
               explain: 'The full sentence: “' + sent + '”' });
   });
   if(!SS.filter) qs = qs.concat(SS.extraMC);
-  return shuffleArr(qs).slice(0, 8);
+  return shuffleArr(qs).slice(0, slQCap(8));
 }
 /* ---------- play engine ---------- */
 function ssRefresh(){
@@ -3060,7 +3303,7 @@ function ssRefresh(){
 function ssChrome(instr, prog){
   return '<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">' +
     '<span class="ss-prog">' + esc(prog) + '</span>' +
-    '<button class="btn plain small" id="ssQuitBtn">All modes</button></div>' +
+    '<button class="btn plain small" id="ssQuitBtn">All modes</button>' + (SS.exam ? '<span class="pill" id="ssExamClock" aria-label="Time left"></span>' : '') + '</div>' +
     '<p class="ss-instr" style="margin-top:10px">' + esc(instr) + '</p><div id="ssStage"></div>';
 }
 function ssBindQuit(){
@@ -3073,6 +3316,8 @@ function ssBindQuit(){
   });
 }
 function ssStartMode(mode){
+  if(mode === 'examround'){ slSetMode('exam', false); slStartExam(); return; }
+  SS.exam = false; slExamStop();
   SS.mode = mode; SS.idx = 0; SS.score = 0; SS.answered = false; SS.picked = null;
   SS.matchSel = null; SS.matchDone = 0; SS.matchMiss = 0; SS.missed = [];
   if(mode === 'wordbank') SS.qs = ssBuildWordBank();
@@ -3100,14 +3345,18 @@ function ssNext(){
   else ssRenderQ();
 }
 function ssRenderQ(){
+  if(SS.exam){ var eq = SS.qs[SS.idx]; if(eq && eq.kind) SS.mode = eq.kind; }
   var play = $('ssPlay');
   if(play){ play.classList.remove('ss-enter'); void play.offsetWidth; play.classList.add('ss-enter'); }
   if(SS.mode === 'wordbank') ssRenderWordBank();
   else if(SS.mode === 'matching') ssRenderMatching();
   else if(SS.mode === 'tf') ssRenderTF();
   else ssRenderMC();
+  if(SLM === 'guided') slGuidedTeach();
+  if(SS.exam) slExamTick(true);
 }
 function ssResults(){
+  if(SS.exam){ slExamResults(); return; }
   var play = $('ssPlay');
   var total = SS.qs.length, score = SS.mode === 'matching' ? SS.matchDone : SS.score;
   var pct = total ? score / total : 0;
@@ -3129,6 +3378,7 @@ function ssResults(){
     ssRefresh();
     $('simpleCard').scrollIntoView({ block: 'start' });
   });
+  try{ slAfterRound(); }catch(e){}
   bumpStreak();
 }
 /* v2.17.0 addition — "Practice what I missed": a focused round built
@@ -3564,6 +3814,7 @@ function ssApplyMaterial(text){
   $('summaryCard').hidden = false;
   $('material').value = text;
   buildCards(); buildQuiz();
+  try{ matchReset(); }catch(e){}
   SESSION.packs += 1; renderSessionStats(); bumpStreak();
   $('cardsHint').textContent = S.cards.length + ' flashcards ready. Browse them freely, or hit Review due to grade cards and space the repeats out.';
   $('quizHint').textContent = S.quiz.length + ' quiz questions ready — built from your material.';
@@ -4077,8 +4328,20 @@ ssRefresh();
    fetched with no-store caching: when a newer build ships, an already-open or
    home-screen copy of an older build sees the newer version number there and
    offers "Update now" (a reload onto the new build). */
-var APP_VERSION = '2.21.6';
+var APP_VERSION = '2.22.0';
 var CHANGELOG = [
+ { v:'2.22.0', date:'Oct 23, 2026', notify:true, notes:[
+   'Meet Iris — StudyLens’s tutor now has a name and one voice everywhere: she teaches, quizzes, and checks your work, and never does it for you.',
+   'NEW study modes: Simple, Guided (teach-first steps + explain-it-back), Challenge (bigger rounds, reverse cards), and Exam Prep (timed, mixed questions, weak spots at the end) — switch any time.',
+   'A review queue that brings missed questions back right away, tomorrow, in 3 days, and in 7 days — with a Due count on the Study tab. Everything stays on your device.',
+   'Iris now spots what you pasted — lecture notes, textbook chapter, problem set, essay draft, lab report — and opens the right tools. Wrong type? Change is always one tap away.',
+   'Subject knowledge packs for biology/ecology, environmental science, geology, chemistry, statistics, anthropology, and academic writing: plain explainers, key formulas, and practice with fresh numbers — never your assignment’s numbers.',
+   'Screen tab: Iris can now tell what kind of thing your screen shows (slides, document, problem set, textbook, video, spreadsheet, code) and gets better at it the more you correct her — only type labels and small tuning numbers are kept on your device, never anything your screen showed.',
+   'Focus music: built-in rain, café, brown-noise and pink-noise soundscapes (made on-device, work offline), plus a Your music slot for your own YouTube or Spotify playlists, and a mini-player that follows you across tabs.',
+   'Screen tab polish: clearer getting-started text, an empty-stage hint, faster captures, and fixes for iPhone typing zoom and cramped layouts.',
+   'AI detector upgraded to the V20 model: it catches more polished AI writing (humanized-text catch 0.611 \u2192 0.722) without flagging more real human writing (false-flag rate 0.0471), measured on held-out samples.',
+   'New in the Quiz tab: Match Pairs — a quick warm-up where you tap a term, then tap what it means.',
+   'Lecture Notes: record a lecture or upload the audio, get a timestamped transcript, and Iris turns it into structured notes — key terms as your professor stated them, their examples, and anything they flagged for the exam.' ]},
   { v: '2.21.6', date: 'Oct 22, 2026', notify: true, notes: [
     'Simple Study has an intake tray now, like Lab: add up to 4 photos and up to 6 files, watch them queue up as chips (files show their character count once read), remove any of them, and tap “Done — build my pack” when you are ready. Nothing is read until Done — then the photos are read on this device, the file text is added, and everything combines with whatever you pasted into “Your material” to build one pack. If one item can\'t be read, it is named and skipped, never a dead end.',
     'Messy scans can no longer turn into messy exercises: photo text now passes a quality check before anything is built. Symbol-soup lines and broken fragments from a rough read are dropped, only clear sentences can become flashcards, quiz questions, or word-bank items, and the word bank only ever holds real terms. If a photo read messily, StudyLens says so plainly and builds from the clean part — and if nothing came through clearly, it tells you instead of inventing exercises from noise.',
@@ -4459,6 +4722,7 @@ function gradeCard(g){
   var now = Date.now();
   SESSION.reviewed += 1; renderSessionStats(); bumpStreak();
   if(g === 'again' && S.cards[idx].term) AGAIN[S.cards[idx].term] = (AGAIN[S.cards[idx].term] || 0) + 1;
+  try{ slSrqFromCard(S.cards[idx], g); }catch(e){}
   if(g === 'again'){
     e.reps = 0; e.interval = 0;
     e.ef = Math.max(1.3, e.ef - 0.2);
@@ -4740,7 +5004,7 @@ $('exportCsvBtn').addEventListener('click', exportAnki);
    StudyLens. Essay feedback = pattern checks on the user's OWN writing
    (structure / clarity / mechanical grammar patterns) framed by the chosen
    reviewer's rubric — suggestions only, it never rewrites the draft. Batch
-   scan reuses the trained V18 classifier (v7Analyze) per file and per PDF
+   scan reuses the trained V20 classifier (v7Analyze) per file and per PDF
    page — no new scores are invented. The writing timeline keeps timestamped
    snapshots of the detector box in memory only: never uploaded, gone when
    the tab closes. */
@@ -6522,7 +6786,7 @@ function chkGrade(){
 function snapShowAutoBanner(){
   var b = $('snapAutoBanner'); if(!b) return;
   var d = SNAP_TYPES[SNAP.type] || SNAP_TYPES.concept;
-  $('snapAutoText').textContent = '📸 Snapped: looks like ' + d.label;
+  $('snapAutoText').textContent = '📸 Iris snapped this: looks like ' + d.label;
   b.hidden = false;
 }
 function snapStartPractice(){
@@ -6646,5 +6910,1739 @@ if($('snapPickBtn')){
   snapRenderGlossary();
 }
 </script>
+<script>
+'use strict';
+/* ================= v2.22.0 — study modes, spaced review queue,
+   knowledge packs, intake routing =================
+   Modes (Simple default) reshape how Simple Study, flashcards and the
+   subject packs teach. The spaced queue keeps MISSED questions only,
+   on-device in localStorage, and resurfaces them at growing gaps.
+   Nothing here ever touches Lab Snapshot data: the learner's lab work
+   is never stored or reused, exactly as before. */
+var SLM = 'simple';
+try{ var _slmSaved = localStorage.getItem('studylens.mode.v1'); if(_slmSaved && ['simple', 'guided', 'challenge', 'exam'].indexOf(_slmSaved) >= 0) SLM = _slmSaved; }catch(e){}
+var SL_MODE_DESC = {
+  simple: 'Simple — easy practice, one question at a time, answers explained as you go.',
+  guided: 'Guided — every question opens with a quick teach drawn from your material, and rounds end with an explain-it-back check (the Feynman step).',
+  challenge: 'Challenge — bigger rounds, a fatter word bank, reverse flashcards, and less scaffolding.',
+  exam: 'Exam Prep — timed, interleaved mixed rounds; you finish with a score and a weak-spot list.'
+};
+function slQCap(n){ return SLM === 'challenge' ? Math.ceil(n * 1.5) : n; }
+function slSetMode(m, persist, opts){
+  if(['simple', 'guided', 'challenge', 'exam'].indexOf(m) < 0) return;
+  SLM = m;
+  document.body.setAttribute('data-slmode', m);
+  document.querySelectorAll('.slm-btn').forEach(function(b){ b.classList.toggle('on', b.getAttribute('data-slmode') === m); });
+  var d = $('slModeDesc'); if(d) d.textContent = SL_MODE_DESC[m];
+  if(persist){ try{ localStorage.setItem('studylens.mode.v1', m); }catch(e){} }
+  if((!opts || opts.rebuild !== false) && typeof S !== 'undefined' && S.terms && S.terms.length && typeof buildCards === 'function') buildCards();
+  slRenderSrqLine();
+}
+window.slSetMode = slSetMode;
+document.querySelectorAll('.slm-btn').forEach(function(b){
+  b.addEventListener('click', function(){ slSetMode(b.getAttribute('data-slmode'), true); });
+});
+
+/* ---------- flashcards: per-mode transforms (called at the end of buildCards) ---------- */
+function slModeCards(){
+  if(SLM === 'guided'){
+    S.cards.forEach(function(c){
+      if(!c.hint) c.hint = c.term ? ('starts with \u201C' + c.term.charAt(0) + '\u201D \u00B7 ' + c.term.length + ' letters') : 'say it in your own words first, then flip';
+    });
+  } else if(SLM === 'challenge'){
+    var rev = [];
+    S.cards.forEach(function(c){
+      if(c.term && /^What is /.test(c.q)) rev.push({ q: c.a, a: c.term, term: c.term, rev: true });
+    });
+    S.cards = S.cards.concat(rev.slice(0, 6));
+  }
+}
+
+/* ---------- spaced review queue (localStorage, missed questions only) ---------- */
+var SRQ_KEY = 'studylens.srq.v1';
+var SRQ_GAPS = [0, 24 * 60 * 60 * 1000, 3 * 24 * 60 * 60 * 1000, 7 * 24 * 60 * 60 * 1000];
+var SRQ_GAP_LABEL = ['right away', 'tomorrow', 'in 3 days', 'in 7 days'];
+function srqLoad(){ try{ var p = JSON.parse(localStorage.getItem(SRQ_KEY) || '[]'); return Array.isArray(p) ? p : []; }catch(e){ return []; } }
+function srqSave(items){ try{ localStorage.setItem(SRQ_KEY, JSON.stringify(items.slice(0, 200))); }catch(e){} slRenderSrqLine(); }
+function srqAdd(q, a, term){
+  q = String(q || '').trim(); a = String(a || '').trim();
+  if(!q || !a) return;
+  var items = srqLoad(), id = q + '\u0001' + a, found = false;
+  items.forEach(function(x){ if(x.id === id){ x.stage = 0; x.due = Date.now(); found = true; } });
+  if(!found) items.push({ id: id, q: q, a: a, term: term || '', stage: 0, due: Date.now() });
+  srqSave(items);
+}
+function srqDueCount(){ var now = Date.now(); return srqLoad().filter(function(x){ return x.due <= now; }).length; }
+window.srqDueCount = srqDueCount;
+function slQueueMiss(o){ if(o) srqAdd(o.q, o.a, o.term); }
+window.slQueueMiss = slQueueMiss;
+function slRenderSrqLine(){
+  var el = $('srqDueLine'); if(!el) return;
+  var n = srqDueCount();
+  el.innerHTML = n
+    ? '<strong>' + n + ' question' + (n === 1 ? '' : 's') + ' due for review</strong> — spaced practice from what you missed, kept on this device. <button class="btn ghost small" id="srqGoBtn">Review now</button>'
+    : 'Spaced review: nothing due right now. Miss a question anywhere and it is kept here, on this device only, and resurfaces at growing gaps.';
+  var b = $('srqGoBtn'); if(b) b.addEventListener('click', slStartSrqReview);
+}
+var SRQ_SESSION = null;
+function slStartSrqReview(){
+  var due = srqLoad().filter(function(x){ return x.due <= Date.now(); });
+  var card = $('srqCard'); if(!card) return;
+  card.hidden = false;
+  if(!due.length){ $('srqBody').innerHTML = '<p class="mut">Nothing is due right now — you are all caught up.</p>'; return; }
+  SRQ_SESSION = { queue: due.slice(), pos: 0, revealed: false, knew: 0, learning: 0 };
+  slRenderSrqItem();
+  card.scrollIntoView({ block: 'start' });
+}
+function slRenderSrqItem(){
+  var body = $('srqBody'); if(!body || !SRQ_SESSION) return;
+  if(SRQ_SESSION.pos >= SRQ_SESSION.queue.length){
+    body.innerHTML = '<div class="ss-feed good">Review done — ' + SRQ_SESSION.knew + ' known, ' + SRQ_SESSION.learning + ' still learning. The ones you knew moved to a longer gap; the rest come back sooner.</div>';
+    SRQ_SESSION = null;
+    slRenderSrqLine();
+    return;
+  }
+  var it = SRQ_SESSION.queue[SRQ_SESSION.pos];
+  body.innerHTML =
+    '<div class="srq-stage"><p class="small" style="margin:0 0 6px">Review ' + (SRQ_SESSION.pos + 1) + ' of ' + SRQ_SESSION.queue.length + (it.term ? ' \u00B7 ' + esc(it.term) : '') + '</p>' +
+    '<div class="ss-q">' + esc(it.q) + '</div>' +
+    (SRQ_SESSION.revealed
+      ? '<div class="sl-teach" style="margin-top:10px">' + esc(it.a) + '</div><div class="row"><button class="btn" id="srqKnewBtn">I knew it</button><button class="btn ghost" id="srqLearnBtn">Still learning</button></div>'
+      : '<div class="row"><button class="btn" id="srqRevealBtn">Reveal the answer</button></div>') +
+    '</div>';
+  var rv = $('srqRevealBtn'); if(rv) rv.addEventListener('click', function(){ SRQ_SESSION.revealed = true; slRenderSrqItem(); });
+  var kn = $('srqKnewBtn'); if(kn) kn.addEventListener('click', function(){ slSrqGrade(true); });
+  var ln = $('srqLearnBtn'); if(ln) ln.addEventListener('click', function(){ slSrqGrade(false); });
+}
+function slSrqGrade(knew){
+  if(!SRQ_SESSION) return;
+  var it = SRQ_SESSION.queue[SRQ_SESSION.pos];
+  var items = srqLoad();
+  items.forEach(function(x){
+    if(x.id !== it.id) return;
+    if(knew){
+      x.stage = Math.min(SRQ_GAPS.length - 1, (x.stage || 0) + 1);
+      x.due = Date.now() + SRQ_GAPS[x.stage];
+    } else {
+      x.stage = 0;
+      x.due = Date.now();
+    }
+  });
+  srqSave(items);
+  if(knew) SRQ_SESSION.knew += 1;
+  else { SRQ_SESSION.learning += 1; SRQ_SESSION.queue.push(it); }
+  SRQ_SESSION.pos += 1;
+  SRQ_SESSION.revealed = false;
+  slRenderSrqItem();
+}
+/* miss hooks: flashcards graded Again, Simple Study round misses */
+function slSrqFromCard(card, g){ if(g === 'again' && card) srqAdd(card.q, card.a, card.term); }
+function slFrontBack(q, kind){
+  if(!q) return null;
+  if(kind === 'wordbank') return { q: (q.before || '') + '_____ ' + (q.after || ''), a: String(q.answer || '') + (q.sentence ? ' \u2014 ' + q.sentence : ''), term: q.answer || '' };
+  if(kind === 'tf') return { q: 'True or false: ' + (q.statement || ''), a: (q.isTrue ? 'True' : 'False') + (q.correct ? ' \u2014 ' + q.correct : ''), term: q.term || '' };
+  if(kind === 'matching') return { q: 'What does \u201C' + (q.term || '') + '\u201D mean in your material?', a: q.target || '', term: q.term || '' };
+  return { q: q.q || '', a: q.answer || '', term: q.term || '' };
+}
+function slAfterRound(){
+  (SS.missed || []).forEach(function(q){ var fb = slFrontBack(q, SS.mode); if(fb) srqAdd(fb.q, fb.a, fb.term); });
+  if(SLM === 'guided') slFeynman();
+}
+
+/* ---------- Guided: teach-first + Feynman finish ---------- */
+function slGuidedTeach(){
+  var stage = $('ssStage'); if(!stage || !stage.parentNode) return;
+  if(stage.parentNode.querySelector('.sl-teach')) return;
+  var q = SS.qs[SS.idx]; if(!q) return;
+  var txt = '';
+  if(SS.mode === 'mc'){
+    /* Socratic rule: the teach step points at the thinking, but never
+       blurts the answer — the term itself is blanked out of the source
+       sentence, same as the word-bank hint. */
+    var ex = q.explain || '';
+    if(ex && q.answer){ try{ ex = ex.replace(termRegex(q.answer), '$1_____'); }catch(e){} }
+    txt = ex ? ('Worked thinking, from your material: ' + ex) : '';
+  }
+  else if(SS.mode === 'tf') txt = 'Before you answer: say the true version of this statement out loud in your head \u2014 which term does the idea belong to?';
+  else if(SS.mode === 'wordbank'){
+    var d = (typeof ssDefFor === 'function') ? ssDefFor(q.answer) : null;
+    txt = d ? ('Hint from your material: \u201C' + d.sentence.replace(termRegex(q.answer), '$1_____') + '\u201D') : ('The missing word starts with \u201C' + String(q.answer || '').charAt(0) + '\u201D.');
+  }
+  else if(SS.mode === 'matching') txt = 'Guided: for each term, first recall what it means in your material \u2014 then find its match.';
+  if(!txt) return;
+  var div = document.createElement('div');
+  div.className = 'sl-teach';
+  div.setAttribute('data-teach', '1');
+  div.innerHTML = '<strong>Guided \u2014 think it through first:</strong> ' + esc(txt);
+  stage.parentNode.insertBefore(div, stage);
+}
+function slFeynman(){
+  var play = $('ssPlay'); if(!play || $('slFeynman')) return;
+  var d = document.createElement('div');
+  d.id = 'slFeynman';
+  d.className = 'sl-teach';
+  d.setAttribute('data-feynman', '1');
+  d.style.marginTop = '14px';
+  d.innerHTML = '<strong>Guided finish \u2014 explain it back (the Feynman step):</strong> pick the idea you found hardest and explain it in your own words, as if teaching a friend.' +
+    '<textarea id="slFeynmanText" placeholder="Type your explanation\u2026" style="margin-top:8px"></textarea>' +
+    '<div class="row"><button class="btn ghost small" id="slFeynmanBtn">Check my explanation</button></div>' +
+    '<div id="slFeynmanOut" style="margin-top:8px"></div>';
+  play.appendChild(d);
+  $('slFeynmanBtn').addEventListener('click', function(){
+    var t = ' ' + ($('slFeynmanText').value || '').toLowerCase() + ' ';
+    var hits = [], gaps = [];
+    (S.terms || []).slice(0, 12).forEach(function(term){ (t.indexOf(term.toLowerCase()) >= 0 ? hits : gaps).push(term); });
+    $('slFeynmanOut').innerHTML = 'You used <strong>' + hits.length + '</strong> key term' + (hits.length === 1 ? '' : 's') + (hits.length ? ' (' + esc(hits.join(', ')) + ')' : '') + '. ' +
+      (gaps.length
+        ? 'Ideas from your material you didn\u2019t mention yet: <strong>' + esc(gaps.slice(0, 5).join(', ')) + '</strong> \u2014 try weaving one or two of those in. Explaining how ideas connect is where the learning happens.'
+        : 'You covered every key term \u2014 that is a complete explanation.');
+  });
+}
+
+/* ---------- Exam Prep: timed interleaved Simple Study round ---------- */
+function slStartExam(){
+  if(!S.terms.length || !S.sentences.length){
+    var p0 = $('ssPlay');
+    p0.hidden = false;
+    p0.innerHTML = ssChrome('Exam Prep needs material first', '') + '<div class="ss-feed info">Build a study pack first (paste material and tap \u201CGenerate study pack\u201D, or use Simple Study intake) \u2014 then the exam round deals timed, mixed questions from it.</div>';
+    ssBindQuit();
+    return;
+  }
+  var byKind = { mc: ssBuildMC(), tf: ssBuildTF(), wordbank: ssBuildWordBank() };
+  Object.keys(byKind).forEach(function(k){ byKind[k].forEach(function(q){ q.kind = k; }); });
+  var qs = [], added = true;
+  while(qs.length < 10 && added){
+    added = false;
+    ['mc', 'tf', 'wordbank'].forEach(function(k){
+      if(byKind[k].length && qs.length < 10){ qs.push(byKind[k].shift()); added = true; }
+    });
+  }
+  if(!qs.length){
+    var p1 = $('ssPlay');
+    p1.hidden = false;
+    p1.innerHTML = ssChrome('Not enough material for an exam round yet', '') + '<div class="ss-feed info">This material does not make enough questions yet. Add a bit more, or practice in another mode.</div>';
+    ssBindQuit();
+    return;
+  }
+  SS.exam = true;
+  SS.examTotal = qs.length;
+  SS.qs = qs; SS.idx = 0; SS.score = 0; SS.answered = false; SS.picked = null;
+  SS.matchSel = null; SS.matchDone = 0; SS.matchMiss = 0; SS.missed = [];
+  SS.mode = qs[0].kind;
+  SS.examLeft = qs.length * 45;
+  $('ssPicker').hidden = true;
+  $('ssEmpty').hidden = true;
+  $('ssConfirm').hidden = true;
+  $('ssFixResult').hidden = true;
+  $('ssPlay').hidden = false;
+  slExamStartTimer();
+  ssRenderQ();
+  $('simpleCard').scrollIntoView({ block: 'start' });
+}
+window.slStartExam = slStartExam;
+function slExamStartTimer(){ slExamStop(); SS.examTimer = setInterval(function(){ slExamTick(false); }, 1000); }
+function slExamStop(){ if(typeof SS !== 'undefined' && SS.examTimer){ clearInterval(SS.examTimer); SS.examTimer = null; } }
+function slExamTick(renderOnly){
+  if(!SS.exam){ slExamStop(); return; }
+  var c = $('ssExamClock');
+  if(c) c.textContent = '\u23F1 ' + Math.floor(Math.max(0, SS.examLeft) / 60) + ':' + ('0' + (Math.max(0, SS.examLeft) % 60)).slice(-2);
+  if(renderOnly) return;
+  SS.examLeft -= 1;
+  if(SS.examLeft < 0){ slExamStop(); if(!$('ssPlay').hidden) ssResults(); }
+}
+function slExamResults(){
+  slExamStop();
+  var total = SS.examTotal || SS.qs.length;
+  var score = SS.score;
+  var secsUsed = Math.max(0, total * 45 - (SS.examLeft || 0));
+  SS.exam = false;
+  var weak = [];
+  (SS.missed || []).forEach(function(q){
+    var fb = slFrontBack(q, q.kind || SS.mode);
+    if(fb){
+      srqAdd(fb.q, fb.a, fb.term);
+      var t = fb.term || q.term || '';
+      if(t && weak.indexOf(t) === -1) weak.push(t);
+    }
+  });
+  var pct = total ? Math.round(score / total * 100) : 0;
+  var play = $('ssPlay');
+  play.innerHTML =
+    '<p class="ss-instr">Exam Prep \u2014 time!</p>' +
+    '<div class="ss-score">' + score + ' of ' + total + ' correct (' + pct + '%)</div>' +
+    '<p class="mut">Finished in ' + Math.floor(secsUsed / 60) + ':' + ('0' + (secsUsed % 60)).slice(-2) + '. Mixed questions, one clock \u2014 that interleaving is what exam day feels like.</p>' +
+    '<div data-weakspots="1"><h3 style="font-size:16px;margin:12px 0 6px">Your weak spots</h3>' +
+    (weak.length
+      ? '<ul class="list">' + weak.map(function(w){ return '<li><strong>' + esc(w) + '</strong></li>'; }).join('') + '</ul><p class="small">These also went into your spaced review queue on this device.</p>'
+      : '<p class="mut">No weak spots this round \u2014 nothing was missed.</p>') +
+    '</div>' +
+    '<div class="row"><button class="btn" id="ssExamRetryBtn">Retake exam</button>' +
+    (weak.length ? '<button class="btn ghost" id="ssExamWeakBtn">Practice weak spots</button>' : '') +
+    '<button class="btn ghost" id="ssExamModesBtn">All modes</button></div>';
+  $('ssExamRetryBtn').addEventListener('click', slStartExam);
+  var wb = $('ssExamWeakBtn');
+  if(wb) wb.addEventListener('click', function(){
+    SS.filter = weak.slice();
+    SS.mode = null;
+    play.hidden = true;
+    ssRefresh();
+    $('simpleCard').scrollIntoView({ block: 'start' });
+  });
+  $('ssExamModesBtn').addEventListener('click', function(){
+    SS.mode = null;
+    play.hidden = true;
+    ssRefresh();
+    $('simpleCard').scrollIntoView({ block: 'start' });
+  });
+  bumpStreak();
+}
+</script>
+
+<script>
+'use strict';
+/* ================= v2.22.0 — intake routing =================
+   StudyLens now spots WHAT KIND of material was pasted and routes it to
+   the mode that teaches it best, Lab-Snapshot-style: a banner names the
+   spot, with a "Wrong type? Change" escape. Honest by design: a read
+   that is not clearly one kind asks the learner instead of guessing. */
+var SL_TYPES = {
+  lecture:    { label: 'Lecture notes / transcript', mode: 'simple',    blurb: 'Routed to Simple mode \u2014 summaries and quick practice shine on lecture material.' },
+  textbook:   { label: 'Textbook chapter',           mode: 'guided',    blurb: 'Routed to Guided mode \u2014 textbook ideas land better taught step by step, with a teach-first pass and an explain-it-back check.' },
+  problemset: { label: 'Problem set',                mode: 'challenge', blurb: 'Routed to Challenge mode. StudyLens teaches the methods and drills the ideas \u2014 it will not work your actual problems for you; the subject packs below show the methods with fresh numbers.' },
+  essay:      { label: 'Essay draft',                mode: null,        blurb: 'This reads like your own writing. Your pack still builds below \u2014 and the Writing Coach on the Coach tab will give feedback on the draft itself.' },
+  labreport:  { label: 'Lab report draft',           mode: 'guided',    blurb: 'Routed to Guided mode \u2014 and the Lab tab holds the tools for the measurement side of lab work.' },
+  notes:      { label: 'Study notes',                mode: 'simple',    blurb: 'Routed to Simple mode.' }
+};
+function slHits(t, words){ var n = 0; words.forEach(function(w){ var i = 0; while((i = t.indexOf(w, i)) >= 0){ n++; i += w.length; } }); return n; }
+function slClassifyMaterial(text){
+  var t = ' ' + String(text || '').toLowerCase().replace(/\s+/g, ' ') + ' ';
+  var imperatives = (t.match(/\b(calculate|solve|determine|compute)\b/g) || []).length;
+  var scores = {
+    lecture: slHits(t, ['lecture', 'professor', 'today we', 'last class', 'next class', 'slide', 'as i said', 'transcript', 'welcome back', 'office hours']),
+    textbook: slHits(t, ['chapter', 'learning objectives', 'key terms', 'review questions', 'in this chapter', 'textbook', 'figure ', 'table ']),
+    problemset: slHits(t, ['show your work', 'problem set', 'homework', 'find the', 'solve for', 'exercise ']) + imperatives,
+    essay: slHits(t, ['however', 'therefore', 'in conclusion', 'furthermore', 'on the other hand', 'this essay', 'argue', 'paragraph', 'i believe']),
+    labreport: slHits(t, ['hypothesis', 'procedure', 'materials and methods', 'results', 'discussion', 'experiment', 'observation', 'data table', 'we measured', 'trial'])
+  };
+  var order = Object.keys(scores).sort(function(a, b){ return scores[b] - scores[a]; });
+  var top = order[0], second = order[1];
+  var confident = scores[top] >= 3 && scores[top] > scores[second];
+  return { type: confident ? top : 'notes', confident: confident, scores: scores, top: scores[top], second: scores[second] };
+}
+window.slClassifyMaterial = slClassifyMaterial;
+function slRouteChooserHTML(){
+  return '<div class="ss-feed info"><strong>What kind of material is this?</strong> Picking right helps StudyLens teach it the best way:<div class="row" style="margin-top:8px">' +
+    Object.keys(SL_TYPES).map(function(k){ return '<button class="btn ghost small sl-route-btn" data-sltype="' + k + '">' + SL_TYPES[k].label + '</button>'; }).join('') +
+    '</div></div>';
+}
+function slBindRouteButtons(box){
+  box.querySelectorAll('.sl-route-btn').forEach(function(b){
+    b.addEventListener('click', function(){ slApplyRoute(b.getAttribute('data-sltype'), true); });
+  });
+}
+function slApplyRoute(type, rebuild){
+  var info = SL_TYPES[type]; if(!info) return;
+  if(info.mode) slSetMode(info.mode, false, { rebuild: rebuild });
+  var box = $('slRoute');
+  if(box){
+    box.hidden = false;
+    box.innerHTML = '<div class="ss-feed info"><strong>Iris spotted: ' + info.label + '.</strong> ' + info.blurb + ' <button class="btn plain small" id="slRouteChangeBtn">Wrong type? Change</button></div>';
+    $('slRouteChangeBtn').addEventListener('click', function(){ box.innerHTML = slRouteChooserHTML(); slBindRouteButtons(box); });
+  }
+  if(rebuild && typeof S !== 'undefined' && S.terms && S.terms.length && typeof buildCards === 'function') buildCards();
+}
+function slIntakeRoute(text){
+  var box = $('slRoute'); if(!box) return;
+  var r = slClassifyMaterial(text);
+  if(r.confident){
+    slApplyRoute(r.type, false);
+  } else {
+    /* not clearly one kind \u2014 ask, don't guess-launch */
+    box.hidden = false;
+    box.innerHTML = slRouteChooserHTML();
+    slBindRouteButtons(box);
+  }
+}
+</script>
+
+<script>
+'use strict';
+/* ================= v2.22.0 — subject knowledge packs =================
+   Compact on-device reference packs for core college subjects. USE RULE
+   (hard): packs power explanations and ANALOGOUS examples only. They
+   never answer a learner's actual assignment question with the
+   assignment's own numbers — a request that carries the learner's own
+   problem numbers is steered to a fresh-numbered example of the same
+   method instead. Every fact below is standard textbook level; each
+   pack carries its sources. */
+function slR(a, b){ return a + Math.floor(Math.random() * (b - a + 1)); }
+function slPick(arr){ return arr[Math.floor(Math.random() * arr.length)]; }
+function slRound(x, d){ var f = Math.pow(10, d); return Math.round(x * f) / f; }
+var SL_PACKS = {
+  bioeco: {
+    title: 'Biology & Ecology',
+    sources: 'Sources: Campbell Biology (Urry et al.); Begon, Townsend & Harper, Ecology; OpenStax Biology 2e.',
+    concepts: [
+      { term: 'Photosynthesis', explain: 'The process by which plants, algae and some bacteria convert light energy into chemical energy, building glucose from carbon dioxide and water and releasing oxygen: 6CO\u2082 + 6H\u2082O \u2192 C\u2086H\u2081\u2082O\u2086 + 6O\u2082.' },
+      { term: 'Cellular respiration', explain: 'The release of energy stored in glucose to make ATP. Aerobic respiration uses oxygen and yields far more ATP per glucose than fermentation, which runs without oxygen.' },
+      { term: 'Exponential growth', explain: 'Population growth at a constant per-capita rate, dN/dt = rN \u2014 a J-shaped curve. It can only last while resources are effectively unlimited.' },
+      { term: 'Logistic growth', explain: 'Growth that slows as the population approaches carrying capacity: dN/dt = rN(1 \u2212 N/K). Produces the S-shaped curve seen in real populations.' },
+      { term: 'Carrying capacity', explain: 'K \u2014 the maximum population size an environment can support over the long term, set by limiting resources such as food, water, space and nesting sites.' },
+      { term: 'Survivorship curves', explain: 'Type I: most individuals survive to old age, then die quickly (humans, large mammals). Type II: a roughly constant chance of death at every age (many birds). Type III: most die young, few survive (oysters, fish, plants).' },
+      { term: 'The 10% law', explain: 'Only about 10% of the energy at one trophic level becomes biomass at the next. The rest is lost to heat, movement, waste and uneaten parts \u2014 which is why food chains are short.' },
+      { term: 'Hardy\u2013Weinberg equilibrium', explain: 'Allele and genotype frequencies stay constant generation after generation when there is no selection, mutation or migration, mating is random, and the population is large: p + q = 1 and p\u00B2 + 2pq + q\u00B2 = 1.' }
+    ],
+    formulas: [
+      { name: 'Percent change', form: '(new \u2212 old) \u00F7 old \u00D7 100', note: 'Sign matters: positive is growth, negative is decline.' },
+      { name: 'Per-capita growth rate', form: 'r = (\u0394N \u00F7 N) \u00F7 \u0394t', note: 'Change in numbers, per individual, per unit time.' },
+      { name: 'Hardy\u2013Weinberg', form: 'p + q = 1 \u00B7 p\u00B2 + 2pq + q\u00B2 = 1', note: 'p = dominant allele frequency, q = recessive; q\u00B2 is the recessive-phenotype frequency.' }
+    ],
+    gens: [
+      function(){
+        var n0 = slR(120, 900), n1 = Math.max(20, Math.round(n0 * slPick([0.6, 0.75, 0.85, 1.25, 1.4, 1.8])));
+        if(n1 === n0) n1 += 10;
+        var ans = slRound((n1 - n0) / n0 * 100, 1);
+        return { prompt: 'A meadow population of rabbits was counted at ' + n0 + ' last spring and ' + n1 + ' this spring. What is the percent change in the population? (Answer in %.)',
+                 answer: ans, unit: '%',
+                 work: 'Percent change = (new \u2212 old) \u00F7 old \u00D7 100 = (' + n1 + ' \u2212 ' + n0 + ') \u00F7 ' + n0 + ' \u00D7 100 = ' + ans + '%.' };
+      },
+      function(hard){
+        var q2 = slPick([0.04, 0.09, 0.16, 0.25, 0.36]);
+        var q = slRound(Math.sqrt(q2), 2), p = slRound(1 - q, 2);
+        if(hard){
+          var carriers = slRound(2 * p * q * 100, 1);
+          return { prompt: 'In a population in Hardy\u2013Weinberg equilibrium, ' + Math.round(q2 * 100) + '% of individuals show the recessive trait. What percentage of the population are carriers (heterozygotes, 2pq)? (Answer in %.)',
+                   answer: carriers, unit: '%',
+                   work: 'Recessive phenotype = q\u00B2 = ' + q2 + ', so q = \u221A' + q2 + ' = ' + q + ' and p = 1 \u2212 q = ' + p + '. Carriers = 2pq = 2 \u00D7 ' + p + ' \u00D7 ' + q + ' = ' + carriers + '%.' };
+        }
+        return { prompt: 'In a population in Hardy\u2013Weinberg equilibrium, ' + Math.round(q2 * 100) + '% of individuals show the recessive trait. What is q, the frequency of the recessive allele?',
+                 answer: q, unit: '',
+                 work: 'Recessive phenotype frequency = q\u00B2 = ' + q2 + '. Take the square root: q = \u221A' + q2 + ' = ' + q + '. (Then p = 1 \u2212 q = ' + p + '.)' };
+      }
+    ]
+  },
+  env: {
+    title: 'Environmental Science',
+    sources: 'Sources: Withgott & Laposata, Environment: The Science Behind the Stories; Miller & Spoolman, Living in the Environment; OpenStax Concepts of Biology (ecology chapters).',
+    concepts: [
+      { term: 'Eutrophication', explain: 'Excess nitrogen and phosphorus (fertiliser runoff, sewage) feed algal blooms; when the algae die and decompose, microbes consume dissolved oxygen and aquatic animals suffocate.' },
+      { term: 'Biomagnification', explain: 'Persistent, fat-soluble toxins (DDT, mercury, PCBs) become more concentrated at each higher trophic level, so top predators carry the heaviest load.' },
+      { term: 'Tragedy of the commons', explain: 'When a resource is shared and unregulated (a fishery, the atmosphere), each user gains by taking more while the cost is spread over everyone \u2014 so the resource is overused unless rules or ownership intervene.' },
+      { term: 'Ecological footprint', explain: 'The land and water area needed to supply a person or population with resources and absorb its wastes, compared against the biocapacity available.' },
+      { term: 'Point vs nonpoint pollution', explain: 'Point source: a single identifiable outlet, like a factory pipe. Nonpoint: diffuse runoff from farms, roads and lawns \u2014 harder to trace and regulate.' },
+      { term: 'LD50 and dose\u2013response', explain: 'LD50 is the dose that kills 50% of a test population. Dose\u2013response curves plot effect against dose; the threshold is the level below which no measurable effect appears.' },
+      { term: 'IPAT equation', explain: 'Impact = Population \u00D7 Affluence \u00D7 Technology. Environmental impact grows with how many people there are, how much each consumes, and how damaging the technology used is.' },
+      { term: 'Nitrogen fixation', explain: 'Converting inert atmospheric N\u2082 into reactive forms (ammonia, nitrates) plants can use \u2014 done naturally by certain bacteria (including in legume root nodules) and industrially by the Haber\u2013Bosch process.' }
+    ],
+    formulas: [
+      { name: 'Rule of 70 (doubling time)', form: 'doubling time \u2248 70 \u00F7 growth rate (%)', note: 'Works for populations, emissions, resource use \u2014 anything growing by a steady percent.' },
+      { name: 'Per-capita amount', form: 'total \u00F7 population', note: 'The fair way to compare countries or years of different sizes.' }
+    ],
+    gens: [
+      function(){
+        var rate = slPick([1.4, 2, 2.8, 3.5, 5, 7]);
+        var ans = slRound(70 / rate, 1);
+        return { prompt: 'A town\u2019s water use is growing at ' + rate + '% per year. Using the rule of 70, in about how many years will it double? (Answer in years.)',
+                 answer: ans, unit: 'years',
+                 work: 'Doubling time \u2248 70 \u00F7 rate = 70 \u00F7 ' + rate + ' = ' + ans + ' years.' };
+      },
+      function(){
+        var total = slR(240, 960), pop = slPick([8, 12, 16, 24, 32, 48]);
+        var ans = slRound(total / pop, 1);
+        return { prompt: 'A country emits ' + total + ' million tonnes of CO\u2082 in a year and has a population of ' + pop + ' million people. What are its per-capita emissions? (Answer in tonnes per person.)',
+                 answer: ans, unit: 't per person',
+                 work: 'Per-capita = total \u00F7 population = ' + total + ' million t \u00F7 ' + pop + ' million people = ' + ans + ' tonnes per person (the millions cancel).' };
+      }
+    ]
+  },
+  geo: {
+    title: 'Geology & Earth Science',
+    sources: 'Sources: Marshak, Earth: Portrait of a Planet; USGS educational materials (usgs.gov); OpenStax Astronomy/Earth science chapters.',
+    concepts: [
+      { term: 'Strike and dip', explain: 'Strike is the compass direction (azimuth) of the horizontal line across a tilted rock layer. Dip is how steeply the layer tilts from flat (0\u201390\u00B0), measured perpendicular to the strike, downhill. With the azimuth worksheet method, dip direction = strike + 90\u00B0.' },
+      { term: 'Plate boundaries', explain: 'Divergent: plates move apart \u2014 mid-ocean ridges, rift valleys, new crust. Convergent: plates collide \u2014 subduction zones, trenches, mountain belts, volcanic arcs. Transform: plates slide sideways \u2014 strike-slip faults like the San Andreas.' },
+      { term: 'The rock cycle', explain: 'Igneous rock (cooled magma/lava) weathers and erodes into sediment, which compacts and cements into sedimentary rock; heat and pressure turn any rock metamorphic; melting restarts the cycle.' },
+      { term: 'Half-life', explain: 'The time for half of a radioactive parent isotope in a sample to decay. After each half-life the amount remaining halves again: \u00BD, \u00BC, \u215B\u2026 \u2014 the basis of radiometric dating.' },
+      { term: 'Contour lines', explain: 'Lines joining points of equal elevation. Closely spaced lines mean steep ground; wide spacing means gentle slopes. Lines never cross, and they form V shapes pointing uphill where they cross valleys.' },
+      { term: 'P and S waves', explain: 'Earthquake waves: P (primary) waves are compressional and travel through solids and liquids; S (secondary) waves are shear, slower, and cannot pass through liquid \u2014 the S-wave shadow zone is evidence for Earth\u2019s liquid outer core.' },
+      { term: 'Uniformitarianism', explain: '\u201CThe present is the key to the past\u201D \u2014 the same slow processes seen today (erosion, deposition, uplift) explain the rock record, given enough time.' }
+    ],
+    formulas: [
+      { name: 'Gradient', form: 'relief \u00F7 horizontal distance', note: 'Relief = highest elevation \u2212 lowest elevation. Keep units consistent (m per km, or ft per mile).' },
+      { name: 'Radioactive remaining', form: 'start \u00D7 (1/2)^(elapsed \u00F7 half-life)', note: 'elapsed \u00F7 half-life = how many half-lives have passed.' },
+      { name: 'Dip direction', form: 'strike + 90\u00B0 (wrap at 360\u00B0)', note: 'Azimuth method: dip direction is always 90\u00B0 clockwise from strike.' }
+    ],
+    gens: [
+      function(){
+        var relief = slR(120, 900), dist = slR(2, 12);
+        var ans = slRound(relief / dist, 1);
+        return { prompt: 'On a topographic map, the relief between a summit and a trailhead is ' + relief + ' m over a horizontal distance of ' + dist + ' km. What is the gradient? (Answer in m per km.)',
+                 answer: ans, unit: 'm/km',
+                 work: 'Gradient = relief \u00F7 distance = ' + relief + ' m \u00F7 ' + dist + ' km = ' + ans + ' m/km.' };
+      },
+      function(){
+        var start = slPick([80, 160, 200, 400]), hl = slPick([5, 10, 20]), n = slR(2, 4);
+        var ans = start / Math.pow(2, n);
+        return { prompt: 'A rock sample starts with ' + start + ' g of a radioactive parent isotope with a half-life of ' + hl + ' million years. How much parent isotope remains after ' + (hl * n) + ' million years? (Answer in grams.)',
+                 answer: ans, unit: 'g',
+                 work: (hl * n) + ' \u00F7 ' + hl + ' = ' + n + ' half-lives pass. Remaining = ' + start + ' \u00D7 (1/2)^' + n + ' = ' + start + ' \u00F7 ' + Math.pow(2, n) + ' = ' + ans + ' g.' };
+      }
+    ]
+  },
+  chem: {
+    title: 'Chemistry Basics',
+    sources: 'Sources: Tro, Introductory Chemistry; Brown et al., Chemistry: The Central Science; OpenStax Chemistry 2e.',
+    concepts: [
+      { term: 'The mole', explain: 'A counting unit: 1 mole = 6.022 \u00D7 10\u00B2\u00B3 particles (Avogadro\u2019s number). The molar mass in grams per mole is read straight off the periodic table for an element.' },
+      { term: 'Molarity', explain: 'Concentration in moles of solute per litre of solution, M = n \u00F7 V. It is the bridge between a measured volume and an amount of substance.' },
+      { term: 'Dilution', explain: 'Adding solvent spreads the same moles of solute through a bigger volume, so concentration falls but moles stay fixed: M\u2081V\u2081 = M\u2082V\u2082.' },
+      { term: 'pH scale', explain: 'pH = \u2212log\u2081\u2080[H\u207A]. Below 7 is acidic, 7 is neutral, above 7 is basic (alkaline). Each pH unit is a tenfold change in hydrogen-ion concentration.' },
+      { term: 'Limiting reactant', explain: 'The reactant that runs out first in a reaction; it caps how much product can form, no matter how much of the other reactants is left over.' },
+      { term: 'Balancing equations', explain: 'Coefficients are adjusted so every element has the same number of atoms on both sides \u2014 atoms are conserved, never created or destroyed in a reaction. Subscripts are never changed when balancing.' }
+    ],
+    formulas: [
+      { name: 'Molarity', form: 'M = n \u00F7 V (mol \u00F7 litres)', note: 'Convert mL to L first: divide by 1000.' },
+      { name: 'Amount from mass', form: 'n = mass \u00F7 molar mass', note: 'Mass in grams, molar mass in g/mol, n in moles.' },
+      { name: 'Dilution', form: 'M\u2081V\u2081 = M\u2082V\u2082', note: 'Volumes can both stay in mL \u2014 they cancel.' }
+    ],
+    gens: [
+      function(hard){
+        if(hard){
+          var mw = slPick([40, 58.5, 98, 180]), mass = slPick([4.9, 9.8, 11.7, 20, 29.25, 36]);
+          var ml = slPick([250, 500, 1000]);
+          var n = mass / mw, ans = slRound(n / (ml / 1000), 3);
+          return { prompt: 'A student dissolves ' + mass + ' g of a compound with molar mass ' + mw + ' g/mol and makes the solution up to ' + ml + ' mL. What is the molarity? (Answer in mol/L.)',
+                   answer: ans, unit: 'mol/L',
+                   work: 'Step 1: moles n = mass \u00F7 molar mass = ' + mass + ' \u00F7 ' + mw + ' = ' + slRound(n, 4) + ' mol. Step 2: M = n \u00F7 V = ' + slRound(n, 4) + ' \u00F7 ' + (ml / 1000) + ' L = ' + ans + ' mol/L.' };
+        }
+        var n2 = slPick([0.25, 0.5, 0.75, 1.2, 2]), ml2 = slPick([250, 500, 750, 2000]);
+        var ans2 = slRound(n2 / (ml2 / 1000), 3);
+        return { prompt: 'A solution is made by dissolving ' + n2 + ' mol of solute and making the volume up to ' + ml2 + ' mL. What is the molarity? (Answer in mol/L.)',
+                 answer: ans2, unit: 'mol/L',
+                 work: 'Convert volume: ' + ml2 + ' mL = ' + (ml2 / 1000) + ' L. M = n \u00F7 V = ' + n2 + ' \u00F7 ' + (ml2 / 1000) + ' = ' + ans2 + ' mol/L.' };
+      },
+      function(){
+        var m1 = slPick([2, 3, 6, 12]), v1 = slPick([10, 25, 50]), v2 = slPick([100, 250, 500]);
+        var ans = slRound(m1 * v1 / v2, 3);
+        return { prompt: 'A ' + m1 + ' M stock solution is diluted: ' + v1 + ' mL of it is made up to ' + v2 + ' mL with water. What is the new concentration? (Answer in mol/L.)',
+                 answer: ans, unit: 'mol/L',
+                 work: 'Moles of solute do not change: M\u2081V\u2081 = M\u2082V\u2082, so M\u2082 = ' + m1 + ' \u00D7 ' + v1 + ' \u00F7 ' + v2 + ' = ' + ans + ' mol/L.' };
+      }
+    ]
+  },
+  stats: {
+    title: 'Intro Statistics',
+    sources: 'Sources: OpenStax Introductory Statistics (Illowsky & Dean).',
+    concepts: [
+      { term: 'Mean, median, mode', explain: 'Mean: the values added up and divided by how many there are. Median: the middle value when ordered (robust to outliers). Mode: the most frequent value. A few extreme values drag the mean but barely move the median.' },
+      { term: 'Standard deviation', explain: 'A typical distance between values and their mean. Small SD = values cluster tightly; large SD = spread out. About 68% of normal data falls within 1 SD of the mean, 95% within 2, 99.7% within 3.' },
+      { term: 'z-score', explain: 'How many standard deviations a value sits above or below the mean: z = (x \u2212 \u03BC) \u00F7 \u03C3. Positive is above the mean, negative below. z-scores let you compare values measured on different scales.' },
+      { term: 'Correlation is not causation', explain: 'Two variables moving together does not prove one causes the other \u2014 a lurking variable may drive both, or it may be coincidence. Only a controlled experiment can support a causal claim.' },
+      { term: 'The p-value', explain: 'The probability of seeing data at least as extreme as yours IF the null hypothesis were true. A small p-value means the data would be surprising under the null \u2014 it is not the probability that the null is true or false.' },
+      { term: 'Random sampling and bias', explain: 'A random sample gives every member of the population an equal chance of selection, which is what makes results generalisable. Convenience samples and voluntary responses are biased toward whoever is easiest to reach or most motivated.' }
+    ],
+    formulas: [
+      { name: 'Mean', form: 'mean = \u03A3x \u00F7 n', note: 'Add every value, divide by the count.' },
+      { name: 'z-score', form: 'z = (x \u2212 \u03BC) \u00F7 \u03C3', note: '\u03BC = population mean, \u03C3 = population standard deviation.' }
+    ],
+    gens: [
+      function(){
+        var xs = [slR(3, 30), slR(3, 30), slR(3, 30), slR(3, 30), slR(3, 30)];
+        var sum = xs.reduce(function(a, b){ return a + b; }, 0);
+        var ans = slRound(sum / xs.length, 2);
+        return { prompt: 'Find the mean of these five values: ' + xs.join(', ') + '.',
+                 answer: ans, unit: '',
+                 work: 'Mean = sum \u00F7 count = (' + xs.join(' + ') + ') \u00F7 5 = ' + sum + ' \u00F7 5 = ' + ans + '.' };
+      },
+      function(){
+        var mu = slPick([60, 70, 80, 100]), sd = slPick([5, 8, 10, 12]);
+        var k = slPick([-2, -1.5, -0.5, 0.5, 1, 1.5, 2, 2.5]);
+        var x = mu + k * sd;
+        return { prompt: 'Exam scores have mean \u03BC = ' + mu + ' and standard deviation \u03C3 = ' + sd + '. A student scores x = ' + x + '. What is the student\u2019s z-score?',
+                 answer: slRound(k, 2), unit: '',
+                 work: 'z = (x \u2212 \u03BC) \u00F7 \u03C3 = (' + x + ' \u2212 ' + mu + ') \u00F7 ' + sd + ' = ' + slRound(k, 2) + ' \u2014 the score sits ' + Math.abs(k) + ' standard deviation' + (Math.abs(k) === 1 ? '' : 's') + (k >= 0 ? ' above' : ' below') + ' the mean.' };
+      }
+    ]
+  },
+  anthro: {
+    title: 'Anthropology',
+    sources: 'Sources: Kottak, Window on Humanity; Crapo, Cultural Anthropology; OpenStax Introduction to Anthropology (2022).',
+    concepts: [
+      { term: 'The four subfields', explain: 'Cultural anthropology (living cultures), biological/physical anthropology (human evolution, primates, adaptation), archaeology (past cultures through material remains), and linguistic anthropology (language and communication). Anthropology\u2019s hallmark is holism \u2014 studying humans whole.' },
+      { term: 'Ethnography and participant observation', explain: 'Ethnography is the written account of a culture, built mainly through participant observation: living with people and joining daily life while systematically recording it.' },
+      { term: 'Cultural relativism', explain: 'Understanding a practice in its own cultural context rather than judging it by your own culture\u2019s standards. Its opposite error is ethnocentrism \u2014 treating your own way of life as the natural standard.' },
+      { term: 'Enculturation', explain: 'The process by which a person learns their culture \u2014 language, norms, skills, values \u2014 through growing up in it.' },
+      { term: 'Relative vs absolute dating', explain: 'Relative dating places things in order (older/younger, e.g. stratigraphy \u2014 deeper layers are older). Absolute (chronometric) dating gives a numerical age range, e.g. radiocarbon dating for once-living material.' },
+      { term: 'Human adaptations', explain: 'Lactase persistence \u2014 adults digesting milk \u2014 spread in populations with a dairying history. The sickle-cell trait persists where malaria is common because one copy protects against malaria, a balanced polymorphism.' }
+    ],
+    formulas: [
+      { name: 'Stratigraphy rule', form: 'deeper layer = older (unless disturbed)', note: 'The law of superposition \u2014 the backbone of relative dating in archaeology.' }
+    ],
+    gens: [
+      function(){
+        var bank = [
+          { s: 'A researcher lives in a village for a year, joining daily work and rituals to understand its kinship system from the inside.', a: 'Cultural anthropology', opts: ['Cultural anthropology', 'Archaeology', 'Linguistic anthropology', 'Biological anthropology'], w: 'Living with a present-day culture to study it is cultural anthropology, and the method is participant observation.' },
+          { s: 'A team excavates a 2,000-year-old settlement and catalogues its pottery, hearths and burials.', a: 'Archaeology', opts: ['Cultural anthropology', 'Archaeology', 'Linguistic anthropology', 'Biological anthropology'], w: 'Past cultures studied through their material remains \u2014 that is archaeology.' },
+          { s: 'A scientist compares the pelvis of an early hominin fossil with a modern human\u2019s to study the evolution of upright walking.', a: 'Biological anthropology', opts: ['Cultural anthropology', 'Archaeology', 'Linguistic anthropology', 'Biological anthropology'], w: 'Human evolution and fossils belong to biological (physical) anthropology.' },
+          { s: 'A scholar records how a community\u2019s dialect and slang are changing from one generation to the next.', a: 'Linguistic anthropology', opts: ['Cultural anthropology', 'Archaeology', 'Linguistic anthropology', 'Biological anthropology'], w: 'Language in its social and cultural context \u2014 linguistic anthropology.' }
+        ];
+        var it = slPick(bank);
+        return { prompt: 'Which subfield of anthropology is this? \u2014 ' + it.s, options: it.opts.slice(), answer: it.a, work: it.w };
+      },
+      function(){
+        var bank = [
+          { s: 'Joining daily routines, interviewing elders and recording life from inside a culture over many months is called\u2026', a: 'Participant observation', opts: ['Participant observation', 'Cultural relativism', 'Ethnocentrism', 'Stratigraphy'], w: 'Participant observation is anthropology\u2019s signature method: take part, observe, record.' },
+          { s: 'Judging another culture\u2019s food, dress and customs as \u201Cbackwards\u201D because they differ from your own is\u2026', a: 'Ethnocentrism', opts: ['Cultural relativism', 'Ethnocentrism', 'Enculturation', 'Holism'], w: 'Ethnocentrism = evaluating other cultures by your own culture\u2019s standards. Cultural relativism is the corrective.' },
+          { s: 'In an undisturbed dig, a pot found in a deeper layer than a bronze tool is most likely\u2026', a: 'Older than the tool', opts: ['Older than the tool', 'Newer than the tool', 'Exactly the same age', 'Impossible to compare'], w: 'Law of superposition: in undisturbed deposits, deeper layers were laid down earlier, so their contents are older.' }
+        ];
+        var it = slPick(bank);
+        return { prompt: it.s, options: it.opts.slice(), answer: it.a, work: it.w };
+      }
+    ]
+  },
+  writing: {
+    title: 'Academic Writing',
+    sources: 'Sources: Purdue Online Writing Lab (OWL); OpenStax Writing Guide; standard first-year composition handbooks.',
+    concepts: [
+      { term: 'Thesis statement', explain: 'One or two sentences stating your specific, arguable claim and the direction of your reasons. A strong thesis can be disagreed with and can be supported with evidence \u2014 a topic announcement (\u201CThis essay is about pollution\u201D) is not a thesis.' },
+      { term: 'Topic sentence', explain: 'The first sentence of a body paragraph: it states the paragraph\u2019s one point and ties it back to the thesis. Every sentence after it should support or explain that point.' },
+      { term: 'Paraphrase, summary, quotation', explain: 'Quotation: exact words, in quotation marks, cited. Paraphrase: someone\u2019s idea restated fully in your own words and structure, cited. Summary: the main points only, much shorter, cited. Changing a few words of the original is not paraphrasing \u2014 it is plagiarism with synonyms.' },
+      { term: 'Plagiarism and citation', explain: 'Using words or ideas that are not yours without credit. Cite quotations, paraphrases, summaries, data and distinctive ideas. Genuinely common knowledge (\u201Cwater boils at 100\u00B0C at sea level\u201D) does not need a citation.' },
+      { term: 'Revision vs editing', explain: 'Revision is big-picture: argument, structure, evidence, order \u2014 done first. Editing is sentence-level: clarity, grammar, typos \u2014 done last. Editing a draft you then restructure wastes the editing.' },
+      { term: 'Claim \u2013 evidence \u2013 warrant', explain: 'A claim states what you argue; evidence is the fact, quote or data behind it; the warrant explains HOW the evidence supports the claim. Most weak paragraphs have claim and evidence but no warrant.' }
+    ],
+    formulas: [
+      { name: 'Paragraph shape', form: 'topic sentence \u2192 evidence \u2192 warrant \u2192 link back to thesis', note: 'One point per paragraph; the link sentence is the one students most often skip.' }
+    ],
+    gens: [
+      function(){
+        var bank = [
+          { weak: 'Social media is a big topic that affects everyone in many ways today.', strong: 'School districts should start first period no earlier than 8:30, because adolescent sleep cycles shift later at puberty and early starts measurably cut both grades and attendance.', w: 'The stronger thesis makes a specific, arguable claim (start times should change) and previews its reasons (sleep cycles, grades, attendance). The weaker one only announces a topic.' },
+          { weak: 'Pollution is a bad problem and there are many causes of it in the world.', strong: 'Cities should fund curbside composting, because it cuts landfill methane while returning nutrients to local farms.', w: 'The stronger thesis takes a position a reader could dispute and names its two supporting reasons. The weaker one states something nobody argues with.' },
+          { weak: 'In this essay I will discuss the themes of the novel and talk about the characters.', strong: 'Through Gatsby\u2019s parties, Fitzgerald presents wealth as a performance that isolates the performer: the grander the display, the emptier the room feels.', w: 'The stronger thesis interprets rather than announces \u2014 it claims something about the text that evidence must then prove.' }
+        ];
+        var it = slPick(bank);
+        var opts = Math.random() < 0.5 ? [it.weak, it.strong] : [it.strong, it.weak];
+        return { prompt: 'Which of these is the stronger thesis statement?', options: opts, answer: it.strong, work: it.w };
+      },
+      function(){
+        var good = 'In her study, families who ate dinner together at least four nights a week reported stronger communication with their teenagers (Alvarez, 2021).';
+        var bank = [
+          { prompt: 'Original: \u201CFamilies that share evening meals on four or more nights each week tend to report better communication with their adolescent children.\u201D Which option is an ACCEPTABLE paraphrase?', options: ['Families that share evening meals four or more nights weekly tend to report better communication with their adolescent children (Alvarez, 2021).', good, 'Evening meals shared by families four or more nights a week tend to make communication with adolescents better.'], answer: good, work: 'A real paraphrase changes the wording AND the sentence structure, and still cites the source. Swapping in synonyms while keeping the original skeleton is plagiarism with synonyms \u2014 cited or not.' }
+        ];
+        var it = bank[0];
+        return { prompt: it.prompt, options: it.options.slice(), answer: it.answer, work: it.work };
+      }
+    ]
+  }
+};
+window.slPacks = SL_PACKS;
+/* Ask a pack: explanations + analogous examples only. A request carrying
+   the learner's own problem numbers is steered to a fresh example. */
+function slPackAsk(id, text){
+  var p = SL_PACKS[id]; if(!p) return null;
+  var raw = String(text || '');
+  var nums = raw.match(/\d+(?:\.\d+)?/g) || [];
+  var hw = /(homework|my problem|assignment|worksheet|quiz question|exam question)/i.test(raw) ||
+           (nums.length >= 2 && /\b(calculate|find|solve|work out|determine|compute)\b/i.test(raw));
+  if(hw) return { steer: true, gen: p.gens[0](false), text: 'Good instinct to ask \u2014 but packs teach with fresh numbers instead of your exact problem, so the method sticks and the work stays yours. Try this one; then yours will feel familiar:' };
+  var low = ' ' + raw.toLowerCase() + ' ';
+  var best = null, bs = 0;
+  p.concepts.forEach(function(c){
+    var s = 0;
+    if(low.indexOf(c.term.toLowerCase()) >= 0) s += 3;
+    c.term.toLowerCase().split(/[^a-z]+/).forEach(function(w){ if(w.length > 3 && low.indexOf(w) >= 0) s++; });
+    c.explain.toLowerCase().split(/[^a-z]+/).forEach(function(w){ if(w.length > 5 && low.indexOf(w) >= 0) s++; });
+    if(s > bs){ bs = s; best = c; }
+  });
+  if(best && bs >= 2) return { concept: best };
+  var f = null;
+  p.formulas.forEach(function(x){ if(raw.toLowerCase().indexOf(x.name.toLowerCase().split(' ')[0]) >= 0 && !f) f = x; });
+  if(f) return { formula: f };
+  return { gen: p.gens[0](false) };
+}
+window.slPackAsk = slPackAsk;
+/* pack panel */
+var SL_PACK_OPEN = null, SL_PACK_STATE = null;
+function slRenderPackBtns(){
+  var row = $('packBtns'); if(!row) return;
+  row.innerHTML = '';
+  Object.keys(SL_PACKS).forEach(function(id){
+    var b = document.createElement('button');
+    b.className = 'btn ghost small';
+    b.textContent = SL_PACKS[id].title;
+    b.setAttribute('data-pack', id);
+    b.addEventListener('click', function(){ slOpenPack(id); });
+    row.appendChild(b);
+  });
+}
+function slOpenPack(id){
+  var p = SL_PACKS[id]; if(!p) return;
+  SL_PACK_OPEN = id;
+  document.querySelectorAll('#packBtns [data-pack]').forEach(function(b){ b.classList.toggle('on', b.getAttribute('data-pack') === id); });
+  var body = $('packBody');
+  body.setAttribute('data-pack-open', id);
+  body.setAttribute('data-mode', SLM);
+  body.innerHTML =
+    '<h3 style="font-size:17px;margin:0 0 4px">' + esc(p.title) + '</h3>' +
+    '<p class="small">' + esc(p.sources) + '</p>' +
+    p.concepts.map(function(c){ return '<div class="pack-concept"><strong>' + esc(c.term) + '</strong> \u2014 ' + esc(c.explain) + '</div>'; }).join('') +
+    '<h3 style="font-size:15px;margin:12px 0 4px">Formulas &amp; rules</h3>' +
+    p.formulas.map(function(f){ return '<div class="pack-concept"><strong>' + esc(f.name) + ':</strong> ' + esc(f.form) + '<br><span class="small">' + esc(f.note) + '</span></div>'; }).join('') +
+    '<div class="pack-practice" id="packPractice"></div>';
+  slNewPackPractice(false);
+}
+function slNewPackPractice(fromAsk){
+  var p = SL_PACKS[SL_PACK_OPEN]; if(!p) return;
+  var area = $('packPractice'); if(!area) return;
+  var html = '<h3 style="font-size:15px;margin:0 0 6px">Practice \u2014 fresh numbers every time</h3>';
+  var gen;
+  if(SLM === 'guided'){
+    var ex = p.gens[0](false);
+    html += '<div class="sl-teach pack-worked" data-worked="1"><strong>Worked example (different numbers):</strong><br>' + esc(ex.prompt) + '<br><em>' + esc(ex.work) + '</em></div>';
+    gen = p.gens[slR(0, p.gens.length - 1)](false);
+  } else {
+    gen = p.gens[slR(0, p.gens.length - 1)](SLM === 'challenge');
+  }
+  SL_PACK_STATE = { gen: gen, attempted: false, timer: null, left: 90 };
+  html += '<p style="margin:6px 0">' + esc(gen.prompt) + '</p>';
+  if(gen.options){
+    html += gen.options.map(function(o, i){ return '<label style="display:block;margin:6px 0"><input type="radio" name="packOpt" value="' + esc(o).replace(/"/g, '&quot;') + '"> ' + esc(o) + '</label>'; }).join('');
+  } else {
+    html += '<input type="text" id="packAnsIn" inputmode="decimal" placeholder="Your answer' + (gen.unit ? ' (' + esc(gen.unit) + ')' : '') + '" style="max-width:220px">';
+  }
+  if(SLM === 'exam') html += ' <span class="pill" id="packClock">\u23F1 1:30</span>';
+  html += '<div class="row" style="margin-top:10px"><button class="btn" id="packCheckBtn">Check</button><button class="btn ghost small" id="packNewBtn">New example</button></div><div id="packFeed" style="margin-top:8px"></div>';
+  area.innerHTML = html;
+  $('packNewBtn').addEventListener('click', function(){ slNewPackPractice(false); });
+  $('packCheckBtn').addEventListener('click', slCheckPackPractice);
+  if(SLM === 'exam'){
+    SL_PACK_STATE.timer = setInterval(function(){
+      SL_PACK_STATE.left -= 1;
+      var c = $('packClock');
+      if(c) c.textContent = '\u23F1 ' + Math.floor(Math.max(0, SL_PACK_STATE.left) / 60) + ':' + ('0' + (Math.max(0, SL_PACK_STATE.left) % 60)).slice(-2);
+      if(SL_PACK_STATE.left <= 0){ clearInterval(SL_PACK_STATE.timer); var b = $('packCheckBtn'); if(b) b.disabled = true; var f = $('packFeed'); if(f) f.innerHTML = '<div class="ss-feed info">Time \u2014 exam pace means moving on. The worked answer is with the next example.</div>'; }
+    }, 1000);
+  }
+}
+function slCheckPackPractice(){
+  var st = SL_PACK_STATE; if(!st || st.attempted) return;
+  var gen = st.gen, feed = $('packFeed'); if(!feed) return;
+  if(st.timer){ clearInterval(st.timer); st.timer = null; }
+  st.attempted = true;
+  var ok = false, given = '';
+  if(gen.options){
+    var sel = document.querySelector('input[name="packOpt"]:checked');
+    given = sel ? sel.value : '';
+    ok = given === gen.answer;
+  } else {
+    var inp = $('packAnsIn');
+    given = inp ? inp.value : '';
+    var v = parseFloat(String(given).replace(/[^0-9.\-]/g, ''));
+    ok = !isNaN(v) && Math.abs(v - gen.answer) <= Math.max(0.051, Math.abs(gen.answer) * 0.03);
+  }
+  if(ok){
+    feed.innerHTML = '<div class="ss-feed good">That\u2019s right. <strong>How it works:</strong> ' + esc(gen.work) + '</div>';
+  } else {
+    feed.innerHTML = '<div class="ss-feed bad">Not quite' + (given ? ' \u2014 you gave \u201C' + esc(given) + '\u201D' : '') + '. <strong>Work it through:</strong> ' + esc(gen.work) + '</div>';
+    var p = SL_PACKS[SL_PACK_OPEN];
+    srqAdd(gen.prompt, gen.work, p ? p.title : 'Pack practice');
+  }
+}
+$('packAskBtn').addEventListener('click', function(){
+  var inp = $('packAskIn');
+  var q = inp ? inp.value.trim() : '';
+  if(!q) return;
+  if(!SL_PACK_OPEN) slOpenPack('bioeco');
+  var r = slPackAsk(SL_PACK_OPEN, q);
+  var body = $('packBody'); if(!r || !body) return;
+  var note = document.createElement('div');
+  note.className = 'sl-teach';
+  note.style.marginTop = '12px';
+  if(r.steer){
+    note.setAttribute('data-steer', '1');
+    note.innerHTML = '<strong>Same method, fresh numbers:</strong> ' + esc(r.text) + '<br>' + esc(r.gen.prompt) + '<br><em>Worked answer (once you\u2019ve tried): ' + esc(r.gen.work) + '</em>';
+  } else if(r.concept){
+    note.setAttribute('data-concept', r.concept.term);
+    note.innerHTML = '<strong>' + esc(r.concept.term) + ':</strong> ' + esc(r.concept.explain);
+  } else if(r.formula){
+    note.innerHTML = '<strong>' + esc(r.formula.name) + ':</strong> ' + esc(r.formula.form) + ' \u2014 ' + esc(r.formula.note);
+  } else if(r.gen){
+    note.innerHTML = '<strong>Try it with fresh numbers:</strong><br>' + esc(r.gen.prompt);
+  }
+  body.appendChild(note);
+  note.scrollIntoView({ block: 'nearest' });
+});
+/* init */
+(function(){
+  document.body.setAttribute('data-slmode', SLM);
+  document.querySelectorAll('.slm-btn').forEach(function(b){ b.classList.toggle('on', b.getAttribute('data-slmode') === SLM); });
+  var d = $('slModeDesc'); if(d) d.textContent = SL_MODE_DESC[SLM];
+  slRenderSrqLine();
+  slRenderPackBtns();
+  slOpenPack('bioeco');
+})();
+</script>
+
+<script>
+/* =====================================================================
+   FOCUS MUSIC (v2.22) — built-in synthesized soundscapes (Web Audio,
+   generated on-device: licensing-clean, no audio files, works offline)
+   + bring-your-own YouTube/Spotify via their OFFICIAL embed players.
+   Only youtube.com / youtu.be / open.spotify.com links are accepted.
+   Nothing is downloaded, ripped, or credentialed.
+   ===================================================================== */
+var MU = { ctx: null, master: null, srcs: [], kind: 'off', selected: 'rain', vol: 0.7, embed: null, playing: false };
+var MU_LABELS = { rain: 'Rain', cafe: 'Café murmur', brown: 'Brown noise', pink: 'Pink noise' };
+function muCtx(){
+  if(!MU.ctx){
+    var AC = window.AudioContext || window.webkitAudioContext;
+    if(!AC) return null;
+    MU.ctx = new AC();
+    MU.master = MU.ctx.createGain();
+    MU.master.gain.value = MU.vol;
+    MU.master.connect(MU.ctx.destination);
+  }
+  if(MU.ctx.state === 'suspended' && MU.ctx.resume) MU.ctx.resume();
+  return MU.ctx;
+}
+function muNoiseBuffer(sec, mode){
+  var ctx = MU.ctx, len = Math.max(1, Math.floor(ctx.sampleRate * sec));
+  var buf = ctx.createBuffer(1, len, ctx.sampleRate), d = buf.getChannelData(0);
+  var last = 0, b0 = 0, b1 = 0, b2 = 0, i, w;
+  for(i = 0; i < len; i++){
+    w = Math.random() * 2 - 1;
+    if(mode === 'brown'){ last = (last + 0.02 * w) / 1.02; d[i] = last * 3.2; }
+    else if(mode === 'pink'){ b0 = 0.997 * b0 + 0.029 * w; b1 = 0.985 * b1 + 0.032 * w; b2 = 0.95 * b2 + 0.048 * w; d[i] = (b0 + b1 + b2 + w * 0.05) * 0.9; }
+    else d[i] = w;
+  }
+  return buf;
+}
+function muLayer(buf, fType, freq, gVal, rate){
+  var ctx = MU.ctx;
+  var s = ctx.createBufferSource(); s.buffer = buf; s.loop = true;
+  if(rate && s.playbackRate) s.playbackRate.value = rate;
+  var f = ctx.createBiquadFilter(); f.type = fType; f.frequency.value = freq;
+  var g = ctx.createGain(); g.gain.value = gVal;
+  s.connect(f); f.connect(g); g.connect(MU.master); s.start();
+  MU.srcs.push(s);
+}
+function muStopAmbient(){
+  MU.srcs.forEach(function(s){ try{ s.stop(); }catch(e){} try{ s.disconnect(); }catch(e){} });
+  MU.srcs = []; MU.playing = false;
+  if(MU.kind !== 'embed') MU.kind = 'off';
+}
+function muPlay(kind){
+  var ctx = muCtx();
+  if(!ctx){ muNote('This browser cannot play the built-in sounds (no Web Audio). Your own YouTube/Spotify link below still works.'); return; }
+  muStopAmbient();
+  MU.kind = kind; MU.selected = kind;
+  if(kind === 'brown') muLayer(muNoiseBuffer(3, 'brown'), 'lowpass', 420, 0.9);
+  else if(kind === 'pink') muLayer(muNoiseBuffer(3, 'pink'), 'lowpass', 1400, 0.55);
+  else if(kind === 'rain'){ muLayer(muNoiseBuffer(3, 'brown'), 'lowpass', 820, 0.75); muLayer(muNoiseBuffer(2, 'white'), 'bandpass', 2600, 0.05); }
+  else if(kind === 'cafe'){ muLayer(muNoiseBuffer(3, 'brown'), 'lowpass', 480, 0.8); muLayer(muNoiseBuffer(2, 'pink'), 'bandpass', 520, 0.16, 0.7); }
+  MU.playing = true;
+  muUi();
+}
+function muNote(t){ var n = $('muNote'); if(n) n.textContent = t || ''; }
+function muUi(){
+  document.querySelectorAll('#muChips .slm-btn').forEach(function(b){
+    b.classList.toggle('on', b.getAttribute('data-mu') === MU.selected);
+  });
+  var label = MU.kind === 'embed' && MU.embed ? MU.embed.label
+    : MU.kind !== 'off' ? MU_LABELS[MU.kind] : '';
+  var mp = $('miniPlayer');
+  if(mp){
+    var show = MU.playing || MU.kind === 'embed';
+    mp.hidden = !show;
+    if(show) $('mpLabel').textContent = '♪ ' + (label || 'Focus music') + (MU.kind === 'embed' ? ' (player above)' : '');
+    $('mpToggle').textContent = MU.playing ? 'Pause' : 'Play';
+  }
+  var pb = $('muPlayBtn');
+  if(pb) pb.textContent = MU.playing ? 'Pause sound' : 'Play sound';
+}
+function muToggle(){
+  if(MU.playing){ muStopAmbient(); muUi(); return; }
+  if(MU.kind === 'embed'){ muNote('Embedded players have their own play button — it is in the Your music player on the Focus tab.'); return; }
+  muPlay(MU.selected);
+}
+function muStopAll(){
+  muStopAmbient();
+  MU.kind = 'off'; MU.embed = null;
+  var w = $('muEmbedWrap'); if(w){ w.innerHTML = ''; w.hidden = true; }
+  muUi();
+}
+function muSetVol(v){
+  MU.vol = Math.max(0, Math.min(1, v));
+  if(MU.master) MU.master.gain.value = MU.vol;
+  var a = $('muVol'), b = $('mpVol');
+  if(a && document.activeElement !== a) a.value = Math.round(MU.vol * 100);
+  if(b && document.activeElement !== b) b.value = Math.round(MU.vol * 100);
+}
+/* ---- BYO embeds: strict official-domain validation ---- */
+function slMusicEmbed(raw){
+  var u;
+  try{ u = new URL(String(raw || '').trim()); }catch(e){ return { ok: false, msg: 'That does not look like a link. Paste the full YouTube or Spotify link.' }; }
+  if(u.protocol !== 'https:' && u.protocol !== 'http:'){ return { ok: false, msg: 'That link is not a web link Iris can play.' }; }
+  var host = u.hostname.toLowerCase();
+  if(host === 'youtu.be'){
+    var id = u.pathname.slice(1).split('/')[0];
+    if(id) return { ok: true, kind: 'youtube', label: 'YouTube video', src: 'https://www.youtube.com/embed/' + encodeURIComponent(id) };
+    return { ok: false, msg: 'That youtu.be link has no video in it. Open the video and copy its link again.' };
+  }
+  if(host === 'youtube.com' || host === 'www.youtube.com' || host === 'm.youtube.com' || host === 'music.youtube.com'){
+    var list = u.searchParams.get('list'), v = u.searchParams.get('v');
+    if(list) return { ok: true, kind: 'youtube', label: 'YouTube playlist', src: 'https://www.youtube.com/embed/videoseries?list=' + encodeURIComponent(list) };
+    if(v) return { ok: true, kind: 'youtube', label: 'YouTube video', src: 'https://www.youtube.com/embed/' + encodeURIComponent(v) };
+    var m = u.pathname.match(/^\/(shorts|live)\/([\w-]+)/);
+    if(m) return { ok: true, kind: 'youtube', label: 'YouTube video', src: 'https://www.youtube.com/embed/' + m[2] };
+    return { ok: false, msg: 'That YouTube link has no video or playlist in it. Open the video or playlist page and copy the link from there.' };
+  }
+  if(host === 'open.spotify.com'){
+    var p = u.pathname.match(/^\/(playlist|album|track|episode|show)\/([A-Za-z0-9]+)/);
+    if(p) return { ok: true, kind: 'spotify', label: 'Spotify ' + p[1], src: 'https://open.spotify.com/embed/' + p[1] + '/' + p[2] + '?utm_source=generator' };
+    return { ok: false, msg: 'That Spotify link is not a playlist, album, track, or episode. Use Share in Spotify and copy the link from there.' };
+  }
+  return { ok: false, msg: 'Only YouTube and Spotify links work here — that one is from ' + host + ', so Iris can\u2019t play it.' };
+}
+window.slMusicEmbed = slMusicEmbed;
+window.slMusic = { play: muPlay, stop: muStopAll, toggle: muToggle, state: function(){ return { kind: MU.kind, playing: MU.playing, ctxState: MU.ctx ? MU.ctx.state : 'none' }; } };
+function muLoadEmbed(){
+  var msg = $('muEmbedMsg');
+  var r = slMusicEmbed($('muUrl').value);
+  if(!r.ok){ msg.textContent = r.msg; return; }
+  muStopAmbient();
+  MU.kind = 'embed'; MU.embed = r;
+  var w = $('muEmbedWrap');
+  w.innerHTML = '';
+  var f = document.createElement('iframe');
+  f.src = r.src; f.title = r.label + ' player'; f.width = '100%';
+  f.height = r.kind === 'spotify' ? '152' : '315';
+  f.style.border = '0'; f.style.borderRadius = '14px'; f.loading = 'lazy';
+  f.setAttribute('allow', 'autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture');
+  f.setAttribute('allowfullscreen', '');
+  w.appendChild(f); w.hidden = false;
+  msg.textContent = r.kind === 'spotify'
+    ? 'Loaded in Spotify\u2019s own player. Full songs play when you are signed in to Spotify in this browser with Premium — that is Spotify\u2019s rule; otherwise it plays previews.'
+    : 'Loaded in YouTube\u2019s own player. Press play in the player to start.';
+  try{ localStorage.setItem('studylens.music.v1', JSON.stringify({ url: $('muUrl').value })); }catch(e){}
+  muUi();
+}
+(function(){
+  var chips = $('muChips');
+  if(chips) chips.addEventListener('click', function(e){
+    var b = e.target.closest('[data-mu]'); if(!b) return;
+    MU.selected = b.getAttribute('data-mu');
+    if(MU.kind === 'embed'){ MU.kind = 'off'; }
+    muUi();
+  });
+  var pb = $('muPlayBtn'); if(pb) pb.addEventListener('click', muToggle);
+  var lb = $('muLoadBtn'); if(lb) lb.addEventListener('click', muLoadEmbed);
+  var fb = $('muFocusBtn'); if(fb) fb.addEventListener('click', function(){
+    if(!MU.playing && MU.kind !== 'embed') muPlay(MU.selected);
+    var tb = $('timerToggleBtn');
+    if(tb && typeof FOCUS !== 'undefined' && !FOCUS.running) tb.click();
+    muNote('Focus session started: sound on, timer running. The mini-player at the bottom follows you across tabs.');
+  });
+  var v1 = $('muVol'); if(v1) v1.addEventListener('input', function(){ muSetVol(v1.value / 100); });
+  var v2 = $('mpVol'); if(v2) v2.addEventListener('input', function(){ muSetVol(v2.value / 100); });
+  var mt = $('mpToggle'); if(mt) mt.addEventListener('click', muToggle);
+  var ms = $('mpStop'); if(ms) ms.addEventListener('click', muStopAll);
+  try{
+    var saved = JSON.parse(localStorage.getItem('studylens.music.v1') || 'null');
+    if(saved && saved.url && $('muUrl')) $('muUrl').value = saved.url;
+  }catch(e){}
+  muUi();
+})();
+</script>
+
+<script>
+/* =====================================================================
+   SCREEN LEARNING (v2.22) — Iris classifies what a capture shows by
+   TYPE and routes to the matching study tool. She LEARNS from the
+   student's confirmations/corrections.
+   PRIVACY (hard rule): the capture and its text are processed
+   TRANSIENTLY and dropped. The only things ever stored on-device are
+   type labels, confirm/correct counts, and tuning weights for a FIXED
+   built-in vocabulary — never a word copied off the screen, never an
+   image, never any text. The paused capture Save/Refresh is untouched.
+   ===================================================================== */
+var SL_SCR_TYPES = {
+  slides:      { label: 'Slides',        route: 'Study as lecture notes', mode: 'simple' },
+  document:    { label: 'Document / essay', route: 'Open the Voice Coach', mode: null },
+  problemset:  { label: 'Problem set',   route: 'Practice it in Challenge mode', mode: 'challenge' },
+  textbook:    { label: 'Textbook page', route: 'Study it in Guided mode', mode: 'guided' },
+  video:       { label: 'Video',         route: 'Study the transcript', mode: 'simple' },
+  spreadsheet: { label: 'Spreadsheet',   route: 'Study it in Guided mode', mode: 'guided' },
+  code:        { label: 'Code',          route: 'Ask Iris the Tutor about it', mode: null }
+};
+/* Built-in vocabulary ONLY. Learning adjusts weights for these words;
+   words from a student's screen are never added or stored. */
+var SL_SCR_VOCAB = {
+  slides: ['slide', 'slides', 'lecture', 'agenda', 'outline', 'objectives', 'presentation', 'bullet', 'today', 'welcome'],
+  document: ['dear', 'paragraph', 'essay', 'introduction', 'conclusion', 'sincerely', 'references', 'cited', 'thesis', 'argue'],
+  problemset: ['problem', 'exercise', 'calculate', 'solve', 'find', 'show', 'work', 'due', 'points', 'question'],
+  textbook: ['chapter', 'section', 'figure', 'textbook', 'summary', 'terms', 'edition', 'authors', 'review'],
+  video: ['subscribe', 'views', 'watch', 'transcript', 'captions', 'channel', 'episode', 'lesson', 'video', 'play'],
+  spreadsheet: ['total', 'sum', 'column', 'columns', 'row', 'rows', 'budget', 'balance', 'sheet', 'cost'],
+  code: ['function', 'return', 'const', 'var', 'import', 'class', 'def', 'console', 'error', 'null', 'loop', 'variable', 'value', 'values', 'output', 'input', 'algorithm']
+};
+var SL_SCR_KEY = 'studylens.screenlearn.v1';
+function slScrLoad(){
+  try{ var s = JSON.parse(localStorage.getItem(SL_SCR_KEY) || 'null'); if(s && s.kw && s.cal) return s; }catch(e){}
+  return { kw: {}, cal: {} };
+}
+function slScrSave(s){ try{ localStorage.setItem(SL_SCR_KEY, JSON.stringify(s)); }catch(e){} }
+function slScrTokens(text){
+  return String(text || '').toLowerCase().replace(/[^a-z0-9\s]/g, ' ').split(/\s+/).filter(function(t){ return t.length >= 3; });
+}
+function slScrLayout(text){
+  var lines = String(text || '').split(/\n+/), nums = 0, bullets = 0, brace = 0, i, parts;
+  for(i = 0; i < lines.length; i++){
+    parts = lines[i].trim().split(/\s+/).filter(Boolean);
+    var n = parts.filter(function(p){ return /\d/.test(p); }).length;
+    if(n >= 2 && parts.length >= 3) nums++;
+    if(/^[•\-\*▪]/.test(lines[i].trim())) bullets++;
+    if(/[{};]/.test(lines[i])) brace++;
+  }
+  return { numRows: nums, bullets: bullets, codeLines: brace, lines: lines.length };
+}
+function slScrClassify(text){
+  var store = slScrLoad();
+  var toks = slScrTokens(text), counts = {}, i, t;
+  for(i = 0; i < toks.length; i++){ t = toks[i]; counts[t] = (counts[t] || 0) + 1; }
+  var lay = slScrLayout(text);
+  var scores = {}, best = null, bestScore = 0, second = 0;
+  Object.keys(SL_SCR_VOCAB).forEach(function(type){
+    var sc = 0;
+    SL_SCR_VOCAB[type].forEach(function(w){
+      var c = 0;
+      Object.keys(counts).forEach(function(tok){ if(tok === w || (w.length >= 4 && tok.indexOf(w) === 0)) c += counts[tok]; });
+      if(c) sc += Math.min(c, 4) * (1 + ((store.kw[w] && store.kw[w][type]) || 0));
+    });
+    /* per-type calibration from the student's history */
+    var cal = store.cal[type];
+    if(cal && (cal.ok + cal.fix) >= 2){
+      var rate = cal.ok / (cal.ok + cal.fix);
+      sc *= (0.75 + 0.5 * rate);
+    }
+    scores[type] = Math.round(sc * 10) / 10;
+  });
+  if(lay.numRows >= 2) scores.spreadsheet += lay.numRows * 1.5;
+  if(lay.bullets >= 3) scores.slides += lay.bullets * 0.8;
+  if(lay.codeLines >= 3) scores.code += lay.codeLines * 0.7;
+  Object.keys(scores).forEach(function(type){
+    if(scores[type] > bestScore){ second = bestScore; bestScore = scores[type]; best = type; }
+    else if(scores[type] > second) second = scores[type];
+  });
+  var conf = bestScore <= 0 ? 0 : Math.min(0.97, 0.35 + 0.09 * bestScore) * (second > 0 ? (0.6 + 0.4 * (1 - second / (bestScore + 0.01))) : 1);
+  return { type: bestScore > 0 ? best : 'document', conf: Math.round(conf * 100) / 100, scores: scores };
+}
+/* A confirmation or correction: adjust ONLY built-in-vocabulary weights
+   for words present in this (transient) text, and the type counters.
+   The text itself is never stored. */
+function slScrLearn(text, type, wasCorrect, fromType){
+  var store = slScrLoad();
+  var present = {};
+  slScrTokens(text).forEach(function(t){ present[t] = true; });
+  Object.keys(SL_SCR_VOCAB).forEach(function(ty){
+    SL_SCR_VOCAB[ty].forEach(function(w){
+      var hit = present[w] || Object.keys(present).some(function(tok){ return w.length >= 4 && tok.indexOf(w) === 0; });
+      if(!hit) return;
+      if(!store.kw[w]) store.kw[w] = {};
+      var d = (store.kw[w][type] || 0) + (ty === type ? 0.6 : -0.2);
+      store.kw[w][type] = Math.max(-3, Math.min(6, Math.round(d * 10) / 10));
+    });
+  });
+  if(!store.cal[type]) store.cal[type] = { ok: 0, fix: 0 };
+  if(wasCorrect) store.cal[type].ok++;
+  else {
+    /* a correction: the miss counts against the type Iris guessed,
+       and the student's chosen type earns the confirmation */
+    if(fromType){ if(!store.cal[fromType]) store.cal[fromType] = { ok: 0, fix: 0 }; store.cal[fromType].fix++; }
+    store.cal[type].ok++;
+  }
+  slScrSave(store);
+  return store;
+}
+window.slScreenType = { classify: slScrClassify, learn: slScrLearn, stats: slScrLoad, types: SL_SCR_TYPES };
+var SL_SCR_CURRENT = null;
+function slScreenShowType(){
+  var box = $('screenTypeBox'); if(!box) return;
+  var text = ($('ocrText') && $('ocrText').value) || '';
+  if(!text.trim()){ box.hidden = true; return; }
+  var r = slScrClassify(text);
+  SL_SCR_CURRENT = r.type;
+  var info = SL_SCR_TYPES[r.type];
+  box.hidden = false;
+  box.innerHTML = '<strong>Iris sees: ' + info.label + '</strong> (' + Math.round(r.conf * 100) + '% sure). ' +
+    'Best next step: ' + info.route + '.' +
+    '<div class="row" style="margin-top:8px">' +
+    '<button class="btn small" id="scrTypeGo">Go with it</button>' +
+    '<button class="btn ghost small" id="scrTypeOk">Looks right</button>' +
+    '<button class="btn plain small" id="scrTypeFix">Wrong type? Change</button></div>' +
+    '<div id="scrTypeChoices" hidden style="margin-top:8px"></div>';
+  $('scrTypeOk').addEventListener('click', function(){
+    slScrLearn(text, r.type, true);
+    box.innerHTML = '<strong>Thanks — noted.</strong> Iris gets a little better at spotting ' + info.label.toLowerCase() + ' every time you confirm her.';
+  });
+  $('scrTypeFix').addEventListener('click', function(){
+    var ch = $('scrTypeChoices'); ch.hidden = false;
+    ch.innerHTML = Object.keys(SL_SCR_TYPES).filter(function(t){ return t !== r.type; }).map(function(t){
+      return '<button class="btn ghost small" data-scrtype="' + t + '" style="margin:0 6px 6px 0">' + SL_SCR_TYPES[t].label + '</button>';
+    }).join('');
+    ch.querySelectorAll('[data-scrtype]').forEach(function(b){ b.addEventListener('click', function(){
+      var nt = b.getAttribute('data-scrtype');
+      slScrLearn(text, nt, false, r.type);
+      SL_SCR_CURRENT = nt;
+      slScreenShowTypeRefresh(nt);
+    }); });
+  });
+  $('scrTypeGo').addEventListener('click', function(){ slScreenRoute(r.type, text); });
+}
+function slScreenShowTypeRefresh(type){
+  var box = $('screenTypeBox'); if(!box) return;
+  var info = SL_SCR_TYPES[type];
+  box.innerHTML = '<strong>Got it — ' + info.label + '.</strong> Iris updated her tuning on this device (labels and small numbers only — nothing from your screen was kept).' +
+    '<div class="row" style="margin-top:8px"><button class="btn small" id="scrTypeGo2">Go with it</button></div>';
+  $('scrTypeGo2').addEventListener('click', function(){ slScreenRoute(type, ($('ocrText') || {}).value || ''); });
+}
+function slScreenRoute(type, text){
+  var info = SL_SCR_TYPES[type];
+  if(type === 'document'){ showTab('coach'); var ci = $('coachInput'); if(ci && text){ ci.value = text; ci.dispatchEvent(new Event('input', { bubbles: true })); } return; }
+  if(type === 'code'){ showTab('tutor'); return; }
+  /* study types: send the read text into study material (the existing,
+     user-visible flow), set the suggested mode, and go to the Study tab */
+  var m = $('material');
+  if(m && text){ m.value = (m.value ? m.value + '\n\n' : '') + text; }
+  if(info.mode && typeof slSetMode === 'function') slSetMode(info.mode, false);
+  showTab('study');
+  showNotice($('studyNotice'), 'Screen text added as ' + info.label.toLowerCase() + ' — hit \u201cGenerate study pack\u201d when you\u2019re ready.', 'ok');
+}
+</script>
+
+<script>
+/* ---- Match pairs: tap-to-pair term<->meaning warm-up, built from the pack ----
+   Every pair comes from the learner's own material: a term plus its definition
+   ("X is …" sentence) or, failing that, the sentence about it with the term
+   blanked. One defensible answer per pair — near-duplicate meanings are
+   skipped at build time so two terms never share an indistinguishable match. */
+var MATCH = { pairs: [], tOrder: [], mOrder: [], selT: -1, selM: -1, matched: 0, tries: 0, mistakes: 0, t0: 0, done: false };
+function matchDefFor(term){
+  var safe = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  var rx = new RegExp('^' + safe + '\\s+(is|are|refers to|means)\\b', 'i');
+  for(var i = 0; i < S.sentences.length; i++){
+    var s = S.sentences[i].trim();
+    if(rx.test(s)){
+      var def = s.replace(rx, '').trim();
+      def = def.charAt(0).toUpperCase() + def.slice(1);
+      return def.length > 170 ? def.slice(0, 167) + '…' : def;
+    }
+  }
+  for(var j = 0; j < S.sentences.length; j++){
+    if(sentenceHasTerm(S.sentences[j], term)) return S.sentences[j].replace(termRegex(term), '$1_____');
+  }
+  return null;
+}
+function buildMatchPairs(){
+  var pairs = [], seenKey = {};
+  for(var i = 0; i < S.terms.length && pairs.length < 6; i++){
+    var term = S.terms[i], def = matchDefFor(term);
+    if(!def) continue;
+    var key = def.slice(0, 40).toLowerCase();
+    if(seenKey[key]) continue;
+    seenKey[key] = 1;
+    pairs.push({ term: term, def: def });
+  }
+  return pairs;
+}
+function matchReset(){
+  MATCH = { pairs: [], tOrder: [], mOrder: [], selT: -1, selM: -1, matched: 0, tries: 0, mistakes: 0, t0: 0, done: false };
+  $('matchBoard').innerHTML = '';
+  $('matchStatus').textContent = '';
+  $('matchNewBtn').hidden = true;
+  $('matchStartBtn').hidden = false;
+  $('matchHint').textContent = 'A quick warm-up: tap a term, then tap what it means. Every pair comes from your study pack.';
+}
+function matchStart(){
+  if(!S.terms.length){
+    $('matchStatus').textContent = 'Generate a study pack first — then come back and match.';
+    return;
+  }
+  MATCH.pairs = buildMatchPairs();
+  if(MATCH.pairs.length < 4){
+    $('matchStatus').textContent = 'Not enough matchable terms yet — add more material with "X is …" sentences and generate again.';
+    return;
+  }
+  MATCH.tOrder = shuffleArr(MATCH.pairs.map(function(_, i){ return i; }));
+  MATCH.mOrder = shuffleArr(MATCH.pairs.map(function(_, i){ return i; }));
+  MATCH.selT = -1; MATCH.selM = -1; MATCH.matched = 0; MATCH.tries = 0;
+  MATCH.mistakes = 0; MATCH.done = false; MATCH.t0 = Date.now();
+  $('matchStartBtn').hidden = true; $('matchNewBtn').hidden = false;
+  $('matchStatus').textContent = '';
+  $('matchHint').textContent = 'Tap a term, then tap what it means.';
+  renderMatchBoard();
+}
+function renderMatchBoard(){
+  var b = $('matchBoard');
+  var tHtml = '<div class="mcol"><p class="mhead">Terms</p>' + MATCH.tOrder.map(function(pi, di){
+    return '<button class="mtile" data-side="t" data-di="' + di + '">' + esc(MATCH.pairs[pi].term) + '</button>';
+  }).join('') + '</div>';
+  var mHtml = '<div class="mcol"><p class="mhead">What it means</p>' + MATCH.mOrder.map(function(pi, di){
+    return '<button class="mtile mdef" data-side="m" data-di="' + di + '">' + esc(MATCH.pairs[pi].def) + '</button>';
+  }).join('') + '</div>';
+  b.innerHTML = '<div class="mboard">' + tHtml + mHtml + '</div>';
+  b.querySelectorAll('.mtile').forEach(function(btn){
+    btn.addEventListener('click', function(){ matchTap(btn); });
+  });
+}
+function matchTap(btn){
+  if(MATCH.done || btn.classList.contains('mlocked') || btn.classList.contains('mwrong')) return;
+  var side = btn.getAttribute('data-side'), di = parseInt(btn.getAttribute('data-di'), 10);
+  var board = $('matchBoard');
+  board.querySelectorAll('.mtile[data-side="' + side + '"].msel').forEach(function(x){ x.classList.remove('msel'); });
+  btn.classList.add('msel');
+  if(side === 't') MATCH.selT = di; else MATCH.selM = di;
+  if(MATCH.selT < 0 || MATCH.selM < 0) return;
+  var tBtn = board.querySelector('.mtile[data-side="t"][data-di="' + MATCH.selT + '"]');
+  var mBtn = board.querySelector('.mtile[data-side="m"][data-di="' + MATCH.selM + '"]');
+  MATCH.tries++;
+  if(MATCH.tOrder[MATCH.selT] === MATCH.mOrder[MATCH.selM]){
+    tBtn.classList.remove('msel'); mBtn.classList.remove('msel');
+    tBtn.classList.add('mlocked'); mBtn.classList.add('mlocked');
+    MATCH.matched++;
+    if(MATCH.matched === MATCH.pairs.length){
+      MATCH.done = true;
+      var secs = Math.round((Date.now() - MATCH.t0) / 1000);
+      $('matchStatus').textContent = 'All ' + MATCH.pairs.length + ' matched — ' + MATCH.tries + ' tries, ' + MATCH.mistakes + ' miss' + (MATCH.mistakes === 1 ? '' : 'es') + ', ' + secs + 's. Nice work.';
+      $('matchHint').textContent = 'Round complete. Hit "New round" to shuffle and go again.';
+    } else {
+      $('matchStatus').textContent = MATCH.matched + ' / ' + MATCH.pairs.length + ' matched';
+    }
+  } else {
+    MATCH.mistakes++;
+    tBtn.classList.add('mwrong'); mBtn.classList.add('mwrong');
+    setTimeout(function(){
+      tBtn.classList.remove('mwrong', 'msel'); mBtn.classList.remove('mwrong', 'msel');
+    }, 420);
+  }
+  MATCH.selT = -1; MATCH.selM = -1;
+}
+$('matchStartBtn').addEventListener('click', matchStart);
+$('matchNewBtn').addEventListener('click', matchStart);
+</script>
+<script>
+/* =====================================================================
+   LECTURE NOTES (v2.22) — record or upload a lecture, get a timestamped
+   transcript, and Iris builds structured notes from ONLY what the
+   transcript says: key terms with the professor's own definitions,
+   their examples, exam-emphasis flags, and honest "couldn't hear this
+   clearly" spans. Notes are editable and stored ON-DEVICE as the
+   student's own material. Audio is never uploaded by StudyLens.
+   Transcription tiers: (a) live captions via the browser's speech
+   service where offered (labeled honestly), (b) OPT-IN on-device
+   Whisper (transformers.js) — one-time model download, audio stays on
+   the device, (c) paste/upload a transcript.
+   ===================================================================== */
+var LEC = { rec: null, chunks: [], stream: null, t0: 0, elapsed: 0, timer: null, paused: false, sr: null, audioBlob: null, audioFile: null };
+var LEC_KEY = 'studylens.lecture.v1';
+function lecFmt(sec){ sec = Math.max(0, Math.floor(sec)); var m = Math.floor(sec / 60), s = sec % 60; return (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s; }
+function lecStatus(t){ var el = $('lecRecStatus'); if(el) el.textContent = t || ''; }
+function lecSupported(){ return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia && window.MediaRecorder); }
+function lecTick(){
+  var el = $('lecTimer'); if(!el) return;
+  var sec = LEC.elapsed + (LEC.t0 ? (Date.now() - LEC.t0) / 1000 : 0);
+  el.textContent = lecFmt(sec);
+}
+function lecStartTimer(){ lecStopTimer(); LEC.timer = setInterval(lecTick, 500); lecTick(); }
+function lecStopTimer(){ if(LEC.timer){ clearInterval(LEC.timer); LEC.timer = null; } }
+async function lecRecord(){
+  if(!lecSupported()){
+    lecStatus('Recording is not available in this browser (no microphone recording support). You can still upload an audio file or paste a transcript below.');
+    return;
+  }
+  try{
+    LEC.stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  }catch(e){
+    lecStatus('Microphone permission was not given, so Iris can\u2019t record. You can still upload an audio file or paste a transcript below.');
+    return;
+  }
+  LEC.chunks = []; LEC.elapsed = 0; LEC.paused = false;
+  LEC.rec = new MediaRecorder(LEC.stream);
+  LEC.rec.ondataavailable = function(e){ if(e.data && e.data.size) LEC.chunks.push(e.data); };
+  LEC.rec.onstop = lecFinishRecording;
+  LEC.rec.start(1000);
+  LEC.t0 = Date.now(); lecStartTimer();
+  $('lecRecordBtn').hidden = true; $('lecPauseBtn').hidden = false; $('lecStopBtn').hidden = false;
+  $('lecPauseBtn').textContent = 'Pause';
+  lecStatus('Recording… live captions are on if this browser offers them (see the note under the transcript).');
+  lecStartCaptions();
+}
+function lecPause(){
+  if(!LEC.rec) return;
+  if(LEC.rec.state === 'recording'){
+    LEC.rec.pause(); LEC.elapsed += (Date.now() - LEC.t0) / 1000; LEC.t0 = 0; LEC.paused = true;
+    $('lecPauseBtn').textContent = 'Resume'; lecStatus('Paused.');
+    if(LEC.sr){ try{ LEC.sr.stop(); }catch(e){} }
+  } else if(LEC.rec.state === 'paused'){
+    LEC.rec.resume(); LEC.t0 = Date.now(); LEC.paused = false;
+    $('lecPauseBtn').textContent = 'Pause'; lecStatus('Recording…');
+    lecStartCaptions();
+  }
+}
+function lecStop(){
+  if(LEC.rec && LEC.rec.state !== 'inactive') LEC.rec.stop();
+}
+function lecFinishRecording(){
+  lecStopTimer();
+  if(LEC.t0) LEC.elapsed += (Date.now() - LEC.t0) / 1000;
+  LEC.t0 = 0;
+  if(LEC.stream){ LEC.stream.getTracks().forEach(function(t){ t.stop(); }); LEC.stream = null; }
+  if(LEC.sr){ try{ LEC.sr.stop(); }catch(e){} LEC.sr = null; }
+  LEC.audioBlob = new Blob(LEC.chunks, { type: (LEC.rec && LEC.rec.mimeType) || 'audio/webm' });
+  LEC.audioFile = null;
+  $('lecRecordBtn').hidden = false; $('lecPauseBtn').hidden = true; $('lecStopBtn').hidden = true;
+  lecShowAudio(URL.createObjectURL(LEC.audioBlob), 'Your recording (' + lecFmt(LEC.elapsed) + ')');
+  lecStatus('Recording saved on this device for this session. Transcribe it on-device with Whisper below, download it, or type/paste the transcript.');
+  lecSave();
+}
+function lecShowAudio(url, label){
+  var w = $('lecAudioWrap'); if(!w) return;
+  w.hidden = false;
+  w.innerHTML = '<p class="small" style="margin:0 0 6px"><strong>' + esc(label) + '</strong></p>' +
+    '<audio controls src="' + url + '" style="width:100%"></audio>' +
+    '<div class="row" style="margin-top:6px"><a class="btn ghost small" href="' + url + '" download="studylens-lecture.webm">Download audio</a></div>';
+}
+/* ---- live captions: the BROWSER's speech service, labeled honestly ---- */
+function lecStartCaptions(){
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  var note = $('lecCaptionNote');
+  if(!SR){ if(note) note.textContent = 'Live captions are not offered by this browser, so nothing is captioned while you record. Use on-device Whisper after recording, or paste a transcript.'; return; }
+  if(note) note.textContent = 'Live captions are running through your browser\u2019s own speech service — in Chrome, that means the audio is sent to Google to transcribe. Prefer fully private? Skip captions and use on-device Whisper below; your audio never leaves this device there.';
+  try{
+    var sr = new SR();
+    sr.continuous = true; sr.interimResults = false; sr.lang = 'en-US';
+    sr.onresult = function(ev){
+      for(var i = ev.resultIndex; i < ev.results.length; i++){
+        if(ev.results[i].isFinal){
+          var txt = ev.results[i][0].transcript.trim();
+          if(txt) lecAppendTranscript(LEC.elapsed + (LEC.t0 ? (Date.now() - LEC.t0) / 1000 : 0), txt);
+        }
+      }
+    };
+    sr.onend = function(){ if(LEC.rec && LEC.rec.state === 'recording' && !LEC.paused){ try{ sr.start(); }catch(e){} } };
+    sr.onerror = function(){};
+    LEC.sr = sr; sr.start();
+  }catch(e){}
+}
+function lecAppendTranscript(sec, text){
+  var ta = $('lecTranscript'); if(!ta) return;
+  var line = '[' + lecFmt(sec) + '] ' + text;
+  ta.value = (ta.value ? ta.value.replace(/\s+$/, '') + '\n' : '') + line + '\n';
+  lecSave();
+}
+/* ---- on-device Whisper (OPT-IN download; audio never leaves the device) ---- */
+async function lecWhisper(){
+  var st = $('lecWhisperStatus');
+  var blob = LEC.audioFile || LEC.audioBlob;
+  if(!blob){ st.textContent = 'Record a lecture or upload an audio file first — then Whisper can transcribe it on this device.'; return; }
+  st.textContent = 'Loading the on-device transcription tools (one-time download)…';
+  try{
+    var mod = await import('https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2/dist/transformers.min.js');
+    st.textContent = 'Downloading the Whisper speech model (one time, then it works offline)…';
+    var pipe = await mod.pipeline('automatic-speech-recognition', 'Xenova/whisper-tiny.en', {
+      progress_callback: function(p){ if(p && p.status === 'progress' && p.file) st.textContent = 'Downloading model file ' + p.file + ' — ' + Math.round(p.progress || 0) + '%'; }
+    });
+    st.textContent = 'Reading your audio…';
+    var buf = await blob.arrayBuffer();
+    var AC = window.AudioContext || window.webkitAudioContext;
+    var actx = new AC();
+    var decoded = await actx.decodeAudioData(buf);
+    var off = new OfflineAudioContext(1, Math.ceil(decoded.duration * 16000), 16000);
+    var srcNode = off.createBufferSource(); srcNode.buffer = decoded; srcNode.connect(off.destination); srcNode.start();
+    var rendered = await off.startRendering();
+    var audio = rendered.getChannelData(0);
+    st.textContent = 'Transcribing on this device — long lectures take a while; keep this tab open…';
+    var out = await pipe(audio, { chunk_length_s: 30, stride_length_s: 5, return_timestamps: true });
+    var ta = $('lecTranscript');
+    var lines = (out.chunks || []).map(function(c){ return '[' + lecFmt(c.timestamp[0] || 0) + '] ' + (c.text || '').trim(); }).filter(function(l){ return l.length > 8; });
+    if(!lines.length && out.text) lines = ['[00:00] ' + out.text.trim()];
+    ta.value = lines.join('\n') + '\n';
+    st.textContent = 'Done — transcript is in the box below, made entirely on this device. Now hit “Make my notes”.';
+    lecSave();
+  }catch(e){
+    st.textContent = 'On-device transcription couldn\u2019t run in this browser just now (' + (e && e.message ? e.message.slice(0, 90) : 'error') + '). Nothing was uploaded. Live captions while recording, or pasting a transcript, still work.';
+  }
+}
+/* ---- Iris notes: ONLY what the transcript says ---- */
+function lecSentences(text){
+  var clean = String(text || '').replace(/\[(\d+):(\d+)\]/g, function(m, a, b){ return '\u0001' + a + ':' + b + '\u0002'; });
+  var parts = clean.split(/(?<=[.!?])\s+/);
+  var out = [], curT = '00:00';
+  parts.forEach(function(p){
+    var m = p.match(/\u0001(\d+:\d+)\u0002\s*/);
+    if(m){ curT = m[1]; p = p.replace(/\u0001\d+:\d+\u0002\s*/, ''); }
+    p = p.replace(/\u0001|\u0002/g, '').trim();
+    if(p) out.push({ t: curT, text: p });
+  });
+  return out;
+}
+function lecIsGarbled(s){
+  if(/\[inaudible|\[unclear|\[crosstalk/i.test(s)) return true;
+  var toks = s.split(/\s+/).filter(Boolean);
+  if(!toks.length) return false;
+  var junk = toks.filter(function(w){ return /[^a-zA-Z0-9'.,!?-]/g.test(w) || /^(.)\1{3,}$/.test(w); }).length;
+  var vowelless = toks.filter(function(w){ return w.length > 4 && !/[aeiou]/i.test(w); }).length;
+  return (junk / toks.length) > 0.3 || (toks.length >= 5 && vowelless / toks.length > 0.5);
+}
+function lecMakeNotes(transcript){
+  var sents = lecSentences(transcript);
+  var terms = [], examples = [], flags = [], garbled = [], body = [];
+  var seenTerm = {};
+  sents.forEach(function(s){
+    if(lecIsGarbled(s.text)){ garbled.push(s); return; }
+    var m = s.text.match(/^([A-Z][A-Za-z0-9'’\- ]{2,40}?)\s+(is|are|refers to|means)\s+(.+)$/);
+    if(m && !seenTerm[m[1].toLowerCase()]){
+      seenTerm[m[1].toLowerCase()] = 1;
+      var termName = m[1].trim().replace(/^(a|an|the)\s+/i, '');
+      terms.push({ term: termName, def: (m[1] + ' ' + m[2] + ' ' + m[3]).trim(), t: s.t });
+    }
+    if(/\bfor example\b|\bfor instance\b|\bsuch as\b|\blike when\b/i.test(s.text)) examples.push(s);
+    if(/\bon the exam\b|\bon the test\b|\bwill be on\b|\bremember\b|\bimportant\b|\bmake sure\b|\bquiz\b/i.test(s.text)) flags.push(s);
+    body.push(s);
+  });
+  /* topic sections: split on lecture signposts, else chunk by 6 sentences */
+  var sections = [], cur = { title: 'Opening', items: [] };
+  body.forEach(function(s){
+    var sign = s.text.match(/^(?:okay|ok|now|next|so next|moving on|another (?:one|thing|topic)|finally|lastly)\b[,.\s]+(?:we(?:'ll| will)?\s+)?(?:talk about|cover|look at)?\s*(.{0,50})/i);
+    if(sign && cur.items.length >= 2){ sections.push(cur); cur = { title: (sign[1] || 'Next topic').trim().replace(/^(is|are)\s+/i, '') || 'Next topic', items: [] }; }
+    else if(cur.items.length >= 6){ sections.push(cur); cur = { title: 'Continued', items: [] }; }
+    cur.items.push(s);
+  });
+  if(cur.items.length) sections.push(cur);
+  return { terms: terms, examples: examples, flags: flags, garbled: garbled, sections: sections, sentences: body };
+}
+function lecNotesText(n){
+  var out = [];
+  n.sections.forEach(function(sec){
+    out.push('## ' + sec.title);
+    sec.items.forEach(function(s){ out.push('- [' + s.t + '] ' + s.text); });
+    out.push('');
+  });
+  if(n.terms.length){
+    out.push('## Key terms (as your professor stated them)');
+    n.terms.forEach(function(x){ out.push('- ' + x.def + ' [' + x.t + ']'); });
+    out.push('');
+  }
+  if(n.examples.length){
+    out.push('## Examples your professor used');
+    n.examples.forEach(function(s){ out.push('- [' + s.t + '] ' + s.text); });
+    out.push('');
+  }
+  if(n.flags.length){
+    out.push('## Flagged: sounds like exam material');
+    n.flags.forEach(function(s){ out.push('- [' + s.t + '] ' + s.text); });
+    out.push('');
+  }
+  if(n.garbled.length){
+    out.push('## Parts Iris couldn\u2019t hear clearly (check these against your memory or a classmate\u2019s notes)');
+    n.garbled.forEach(function(s){ out.push('- [' + s.t + '] ' + s.text); });
+    out.push('');
+  }
+  return out.join('\n');
+}
+function lecBuild(){
+  var tr = ($('lecTranscript') || {}).value || '';
+  if(tr.trim().length < 60){ $('lecWhisperStatus').textContent = 'Iris needs a bit more transcript first — record more, upload audio, or paste a longer transcript.'; return null; }
+  var n = lecMakeNotes(tr);
+  $('lecNotes').value = lecNotesText(n);
+  $('lecNotesCard').hidden = false;
+  LEC.lastNotes = n;
+  lecSave();
+  return n;
+}
+/* Ask-Iris: retrieval over THIS lecture's transcript, cited by timestamp */
+function lecAsk(q, transcript){
+  var sents = lecSentences(transcript);
+  var words = String(q || '').toLowerCase().replace(/[^a-z0-9\s]/g, ' ').split(/\s+/).filter(function(w){ return w.length > 3; });
+  var scored = sents.map(function(s){
+    var low = ' ' + s.text.toLowerCase() + ' ';
+    var sc = 0;
+    words.forEach(function(w){ if(low.indexOf(w) >= 0) sc++; });
+    return { s: s, sc: sc };
+  }).filter(function(x){ return x.sc > 0; }).sort(function(a, b){ return b.sc - a.sc; });
+  if(!scored.length) return { found: false, text: 'Iris couldn\u2019t find that in this lecture\u2019s transcript. Try the words your professor used, or check the parts flagged as hard to hear.' };
+  var top = scored.slice(0, 2);
+  return { found: true, text: top.map(function(x){ return '\u201C' + x.s.text + '\u201D — from your lecture at ' + x.s.t; }).join('\n') };
+}
+window.slLecture = { makeNotes: lecMakeNotes, notesText: lecNotesText, ask: lecAsk, sentences: lecSentences };
+/* ---- notes actions ---- */
+function lecNotesToMaterial(goQuiz){
+  var notes = ($('lecNotes') || {}).value || '';
+  if(!notes.trim()) return;
+  var m = $('material'); if(m) m.value = notes;
+  generateStudy();
+  showTab(goQuiz ? 'quiz' : 'study');
+}
+function lecSave(){
+  try{
+    localStorage.setItem(LEC_KEY, JSON.stringify({
+      transcript: ($('lecTranscript') || {}).value || '',
+      notes: ($('lecNotes') || {}).value || '',
+      savedAt: Date.now()
+    }));
+  }catch(e){}
+}
+(function(){
+  var rb = $('lecRecordBtn'); if(!rb) return;
+  rb.addEventListener('click', lecRecord);
+  $('lecPauseBtn').addEventListener('click', lecPause);
+  $('lecStopBtn').addEventListener('click', lecStop);
+  if(!lecSupported()) lecStatus('Recording is not available in this browser. You can still upload an audio file or paste a transcript below.');
+  var up = $('lecAudioInput');
+  up.addEventListener('change', function(e){
+    var f = e.target.files[0]; if(!f) return;
+    LEC.audioFile = f; LEC.audioBlob = null;
+    lecShowAudio(URL.createObjectURL(f), 'Uploaded audio: ' + f.name);
+    lecStatus('Audio loaded on this device (not uploaded anywhere). Transcribe it on-device with Whisper, or paste a transcript.');
+  });
+  var tf = $('lecTextInput');
+  tf.addEventListener('change', function(e){
+    var f = e.target.files[0]; if(!f) return;
+    var r = new FileReader();
+    r.onload = function(){ $('lecTranscript').value = String(r.result || ''); lecSave(); };
+    r.readAsText(f);
+  });
+  $('lecWhisperBtn').addEventListener('click', lecWhisper);
+  $('lecNotesBtn').addEventListener('click', lecBuild);
+  $('lecTranscript').addEventListener('input', lecSave);
+  $('lecNotes').addEventListener('input', lecSave);
+  $('lecCardsBtn').addEventListener('click', function(){ lecNotesToMaterial(false); });
+  $('lecQuizBtn').addEventListener('click', function(){ lecNotesToMaterial(true); });
+  $('lecQueueBtn').addEventListener('click', function(){
+    var n = LEC.lastNotes || lecMakeNotes(($('lecTranscript') || {}).value || '');
+    var added = 0;
+    n.terms.forEach(function(x){ if(typeof slQueueMiss === 'function'){ slQueueMiss({ q: 'Define: ' + x.term, a: x.def, term: x.term }); added++; } });
+    $('lecAskOut').textContent = added ? ('Added ' + added + ' key term' + (added === 1 ? '' : 's') + ' to your review queue — they\u2019ll resurface on the Study tab schedule.') : 'No key terms found to queue yet — make the notes first.';
+  });
+  $('lecListenBtn').addEventListener('click', function(){
+    var notes = ($('lecNotes') || {}).value || '';
+    if(!notes || !window.speechSynthesis){ $('lecAskOut').textContent = 'Listening needs notes and a browser with speech built in.'; return; }
+    speechSynthesis.cancel();
+    speechSynthesis.speak(new SpeechSynthesisUtterance(notes.replace(/[#\-\[\]]/g, ' ')));
+  });
+  $('lecAskBtn').addEventListener('click', function(){
+    var q = $('lecAskInput').value;
+    var r = lecAsk(q, ($('lecTranscript') || {}).value || '');
+    $('lecAskOut').textContent = r.text;
+  });
+  try{
+    var saved = JSON.parse(localStorage.getItem(LEC_KEY) || 'null');
+    if(saved && (saved.transcript || saved.notes)){
+      if(saved.transcript) $('lecTranscript').value = saved.transcript;
+      if(saved.notes){ $('lecNotes').value = saved.notes; $('lecNotesCard').hidden = false; }
+    }
+  }catch(e){}
+})();
+</script>
+
+<script>
+/* =====================================================================
+   PROOF & RESOURCES (v2.22) — after Iris builds lecture notes, look up
+   outside sources that back up what the professor said. Searches use
+   ONLY the extracted term/topic phrases (never transcript text) against
+   CORS-open scholarly sources: Wikipedia, OpenAlex, Crossref. A source
+   is shown only if it topically matches the claim AND its URL answers
+   a reachability check. Zero invented links: every URL displayed came
+   back from one of those APIs. Sections with nothing solid say so.
+   ===================================================================== */
+var LEC_PROOF_STOP = new Set(['that', 'with', 'from', 'this', 'what', 'your', 'professor', 'lecture', 'about', 'which', 'their', 'there', 'these', 'those', 'have', 'been', 'were', 'will', 'when', 'then', 'than', 'into', 'over', 'under', 'between']);
+function lecProofTokens(s){
+  return String(s || '').toLowerCase().replace(/[^a-z0-9\s]/g, ' ').split(/\s+/).filter(function(w){ return w.length > 3 && !LEC_PROOF_STOP.has(w); });
+}
+function lecProofRank(phrase, items){
+  var pt = [];
+  lecProofTokens(phrase).forEach(function(t){ if(pt.indexOf(t) < 0) pt.push(t); });
+  if(!pt.length) return [];
+  return items.map(function(it){
+    var hay = (it.title + ' ' + (it.snippet || '')).toLowerCase();
+    var titleLow = it.title.toLowerCase();
+    var matched = pt.filter(function(t){ return hay.indexOf(t) >= 0; }).length;
+    var titleHits = pt.filter(function(t){ return titleLow.indexOf(t) >= 0; }).length;
+    return { it: it, score: titleHits * 2 + matched + (it.boost || 0), matched: matched, titleHits: titleHits };
+  }).filter(function(x){ return x.titleHits >= 1 && x.matched >= Math.min(2, pt.length); })
+    .sort(function(a, b){ return b.score - a.score; })
+    .slice(0, 3)
+    .map(function(x){ return x.it; });
+}
+async function lecProofSearch(phrase, fetchFn){
+  var f = fetchFn || function(u, o){ return window.fetch(u, o); };
+  var q = encodeURIComponent(phrase);
+  var items = [];
+  function job(p){ return p.then(function(r){ return r.json(); }).catch(function(){ return null; }); }
+  var jobs = [
+    job(f('https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&prop=info%7Cextracts&exintro&explaintext&inprop=url&generator=search&gsrsearch=' + q + '&gsrlimit=3')).then(function(j){
+      if(!j) return;
+      var pages = (j.query && j.query.pages) || {};
+      Object.keys(pages).forEach(function(k){
+        var p = pages[k];
+        if(p.title && p.fullurl) items.push({ title: p.title, url: p.fullurl, source: 'Wikipedia', snippet: (p.extract || '').slice(0, 220), backs: 'Reference overview backing the lecture\u2019s take on ' + phrase });
+      });
+    }),
+    job(f('https://api.openalex.org/works?search=' + q + '&per-page=3')).then(function(j){
+      if(!j) return;
+      (j.results || []).forEach(function(w){
+        var srcName = (w.primary_location && w.primary_location.source && w.primary_location.source.display_name) || 'OpenAlex';
+        var url = w.doi || (w.primary_location && w.primary_location.landing_page_url) || '';
+        if(w.title && url) items.push({ title: w.title, url: url, source: srcName + ' (via OpenAlex)', snippet: '', backs: 'Scholarly work on ' + phrase, boost: w.type === 'article' ? 0.5 : 0 });
+      });
+    }),
+    job(f('https://api.crossref.org/works?query.bibliographic=' + q + '&rows=3')).then(function(j){
+      if(!j) return;
+      (((j.message || {}).items) || []).forEach(function(w){
+        var t = (w.title || [])[0];
+        if(t && w.URL) items.push({ title: t, url: w.URL, source: ((w['container-title'] || [])[0] || 'Crossref'), snippet: '', backs: 'Published source on ' + phrase, boost: w.type === 'journal-article' ? 0.5 : 0 });
+      });
+    })
+  ];
+  await Promise.all(jobs);
+  return lecProofRank(phrase, items);
+}
+async function lecProofVerify(url, fetchFn){
+  var f = fetchFn || function(u, o){ return window.fetch(u, o); };
+  try{ await f(url, { method: 'HEAD', mode: 'no-cors' }); return true; }catch(e){ return false; }
+}
+window.slLectureProof = { tokens: lecProofTokens, rank: lecProofRank, search: lecProofSearch };
+async function lecProofRun(fetchFn){
+  var box = $('lecProof'); if(!box) return;
+  var n = (typeof LEC !== 'undefined' && LEC.lastNotes) || lecMakeNotes(($('lecTranscript') || {}).value || '');
+  if(!n || (!n.terms.length && !n.sections.length)){
+    box.innerHTML = '<p class="small">Make your notes first — then Iris can look up sources for the key terms and topics.</p>';
+    return;
+  }
+  var claims = [];
+  n.sections.slice(0, 6).forEach(function(sec){
+    var txt = sec.items.map(function(s){ return s.text; }).join(' ').toLowerCase();
+    var term = null;
+    for(var i = 0; i < n.terms.length; i++){ if(txt.indexOf(n.terms[i].term.toLowerCase()) >= 0){ term = n.terms[i]; break; } }
+    claims.push({ section: sec.title, phrase: term ? term.term : sec.title });
+  });
+  if(!claims.length && n.terms.length) claims.push({ section: 'Key terms', phrase: n.terms[0].term });
+  box.innerHTML = '<div class="sl-shimmer" aria-label="Searching for sources"></div><p class="small">Iris is checking Wikipedia, OpenAlex, and Crossref…</p>';
+  var html = '<p class="small"><strong>Proof &amp; resources</strong> — outside sources that back up (or expand) what your professor said. Your lecture notes stay the primary source.</p>';
+  for(var ci = 0; ci < claims.length; ci++){
+    var c = claims[ci];
+    var found = await lecProofSearch(c.phrase, fetchFn);
+    var verified = [];
+    for(var vi = 0; vi < found.length; vi++){ if(await lecProofVerify(found[vi].url, fetchFn)) verified.push(found[vi]); }
+    html += '<div style="margin-top:10px"><strong>' + esc(c.section) + '</strong> — \u201c' + esc(c.phrase) + '\u201d';
+    if(verified.length){
+      html += verified.map(function(it){
+        return '<div class="small" style="margin-top:4px">• <a href="' + esc(it.url) + '" target="_blank" rel="noopener">' + esc(it.title) + '</a> — ' + esc(it.source) + '. ' + esc(it.backs) + '.</div>';
+      }).join('');
+    } else {
+      html += '<div class="small" style="margin-top:4px">No solid source found for this part — check your textbook.</div>';
+    }
+    html += '<div class="small" style="margin-top:2px"><a href="https://scholar.google.com/scholar?q=' + encodeURIComponent(c.phrase) + '" target="_blank" rel="noopener">Search Google Scholar for \u201c' + esc(c.phrase) + '\u201d</a></div></div>';
+  }
+  box.innerHTML = html;
+}
+window.lecProofRun = lecProofRun;
+(function(){
+  var b = $('lecProofBtn');
+  if(b) b.addEventListener('click', function(){ lecProofRun(); });
+})();
+</script>
+
+<script>
+/* =====================================================================
+   v2.22 DESIGN SYSTEM — grouped navigation (Study / Lecture / Iris /
+   Screen / Focus), subnav chips, the Today header, focus ambience.
+   The rail keeps every section button (grouped under captions on
+   desktop); on phones the rail becomes a clean 5-destination bar and
+   the group's sections live in the chip row at the top of the page.
+   ===================================================================== */
+var SL_GROUPS = {
+  study:   { label: 'Study',   home: 'study',   tabs: [['study', 'Study pack'], ['cards', 'Flashcards'], ['quiz', 'Quiz'], ['lab', 'Lab tools']] },
+  lecture: { label: 'Lecture', home: 'lecture', tabs: [['lecture', 'Lecture notes']] },
+  iris:    { label: 'Iris',    home: 'detect',  tabs: [['detect', 'Detector'], ['tutor', 'Ask Iris'], ['coach', 'Voice Coach'], ['check', 'Check answers']] },
+  screen:  { label: 'Screen',  home: 'screen',  tabs: [['screen', 'Screen']] },
+  focus:   { label: 'Focus',   home: 'focus',   tabs: [['focus', 'Focus']] }
+};
+var SL_TAB2GROUP = {};
+Object.keys(SL_GROUPS).forEach(function(g){ SL_GROUPS[g].tabs.forEach(function(t){ SL_TAB2GROUP[t[0]] = g; }); });
+function slTodayRender(){
+  var g = $('todayGreet'); if(!g) return;
+  var h = new Date().getHours();
+  g.textContent = (h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening') + ' — I\u2019m Iris.';
+  var due = (typeof srqDueCount === 'function') ? srqDueCount() : 0;
+  var line = $('todayLine');
+  if(line) line.textContent = due > 0
+    ? 'You have ' + due + ' item' + (due === 1 ? '' : 's') + ' due for review — the fastest win of the day.'
+    : 'Nothing due for review right now. Paste material below and I\u2019ll build you a study pack.';
+  var db = $('todayDueBtn'); if(db) db.hidden = !(due > 0);
+  var cont = $('todayContinueBtn'), label = '';
+  try{
+    var lec = JSON.parse(localStorage.getItem('studylens.lecture.v1') || 'null');
+    if(lec && lec.notes) label = 'Continue your lecture notes';
+  }catch(e){}
+  if(!label && typeof S !== 'undefined' && S.terms && S.terms.length) label = 'Continue your study pack';
+  if(cont){ cont.hidden = !label; cont.textContent = label || 'Continue'; }
+  var st = $('todayStreak');
+  if(st){
+    try{
+      var s = JSON.parse(localStorage.getItem('studylens.streak') || 'null');
+      st.textContent = (s && s.count > 0) ? ('🔥 ' + s.count + '-day study streak') : '';
+    }catch(e){ st.textContent = ''; }
+  }
+}
+function slNavSync(id){
+  var grp = SL_TAB2GROUP[id] || 'study';
+  document.querySelectorAll('.gnavbtn').forEach(function(b){ b.classList.toggle('on', b.getAttribute('data-group') === grp); });
+  var bar = $('subNav'); if(!bar) return;
+  var G = SL_GROUPS[grp];
+  if(!G || G.tabs.length <= 1){ bar.hidden = true; bar.innerHTML = ''; return; }
+  bar.hidden = false;
+  bar.innerHTML = G.tabs.map(function(t){
+    return '<button class="slm-btn' + (t[0] === id ? ' on' : '') + '" data-subtab="' + t[0] + '">' + t[1] + '</button>';
+  }).join('');
+  bar.querySelectorAll('[data-subtab]').forEach(function(b){
+    b.addEventListener('click', function(){
+      var t = b.getAttribute('data-subtab');
+      if(t === 'check'){
+        showTab('lab');
+        var gb = $('chkGradeBtn'); if(gb) gb.scrollIntoView();
+        return;
+      }
+      showTab(t);
+    });
+  });
+  if(id === 'study') slTodayRender();
+}
+window.slNavSync = slNavSync;
+(function(){
+  document.querySelectorAll('.gnavbtn').forEach(function(b){
+    b.addEventListener('click', function(){
+      var G = SL_GROUPS[b.getAttribute('data-group')];
+      if(G) showTab(G.home);
+    });
+  });
+  var db = $('todayDueBtn');
+  if(db) db.addEventListener('click', function(){ var c = $('srqCard'); if(c) c.scrollIntoView(); });
+  var cb = $('todayContinueBtn');
+  if(cb) cb.addEventListener('click', function(){
+    if(cb.textContent.indexOf('lecture') >= 0) showTab('lecture');
+    else { var c = $('todayCard'); if(c) c.scrollIntoView(); }
+  });
+  slNavSync('study');
+  /* focus ambience: breathe while the timer runs */
+  setInterval(function(){
+    var a = $('focusAmbience'); if(!a) return;
+    var run = (typeof FOCUS !== 'undefined' && !!FOCUS.running);
+    a.hidden = !run;
+  }, 1000);
+})();
+</script>
+
 </body>
 </html>

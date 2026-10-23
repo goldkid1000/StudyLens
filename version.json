@@ -1,1 +1,9 @@
-{"notes":["Simple Study has an intake tray now, like Lab: add up to 4 photos and up to 6 files, watch them queue up as chips (files show their character count once read), remove any of them, and tap “Done — build my pack” when you are ready. Nothing is read until Done — then the photos are read on this device, the file text is added, and everything combines with whatever you pasted into “Your material” to build one pack. If one item can't be read, it is named and skipped, never a dead end.","Messy scans can no longer turn into messy exercises: photo text now passes a quality check before anything is built. Symbol-soup lines and broken fragments from a rough read are dropped, only clear sentences can become flashcards, quiz questions, or word-bank items, and the word bank only ever holds real terms. If a photo read messily, StudyLens says so plainly and builds from the clean part — and if nothing came through clearly, it tells you instead of inventing exercises from noise.","Everything still happens on this device: photos and files are never uploaded, and the tray holds its items in the page only — reload and it starts empty."],"notify":true,"updated":"2026-10-22","version":"2.21.6"}
+{
+  "version": "2.22.0",
+  "updated": "2026-10-23",
+  "notify": true,
+  "notes": [
+    "Meet Iris, your tutor \u2014 plus new study modes (Simple, Guided, Challenge, Exam Prep), a spaced review queue, and Iris spotting what kind of material you pasted.",
+    "Subject knowledge packs for 7 core subjects with fresh-numbered practice (never your assignment's numbers), focus music built in, and a smarter, better-polished Screen tab."
+  ]
+}
