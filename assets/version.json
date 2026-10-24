@@ -1,9 +1,9 @@
 {
-  "version": "2.23.0",
-  "updated": "2026-10-23",
+  "version": "2.24.0",
+  "updated": "2026-10-24",
   "notify": true,
   "notes": [
-    "Lecture Notes captures audio properly now: capture profiles (lecture hall / close mic / noisy room), a microphone picker with a live level meter and mic test, and crash-safe on-device saving \u2014 a crash or closed tab no longer loses your lecture, and it is never uploaded.",
-    "Whisper transcribes better: audio is level-checked and boosted first, silent audio is called out before any download, long lectures transcribe in parts, and a clearer Base model joins Tiny. Live captions show words as they\u2019re heard and say so when they hiccup."
+    "NEW subject pack: Psychology Basics — classical and operant conditioning, reinforcement schedules, neurons and the action potential, memory and forgetting, sleep, and social influence, with scenario practice using fresh examples, never your assignment.",
+    "Detector V21 was trained and measured this run but HELD, not shipped: on the frozen probe it caught 12 of 18 humanized texts vs 13 for the shipped V20, and its human false-flag rate ticked up slightly (4.75% vs 4.71%). V20 stays live until a round genuinely beats it."
   ]
 }

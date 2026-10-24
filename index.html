@@ -4362,8 +4362,11 @@ ssRefresh();
    fetched with no-store caching: when a newer build ships, an already-open or
    home-screen copy of an older build sees the newer version number there and
    offers "Update now" (a reload onto the new build). */
-var APP_VERSION = '2.23.0';
+var APP_VERSION = '2.24.0';
 var CHANGELOG = [
+ { v:'2.24.0', date:'Oct 24, 2026', notify:true, notes:[
+   'NEW subject pack: Psychology Basics \u2014 classical and operant conditioning, reinforcement schedules, neurons and the action potential, memory and forgetting, sleep, and social influence, with scenario practice (which schedule? which principle?) using fresh examples, never your assignment.',
+   'Detector V21 was trained and measured this run but HELD, not shipped: on the frozen probe it caught 12 of 18 humanized texts vs 13 for the shipped V20, and its human false-flag rate ticked up slightly (4.75% vs 4.71%). V20 stays live until a round genuinely beats it.' ]},
  { v:'2.23.0', date:'Oct 23, 2026', notify:true, notes:[
    'Lecture Notes captures audio properly now: pick a capture profile — lecture hall (no processing to smear a far-away professor), close mic, or noisy room — choose your microphone, and watch a live level meter while you record. Iris warns you mid-recording if she can barely hear anything.',
    'Crash-safe recordings: your lecture audio is saved on this device as you record, so a closed tab, a crash, or a dead battery no longer loses it. It is never uploaded, and “Delete saved audio” removes it whenever you want.',
@@ -7574,9 +7577,66 @@ var SL_PACKS = {
         return { prompt: it.prompt, options: it.options.slice(), answer: it.answer, work: it.work };
       }
     ]
+  },
+  psych: {
+    title: 'Psychology Basics',
+    sources: 'Sources: OpenStax Psychology 2e (Spielman et al.); Myers & DeWall, Psychology. Explanations are textbook-level summaries, not medical advice.',
+    concepts: [
+      { term: 'Classical conditioning', explain: 'Learning by association (Pavlov): a neutral stimulus paired repeatedly with an unconditioned stimulus (UCS) becomes a conditioned stimulus (CS) that alone triggers the conditioned response (CR). Example: a bell paired with food eventually makes a dog salivate to the bell alone. Without further pairing, the response fades (extinction) but can briefly return (spontaneous recovery).' },
+      { term: 'Operant conditioning', explain: 'Learning by consequences (Skinner): behaviours followed by reinforcement get stronger; behaviours followed by punishment get weaker. Reinforcement always strengthens a behaviour, punishment always weakens one \u2014 judge by what happens to the behaviour, not by whether the consequence feels nice or nasty.' },
+      { term: 'Reinforcement schedules', explain: 'Continuous reinforcement rewards every response; partial (intermittent) reinforcement rewards only some, and resists extinction better. Fixed-ratio: after a set number of responses (piecework pay). Variable-ratio: after an unpredictable number (slot machines \u2014 the most persistent). Fixed-interval: after a set time (a weekly paycheck). Variable-interval: after an unpredictable time (surprise inspections).' },
+      { term: 'Neurons and the action potential', explain: 'A neuron receives signals at its dendrites, integrates them in the cell body, and sends its own signal down the axon to the terminal buttons, which release neurotransmitters across the synapse. At rest the inside of the axon is about \u221270 mV; a stimulus past threshold (about \u221255 mV) fires an all-or-none action potential, sped along by the myelin sheath.' },
+      { term: 'Memory: encoding, storage, retrieval', explain: 'Atkinson\u2013Shiffrin model: sensory memory holds raw input for a second or two; short-term (working) memory holds about 7 items (Miller\u2019s 7 \u00B1 2) for roughly 20\u201330 seconds unless rehearsed; long-term memory is effectively unlimited. Forgetting can strike at any stage: encoding failure (never stored), decay, or retrieval failure (stored but not found).' },
+      { term: 'Interference', explain: 'Old memories can block new ones (proactive interference \u2014 your old phone number keeps surfacing when you try to recall the new one) and new memories can block old ones (retroactive interference \u2014 this year\u2019s password hides last year\u2019s). Interference, not simple decay, explains most everyday forgetting.' },
+      { term: 'Sleep and circadian rhythm', explain: 'The circadian rhythm is the roughly 24-hour body clock, driven by the suprachiasmatic nucleus and reset by light. Night sleep cycles through light NREM stages, deep slow-wave sleep, and REM sleep (rapid eye movements, vivid dreams, a near-paralysed body). Sleep consolidates memories: studying then sleeping beats studying then staying up.' },
+      { term: 'Social influence', explain: 'Conformity: matching a group\u2019s judgement even when it looks wrong (Asch\u2019s line experiment). Obedience: following an authority\u2019s orders even against conscience (Milgram\u2019s shock experiment \u2014 most participants went to the maximum, in a lab setting, under an experimenter\u2019s direction). Bystander effect: people are less likely to help when others are present, because responsibility feels shared (diffusion of responsibility).' }
+    ],
+    formulas: [
+      { name: 'Positive vs negative', form: 'Positive = ADDS a stimulus \u00B7 Negative = REMOVES a stimulus', note: 'Either can reinforce (strengthen behaviour) or punish (weaken it). Seatbelt on \u2192 beeping stops: negative reinforcement, because a behaviour (buckling) got stronger.' },
+      { name: 'All-or-none law', form: 'A neuron fires fully or not at all', note: 'A stronger stimulus does not make a bigger action potential \u2014 it makes more neurons fire, or fire more often.' },
+      { name: 'Miller\u2019s 7 \u00B1 2', form: 'Short-term memory holds about 7 items (range 5\u20139)', note: 'Chunking beats the limit: group digits or ideas into meaningful units instead of memorising them one by one.' }
+    ],
+    gens: [
+      function(){
+        var bank = [
+          { s: 'A slot-machine player keeps pulling the lever because a win could come after any number of pulls.', a: 'Variable-ratio', w: 'Variable-ratio: reinforcement after an unpredictable NUMBER of responses. Unpredictability is what makes it the hardest schedule to extinguish.' },
+          { s: 'A factory worker is paid for every 10 items assembled.', a: 'Fixed-ratio', w: 'Fixed-ratio: reinforcement after a SET number of responses. Piecework pay is the textbook example.' },
+          { s: 'An employee receives a paycheck every Friday, no matter how much was done that week.', a: 'Fixed-interval', w: 'Fixed-interval: reinforcement after a SET amount of TIME has passed, regardless of response count.' },
+          { s: 'A health inspector visits restaurants at unpredictable times, so kitchens stay ready all the time.', a: 'Variable-interval', w: 'Variable-interval: reinforcement (or checking) after an UNPREDICTABLE amount of time. The unpredictability keeps responding steady.' }
+        ];
+        var it = slPick(bank);
+        var opts = ['Fixed-ratio', 'Variable-ratio', 'Fixed-interval', 'Variable-interval'];
+        var k = slR(0, 3); opts = opts.slice(k).concat(opts.slice(0, k));
+        return { prompt: 'Which reinforcement schedule is this? \u2014 ' + it.s, options: opts, answer: it.a, work: it.w };
+      },
+      function(){
+        var bank = [
+          { s: 'A dog that was fed every time a bell rang now salivates when it hears the bell alone.', a: 'Classical conditioning', w: 'Classical conditioning: a learned ASSOCIATION between two stimuli (bell + food). No voluntary behaviour was rewarded; the bell became a conditioned stimulus.' },
+          { s: 'A student finishes homework early and earns an extra hour of screen time.', a: 'Positive reinforcement', w: 'Positive reinforcement: a pleasant stimulus is ADDED and the behaviour (finishing homework) gets stronger.' },
+          { s: 'A driver buckles the seatbelt and the annoying beeping stops.', a: 'Negative reinforcement', w: 'Negative reinforcement: an unpleasant stimulus is REMOVED and the behaviour (buckling) gets stronger. Negative here means subtraction, not badness.' },
+          { s: 'A teenager loses phone privileges for breaking curfew.', a: 'Negative punishment', w: 'Negative punishment: a valued stimulus is REMOVED and the behaviour (breaking curfew) gets weaker. Punishment always weakens; negative means removal.' }
+        ];
+        var it = slPick(bank);
+        var opts = ['Classical conditioning', 'Positive reinforcement', 'Negative reinforcement', 'Negative punishment'];
+        var k = slR(0, 3); opts = opts.slice(k).concat(opts.slice(0, k));
+        return { prompt: 'Which learning principle is this? \u2014 ' + it.s, options: opts, answer: it.a, work: it.w };
+      },
+      function(){
+        var bank = [
+          { s: 'You repeat a new phone number to yourself until you can dial it, then forget it minutes later.', a: 'Short-term (working) memory', w: 'Short-term memory holds a handful of items for well under a minute unless rehearsed \u2014 exactly what repeating the number was doing.' },
+          { s: 'You study in the evening, sleep well, and recall the material better the next morning than a friend who stayed up.', a: 'Memory consolidation during sleep', w: 'Sleep consolidates memories: the brain replays and stabilises what was encoded, so sleep after studying beats an all-nighter.' },
+          { s: 'You cannot remember the name of someone you met at a noisy party because you never really registered it.', a: 'Encoding failure', w: 'Encoding failure: if attention never got the information into storage, there is nothing to retrieve later \u2014 it is not lost, it was never stored.' },
+          { s: 'Your old phone number keeps popping up when you try to remember your new one.', a: 'Proactive interference', w: 'Proactive interference: an OLD memory blocks a NEW one. (If the new one blocked the old one, it would be retroactive interference.)' }
+        ];
+        var it = slPick(bank);
+        var opts = ['Short-term (working) memory', 'Memory consolidation during sleep', 'Encoding failure', 'Proactive interference'];
+        var k = slR(0, 3); opts = opts.slice(k).concat(opts.slice(0, k));
+        return { prompt: 'Which memory principle is this? \u2014 ' + it.s, options: opts, answer: it.a, work: it.w };
+      }
+    ]
   }
 };
-window.slPacks = SL_PACKS;
+
 /* Ask a pack: explanations + analogous examples only. A request carrying
    the learner's own problem numbers is steered to a fresh example. */
 function slPackAsk(id, text){
