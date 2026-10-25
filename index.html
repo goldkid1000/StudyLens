@@ -1055,12 +1055,13 @@ input.snap-in{background:var(--surface3);border:1.5px solid var(--line);border-r
           <button class="btn plain small iris-chip" data-q="Give me a practice problem">Give me a practice problem</button>
         </div>
         <details>
-          <summary>Optional: connect real AI (Ollama — cloud or your PC)</summary>
+          <summary>Optional: connect real AI (Ollama — cloud, proxy, or your PC)</summary>
           <div class="inner">
-            <p class="small">Connect a real AI model for the Tutor and for chatting about your screen. <strong>Ollama Cloud</strong> works anywhere with your own ollama.com API key; <strong>local Ollama</strong> runs on your own PC. Vision models — the default <strong>qwen2.5vl:7b</strong> — can actually see your screen capture in screen chat; text-only models work from the text read off it instead. Keys and addresses live in this tab's memory only, are never stored, and chats go only to the service you pick. Leave both unconnected to use the built-in tutor.</p>
+            <p class="small">Connect a real AI model for the Tutor and for chatting about your screen. <strong>Ollama Cloud</strong> works anywhere with your own ollama.com API key, but some browsers and networks block the direct call — if you see “Failed to fetch”, use <strong>Proxy</strong> instead: a tiny server holds your key and forwards chats, so the page never touches ollama.com directly. <strong>Local Ollama</strong> runs on your own PC. Vision models — the default <strong>qwen2.5vl:7b</strong> — can actually see your screen capture in screen chat; text-only models work from the text read off it instead. Keys and addresses live in this tab's memory only, are never stored, and chats go only to the service you pick. Leave all three unconnected to use the built-in tutor.</p>
             <div class="mode-row" style="margin-top:10px">
               <button class="mode-btn on" id="ollamaModeCloud">Ollama Cloud</button>
               <button class="mode-btn" id="ollamaModeLocal">Local Ollama (PC)</button>
+              <button class="mode-btn" id="ollamaModeProxy">Proxy (key on server)</button>
             </div>
             <div id="cloudKeyRow">
               <div class="row">
@@ -1074,6 +1075,14 @@ input.snap-in{background:var(--surface3);border:1.5px solid var(--line);border-r
                 <input type="url" id="ollamaUrl" placeholder="http://localhost:11434" style="flex:1;min-width:220px">
                 <button class="btn ghost small" id="ollamaSaveBtn">Use address</button>
               </div>
+            </div>
+            <div id="proxyUrlRow" hidden>
+              <div class="row">
+                <input type="url" id="proxyUrl" placeholder="Proxy address, e.g. http://localhost:8000 or your Worker URL" style="flex:1;min-width:220px">
+                <input type="password" id="proxyKey" placeholder="Proxy password (only if you set one)" autocomplete="off" style="flex:1;min-width:180px">
+                <button class="btn ghost small" id="proxySaveBtn">Use proxy</button>
+              </div>
+              <p class="small">The proxy holds your Ollama key on the server — this page never sees it. Run the included proxy on your PC, or deploy the Worker version, and paste its address here.</p>
             </div>
             <div class="row">
               <label class="small" for="modelPick" style="font-weight:600">Model</label>
@@ -2740,22 +2749,37 @@ function localTutor(q){
     return 'Best routine: 1) read the summary, 2) flip the flashcards until you get each one right twice in a row, 3) take the quiz, 4) re-explain every missed idea out loud in your own words. Short daily reps beat one long cram.';
   return 'Good question. Let\'s break it down: what part do you already understand, and where exactly do you get stuck? If it\'s in your pasted material, quote a line and I\'ll walk through it with you — I won\'t just hand you the answer.';
 }
-/* ---- Ollama wiring: Ollama Cloud or local Ollama, one model picker ----
+/* ---- Ollama wiring: Ollama Cloud, local Ollama, or a proxy, one model picker ----
    Cloud: POST https://ollama.com/api/chat with the user's own key as a Bearer
    token. The key lives in this tab's memory only — never stored, sent only
    to ollama.com. Local: POST {address}/api/chat (default
-   http://localhost:11434). Both the Tutor and screen chat use ollamaChat();
+   http://localhost:11434). Proxy: POST {proxy}/api/chat with NO key from
+   this page — the proxy server holds the Ollama key and adds the Bearer
+   header itself, which is what makes cloud models work from a browser page
+   that ollama.com won't answer directly (plus an optional proxy password).
+   All three modes feed the Tutor and screen chat through ollamaChat();
    vision models (default qwen2.5vl:7b) also receive the capture image.
    GPTZero stays the detector — none of this touches the Detect tab. */
 var OLLAMA_MODE = 'cloud';
 var CLOUD_KEY = '';
+var PROXY_URL = '';
+var PROXY_KEY = '';
 var OLLAMA_MODEL = 'qwen2.5vl:7b';
+function ollamaModeLabel(){
+  return OLLAMA_MODE === 'local' ? 'Local' : (OLLAMA_MODE === 'proxy' ? 'Proxy' : 'Cloud');
+}
 function ollamaReady(){
-  return OLLAMA_MODE === 'local' ? !!OLLAMA : !!CLOUD_KEY;
+  if(OLLAMA_MODE === 'local') return !!OLLAMA;
+  if(OLLAMA_MODE === 'proxy') return !!PROXY_URL;
+  return !!CLOUD_KEY;
 }
 function ollamaChat(messages){
   var url, headers = { 'Content-Type': 'application/json' };
   if(OLLAMA_MODE === 'local'){ url = OLLAMA + '/api/chat'; }
+  else if(OLLAMA_MODE === 'proxy'){
+    url = PROXY_URL + '/api/chat';
+    if(PROXY_KEY) headers['X-Proxy-Key'] = PROXY_KEY;
+  }
   else { url = 'https://ollama.com/api/chat'; headers['Authorization'] = 'Bearer ' + CLOUD_KEY; }
   return fetch(url, { method: 'POST', headers: headers,
     body: JSON.stringify({ model: OLLAMA_MODEL || 'qwen2.5vl:7b', stream: false, messages: messages })
@@ -2781,7 +2805,7 @@ async function sendChat(){
          failed, say exactly why in the Ollama status line, then still
          answer with the built-in tutor so the chat never goes dead. */
       var st = $('ollamaStatus');
-      if(st) st.textContent = 'Ollama ' + (OLLAMA_MODE === 'local' ? 'Local' : 'Cloud')
+      if(st) st.textContent = 'Ollama ' + ollamaModeLabel()
         + ' failed (' + e.message + ') — using the built-in tutor. Check the key and mode above.';
     }
   }
@@ -2794,11 +2818,12 @@ $('chatInput').addEventListener('keydown', function(e){ if(e.key === 'Enter') se
    Iris answers exactly as if the words had been typed. */
 document.querySelectorAll('.iris-chip').forEach(function(b){ b.addEventListener('click', function(){ $('chatInput').value = b.getAttribute('data-q'); sendChat(); }); });
 function syncOllamaUI(){
-  var cloud = OLLAMA_MODE === 'cloud';
-  $('cloudKeyRow').hidden = !cloud;
-  $('localUrlRow').hidden = cloud;
-  $('ollamaModeCloud').classList.toggle('on', cloud);
-  $('ollamaModeLocal').classList.toggle('on', !cloud);
+  $('cloudKeyRow').hidden = OLLAMA_MODE !== 'cloud';
+  $('localUrlRow').hidden = OLLAMA_MODE !== 'local';
+  $('proxyUrlRow').hidden = OLLAMA_MODE !== 'proxy';
+  $('ollamaModeCloud').classList.toggle('on', OLLAMA_MODE === 'cloud');
+  $('ollamaModeLocal').classList.toggle('on', OLLAMA_MODE === 'local');
+  $('ollamaModeProxy').classList.toggle('on', OLLAMA_MODE === 'proxy');
 }
 $('ollamaModeCloud').addEventListener('click', function(){
   OLLAMA_MODE = 'cloud'; syncOllamaUI();
@@ -2807,6 +2832,15 @@ $('ollamaModeCloud').addEventListener('click', function(){
 $('ollamaModeLocal').addEventListener('click', function(){
   OLLAMA_MODE = 'local'; syncOllamaUI();
   $('ollamaStatus').textContent = 'Local Ollama — set the address of the Ollama running on your PC above.';
+});
+$('ollamaModeProxy').addEventListener('click', function(){
+  OLLAMA_MODE = 'proxy'; syncOllamaUI();
+  $('ollamaStatus').textContent = 'Proxy — set the proxy address above. The proxy holds your Ollama key on the server, so this page never sees it.';
+});
+$('proxySaveBtn').addEventListener('click', function(){
+  PROXY_URL = $('proxyUrl').value.trim().replace(/\/+$/, '');
+  PROXY_KEY = $('proxyKey').value.trim();
+  $('ollamaStatus').textContent = PROXY_URL ? 'Set — the Tutor and screen chat will try ' + OLLAMA_MODEL + ' through ' + PROXY_URL + ' first, and fall back to the built-in answers if it doesn\'t respond.' : 'Cleared — using the built-in tutor.';
 });
 $('cloudSaveBtn').addEventListener('click', function(){
   CLOUD_KEY = $('cloudKey').value.trim();
@@ -4380,8 +4414,12 @@ ssRefresh();
    fetched with no-store caching: when a newer build ships, an already-open or
    home-screen copy of an older build sees the newer version number there and
    offers "Update now" (a reload onto the new build). */
-var APP_VERSION = '2.28.0';
+var APP_VERSION = '2.29.0';
 var CHANGELOG = [
+ { v:'2.29.0', date:'Oct 25, 2026', notify:true, notes:[
+   'NEW: Proxy mode for Ollama — if the direct cloud call fails with “Failed to fetch”, pick “Proxy (key on server)” and point it at the included proxy instead. The proxy holds your Ollama key on the server and forwards chats, so the page never touches ollama.com directly and never sees the key. The PC proxy (proxy.py) and Cloudflare Worker version ship in the studylens-ollama-proxy pack.',
+   'Tutor and screen chat both use the new mode, and failures now name it (“Ollama Proxy failed …”) so you can tell which path broke.',
+   'Nothing else changed: the detector, study packs, and tutor rules are untouched.' ]},
  { v:'2.28.0', date:'Oct 25, 2026', notify:true, notes:[
    'Tutor: when Ollama is connected but the call fails, Iris now says exactly why (for example “Ollama Cloud failed (Ollama returned HTTP 401)”) in the Ollama status line instead of quietly falling back to the built-in tutor — so you can tell at a glance whether the cloud key is actually working.',
    'Nothing else changed: the detector, study packs, and tutor rules are untouched.' ]},
