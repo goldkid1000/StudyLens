@@ -1,12 +1,9 @@
 {
   "notes": [
-    "Detector tab fixed: it still called the live model V18 in four places \u2014 the file-scan card, the no-sentences note, the results header, and the per-sentence explanation. It now correctly names the shipped V20 detector with its measured numbers (86.2% overall accuracy, 91.7% GPT-5 detection, 4.71% false-flag rate, 72% humanized catch). The detector itself did not change.",
-    "Focus timer now keeps today's total: finished focus blocks add up across visits, so the Session log shows \u201cToday so far\u201d even after you close and reopen the tab. Breaks don't count toward the total.",
-    "Tutor: Iris now has one-tap starter chips under the chat box \u2014 quiz me on the key terms, explain this in simple words, or give me a practice problem \u2014 instead of typing the prompt yourself.",
-    "Quiz: a live progress line (\u201cAnswered 3 of 8 \u00b7 2 right so far\u201d) while you work through a quiz, so you always know where you stand before the final score.",
-    "Small cleanup: a never-shown lab photo preview element was removed; nothing visible changes."
+    "Tutor: when Ollama is connected but the call fails, Iris now says exactly why (for example “Ollama Cloud failed (Ollama returned HTTP 401)”) in the Ollama status line instead of quietly falling back to the built-in tutor — so you can tell at a glance whether the cloud key is actually working.",
+    "Nothing else changed: the detector, study packs, and tutor rules are untouched."
   ],
   "notify": true,
   "updated": "2026-10-25",
-  "version": "2.27.0"
+  "version": "2.28.0"
 }

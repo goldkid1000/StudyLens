@@ -2776,7 +2776,14 @@ async function sendChat(){
         { role: 'user', content: q }
       ]);
       if(ans){ chatAdd(ans, 'ai'); return; }
-    }catch(e){ /* fall through to built-in tutor */ }
+    }catch(e){
+      /* No more silent fallback: if a key/address was set but the call
+         failed, say exactly why in the Ollama status line, then still
+         answer with the built-in tutor so the chat never goes dead. */
+      var st = $('ollamaStatus');
+      if(st) st.textContent = 'Ollama ' + (OLLAMA_MODE === 'local' ? 'Local' : 'Cloud')
+        + ' failed (' + e.message + ') — using the built-in tutor. Check the key and mode above.';
+    }
   }
   setTimeout(function(){ chatAdd(localTutor(q), 'ai'); }, 150);
 }
@@ -4373,8 +4380,11 @@ ssRefresh();
    fetched with no-store caching: when a newer build ships, an already-open or
    home-screen copy of an older build sees the newer version number there and
    offers "Update now" (a reload onto the new build). */
-var APP_VERSION = '2.27.0';
+var APP_VERSION = '2.28.0';
 var CHANGELOG = [
+ { v:'2.28.0', date:'Oct 25, 2026', notify:true, notes:[
+   'Tutor: when Ollama is connected but the call fails, Iris now says exactly why (for example “Ollama Cloud failed (Ollama returned HTTP 401)”) in the Ollama status line instead of quietly falling back to the built-in tutor — so you can tell at a glance whether the cloud key is actually working.',
+   'Nothing else changed: the detector, study packs, and tutor rules are untouched.' ]},
  { v:'2.27.0', date:'Oct 25, 2026', notify:true, notes:[
    'Detector tab fixed: it still called the live model V18 in four places — the file-scan card, the no-sentences note, the results header, and the per-sentence explanation. It now correctly names the shipped V20 detector with its measured numbers (86.2% overall accuracy, 91.7% GPT-5 detection, 4.71% false-flag rate, 72% humanized catch). The detector itself did not change.',
    'Focus timer now keeps today’s total: finished focus blocks add up across visits, so the Session log shows “Today so far” even after you close and reopen the tab. Breaks don’t count toward the total.',
