@@ -1,9 +1,9 @@
 {
-  "version": "2.24.0",
-  "updated": "2026-10-24",
-  "notify": true,
   "notes": [
-    "NEW subject pack: Psychology Basics — classical and operant conditioning, reinforcement schedules, neurons and the action potential, memory and forgetting, sleep, and social influence, with scenario practice using fresh examples, never your assignment.",
-    "Detector V21 was trained and measured this run but HELD, not shipped: on the frozen probe it caught 12 of 18 humanized texts vs 13 for the shipped V20, and its human false-flag rate ticked up slightly (4.75% vs 4.71%). V20 stays live until a round genuinely beats it."
-  ]
+    "NEW subject pack: Physics Basics — Newton's laws, constant-acceleration motion, work and kinetic energy, momentum and impulse, gravitational potential energy, and waves, with fresh-number practice (force, final velocity) and which-law scenarios, never your assignment.",
+    "Detector V22 was trained and measured this run but HELD, not shipped: on the frozen probe it tied the shipped V20 (13 of 18 humanized texts) instead of beating it, so V20 stays live until a round genuinely beats it. The round did cut the human false-flag rate (4.71% to 4.59%) and reversed the formal-human false-flag creep."
+  ],
+  "notify": true,
+  "updated": "2026-10-25",
+  "version": "2.26.0"
 }

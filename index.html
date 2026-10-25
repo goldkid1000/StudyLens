@@ -4362,8 +4362,11 @@ ssRefresh();
    fetched with no-store caching: when a newer build ships, an already-open or
    home-screen copy of an older build sees the newer version number there and
    offers "Update now" (a reload onto the new build). */
-var APP_VERSION = '2.25.0';
+var APP_VERSION = '2.26.0';
 var CHANGELOG = [
+ { v:'2.26.0', date:'Oct 25, 2026', notify:true, notes:[
+   'NEW subject pack: Physics Basics \u2014 Newton\u2019s laws, constant-acceleration motion, work and kinetic energy, momentum and impulse, gravitational potential energy, and waves, with fresh-number practice (force, final velocity) and which-law scenarios, never your assignment.',
+   'Detector V22 was trained and measured this run but HELD, not shipped: on the frozen probe it tied the shipped V20 (13 of 18 humanized texts) instead of beating it, so V20 stays live until a round genuinely beats it. The round did cut the human false-flag rate (4.71% to 4.59%) and reversed the formal-human false-flag creep.' ]},
  { v:'2.25.0', date:'Oct 24, 2026', notify:true, notes:[
    'Focus music: paste a single YouTube song — or just its 11-character video ID — and it keeps playing after it ends. Your song plays first, then YouTube\u2019s mix carries on with similar songs, so there is no playlist to build. Pasted YouTube playlists still play as-is, and Spotify links are untouched.' ]},
  { v:'2.24.0', date:'Oct 24, 2026', notify:true, notes:[
@@ -7634,6 +7637,49 @@ var SL_PACKS = {
         var opts = ['Short-term (working) memory', 'Memory consolidation during sleep', 'Encoding failure', 'Proactive interference'];
         var k = slR(0, 3); opts = opts.slice(k).concat(opts.slice(0, k));
         return { prompt: 'Which memory principle is this? \u2014 ' + it.s, options: opts, answer: it.a, work: it.w };
+      }
+    ]
+  },
+  phys: {
+    title: 'Physics Basics',
+    sources: 'Sources: OpenStax University Physics Volume 1; OpenStax College Physics. Explanations are textbook-level summaries.',
+    concepts: [
+      { term: 'Newton\u2019s first law (inertia)', explain: 'A body stays at rest or in straight-line motion at constant speed unless a net external force acts on it. Inertia is the resistance to a change in motion \u2014 it is why a seatbelt matters: when the car stops, your body keeps moving forward until something stops it.' },
+      { term: 'Newton\u2019s second law', explain: 'Net force equals mass times acceleration: F = ma. The same net force gives a heavy object a smaller acceleration than a light one, and doubling the force on the same mass doubles its acceleration. Force is measured in newtons (1 N = 1 kg\u00B7m/s\u00B2).' },
+      { term: 'Newton\u2019s third law', explain: 'Forces always come in pairs: if body A pushes body B, body B pushes back on A with equal strength in the opposite direction. The pair acts on DIFFERENT bodies, so the two forces never cancel each other out \u2014 a rocket rises because its exhaust pushes down on the gas and the gas pushes up on the rocket.' },
+      { term: 'Constant-acceleration motion', explain: 'With constant acceleration a, velocity grows steadily: v = v\u2080 + at, and displacement is x = x\u2080 + v\u2080t + \u00BDat\u00B2. A third form skips time entirely: v\u00B2 = v\u2080\u00B2 + 2a\u0394x. Signs matter: pick one direction as positive and keep it for every term.' },
+      { term: 'Work and kinetic energy', explain: 'Work done by a constant force is W = Fd cos\u03B8, where \u03B8 is the angle between force and displacement \u2014 a force at right angles to the motion does no work. The work\u2013energy theorem says the net work on a body equals its change in kinetic energy, KE = \u00BDmv\u00B2.' },
+      { term: 'Momentum and impulse', explain: 'Momentum is p = mv. In an isolated system the total momentum before a collision equals the total after, even when kinetic energy is lost. Impulse is the change in momentum: J = F\u0394t = \u0394p \u2014 the same momentum change can come from a big force briefly or a small force over a long time (why airbags help).' },
+      { term: 'Gravitational potential energy', explain: 'Near Earth\u2019s surface, PE = mgh, where h is height above a chosen zero level. Without friction or other non-conservative work, mechanical energy is conserved: KE + PE stays constant, so a falling body trades height for speed.' },
+      { term: 'Waves', explain: 'For any travelling wave, speed = frequency \u00D7 wavelength: v = f\u03BB, and frequency is the inverse of period, f = 1/T. Doubling the frequency at the same speed halves the wavelength. This holds for sound, water waves and light alike.' }
+    ],
+    formulas: [
+      { name: 'Newton\u2019s second law', form: 'F = ma (net force = mass \u00D7 acceleration)', note: '1 N = 1 kg\u00B7m/s\u00B2. Double the mass at the same acceleration and you need double the force.' },
+      { name: 'Velocity under constant acceleration', form: 'v = v\u2080 + at', note: 'Only for constant a. If the body starts from rest, v\u2080 = 0 and it shortens to v = at.' },
+      { name: 'Kinetic energy', form: 'KE = \u00BDmv\u00B2', note: 'Speed matters more than mass: doubling the speed quadruples the kinetic energy, which is why stopping distance grows so fast with speed.' }
+    ],
+    gens: [
+      function(){
+        var m = slR(2, 20), a = slR(1, 9);
+        return { prompt: 'A net force accelerates a ' + m + ' kg object at ' + a + ' m/s\u00B2. What is the net force in newtons?', answer: m * a, unit: 'N', work: 'F = ma = ' + m + ' \u00D7 ' + a + ' = ' + (m * a) + ' N.' };
+      },
+      function(){
+        var v0 = slR(0, 10), a = slR(1, 5), t = slR(2, 8);
+        return { prompt: 'An object moving at ' + v0 + ' m/s accelerates steadily at ' + a + ' m/s\u00B2 for ' + t + ' s. What is its final velocity in m/s?', answer: v0 + a * t, unit: 'm/s', work: 'v = v\u2080 + at = ' + v0 + ' + ' + a + ' \u00D7 ' + t + ' = ' + (v0 + a * t) + ' m/s.' };
+      },
+      function(){
+        var bank = [
+          { s: 'A passenger lurches forward when the bus brakes suddenly, because nothing is pushing them back.', a: 'Newton\u2019s first law', w: 'Newton\u2019s first law (inertia): the passenger\u2019s body keeps its forward motion until a force \u2014 the seatbelt \u2014 stops it.' },
+          { s: 'The same push sends an empty shopping cart racing but barely moves a full one.', a: 'Newton\u2019s second law', w: 'Newton\u2019s second law: a = F/m, so the same force gives the heavier cart a smaller acceleration.' },
+          { s: 'A rocket climbs because its engines throw exhaust gas downward and the gas pushes the rocket upward.', a: 'Newton\u2019s third law', w: 'Newton\u2019s third law: the action\u2013reaction pair acts on different bodies \u2014 gas down, rocket up.' },
+          { s: 'Two skaters push off each other on ice and glide apart; neither had momentum before the push, and their momenta still sum to zero after.', a: 'Conservation of momentum', w: 'Conservation of momentum: in an isolated system the total momentum before equals the total after, even though each skater now moves.' },
+          { s: 'A hockey puck glides across smooth ice at a steady speed without anyone pushing it.', a: 'Newton\u2019s first law', w: 'Newton\u2019s first law: with no net force, motion continues unchanged \u2014 no push is needed to keep it going.' },
+          { s: 'A golfer\u2019s club and ball: the club hits the ball forward, and the ball pushes back on the club just as hard.', a: 'Newton\u2019s third law', w: 'Newton\u2019s third law: equal and opposite forces on two different bodies \u2014 club on ball, ball on club.' }
+        ];
+        var it = slPick(bank);
+        var opts = ['Newton\u2019s first law', 'Newton\u2019s second law', 'Newton\u2019s third law', 'Conservation of momentum'];
+        var k = slR(0, 3); opts = opts.slice(k).concat(opts.slice(0, k));
+        return { prompt: 'Which law or principle is this? \u2014 ' + it.s, options: opts, answer: it.a, work: it.w };
       }
     ]
   }
