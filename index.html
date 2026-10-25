@@ -528,7 +528,6 @@ mark.stock{background:var(--warn-bg);color:inherit;border-radius:4px;padding:0 3
 .snap-example h4{margin:0 0 6px;font-size:16px}
 .snap-example ol{margin:8px 0 2px;padding-left:22px}
 .snap-example li{margin-bottom:10px}
-.snap-photo{max-width:100%;border-radius:12px;margin-top:12px}
 textarea.snap-text{width:100%;background:var(--surface3);border:1.5px solid var(--line);border-radius:14px;color:var(--ink);padding:13px 14px;font-size:15.5px;font-family:inherit;min-height:110px}
 input.snap-in{background:var(--surface3);border:1.5px solid var(--line);border-radius:12px;color:var(--ink);padding:11px 13px;font-size:16px;font-family:inherit;width:150px;min-height:44px;margin-top:9px}
 .btn.snap-pick.on{outline:3px solid var(--acc);outline-offset:1px}
@@ -929,6 +928,7 @@ input.snap-in{background:var(--surface3);border:1.5px solid var(--line);border-r
         <h2>Quiz</h2>
         <p id="quizHint">Generate a study pack first. Every question is built from your own material.</p>
       </div>
+      <p class="small" id="quizProgLine" hidden></p>
       <div id="quizBox"></div>
       <div class="card" id="quizScoreCard" hidden>
         <h3 id="quizScore"></h3>
@@ -1012,7 +1012,7 @@ input.snap-in{background:var(--surface3);border:1.5px solid var(--line);border-r
 
       <div class="card">
         <h3>Batch file scan</h3>
-        <p class="mut">Scan several files at once with the same on-device V18 detector. PDF, DOCX, TXT/MD, and images (read with on-device OCR) are supported — PDFs are also scored page by page where a page has enough text. Files are read right here in this tab; nothing is uploaded. The PDF/DOCX/image readers load from a CDN on first use, like the Screen tab's text reader.</p>
+        <p class="mut">Scan several files at once with the same on-device V20 detector. PDF, DOCX, TXT/MD, and images (read with on-device OCR) are supported — PDFs are also scored page by page where a page has enough text. Files are read right here in this tab; nothing is uploaded. The PDF/DOCX/image readers load from a CDN on first use, like the Screen tab's text reader.</p>
         <div class="row">
           <label class="btn ghost filelabel" for="batchInput">Choose files…</label>
           <input type="file" id="batchInput" accept=".pdf,.docx,.txt,.md,.png,.jpg,.jpeg,.webp,.gif" multiple hidden>
@@ -1048,6 +1048,11 @@ input.snap-in{background:var(--surface3);border:1.5px solid var(--line);border-r
         <div class="chatrow">
           <input type="text" id="chatInput" placeholder="Ask about your material…">
           <button class="btn" id="chatSendBtn">Send</button>
+        </div>
+        <div class="row" style="margin-top:8px;flex-wrap:wrap">
+          <button class="btn plain small iris-chip" data-q="Quiz me on the key terms">Quiz me on the key terms</button>
+          <button class="btn plain small iris-chip" data-q="Explain this in simple words">Explain this in simple words</button>
+          <button class="btn plain small iris-chip" data-q="Give me a practice problem">Give me a practice problem</button>
         </div>
         <details>
           <summary>Optional: connect real AI (Ollama — cloud or your PC)</summary>
@@ -1228,6 +1233,7 @@ input.snap-in{background:var(--surface3);border:1.5px solid var(--line);border-r
       </div>
       <div class="card">
         <h3>Session log</h3>
+        <p class="small" id="focusTodayLine" role="status"></p>
         <ul class="log-list" id="focusLog"><li id="focusLogEmpty" class="mut">No finished sessions yet this visit — completed focus blocks and breaks will show up here.</li></ul>
       </div>
     </section>
@@ -1252,7 +1258,6 @@ input.snap-in{background:var(--surface3);border:1.5px solid var(--line);border-r
         <p>A clear, straight-on photo or screenshot works best. Reading happens on this device — nothing is uploaded.</p>
         <input type="file" id="snapFile" accept="image/*" hidden>
         <div class="row"><button class="btn" id="snapPickBtn">Choose a photo</button></div>
-        <img id="snapPreview" class="snap-photo" alt="Your lab sheet photo" hidden>
         <div id="snapOcrMsg" class="lab-msg" aria-live="polite"></div>
         <div id="snapPapers" class="snap-papers" hidden></div>
         <div id="snapPaperActions" class="row" hidden>
@@ -2024,6 +2029,7 @@ function buildQuiz(){
 function renderQuiz(){
   var box = $('quizBox');
   $('quizScoreCard').hidden = true;
+  $('quizProgLine').hidden = true;
   if(!S.quiz.length){
     box.innerHTML = '<div class="card"><p class="mut">' + (S.sentences.length
       ? 'Not enough material to build a quiz yet — add more text with several distinct ideas on the Study tab, then generate again.'
@@ -2051,6 +2057,7 @@ function answerQuiz(qi, oi, el){
   $('qfb' + qi).textContent = correct ? 'Correct.' : (q.fb || ('Not quite — the matching statement is: ' + q.answer));
   var done = Object.keys(S.quizAnswered).length;
   var right = S.quiz.filter(function(x, i){ return S.quizAnswered[i] !== undefined && x.opts[S.quizAnswered[i]] === x.answer; }).length;
+  var prog = $('quizProgLine'); if(prog){ prog.hidden = false; prog.textContent = 'Answered ' + done + ' of ' + S.quiz.length + ' · ' + right + ' right so far.'; }
   if(done === S.quiz.length){
     SESSION.quizzes += 1;
     SESSION.scorePctSum += (right / S.quiz.length) * 100;
@@ -2490,7 +2497,7 @@ function v7Reasons(sent){
   if(pos.length) out.push('words pushing toward AI: ' + pos.join(', '));
   if(neg.length) out.push('words pushing toward human: ' + neg.join(', '));
   if(!out.length) out.push('few of this sentence\'s words are in the model\'s vocabulary — it leans on character patterns and the document score');
-  out.push('the V18 sentence model also weighs character patterns — word shapes, spacing, and punctuation habits');
+  out.push('the V20 sentence model also weighs character patterns — word shapes, spacing, and punctuation habits');
   return out;
 }
 function clfTips(text, sents){
@@ -2519,7 +2526,7 @@ async function runClassifierDetector(){
   var res = v7Analyze(text);
   var sents = res.sents;
   if(!sents.length){
-    out.innerHTML = '<div class="flagbox">No full sentences found — the V18 model reads complete sentences (4+ words each). Paste a paragraph or two of connected writing.</div>';
+    out.innerHTML = '<div class="flagbox">No full sentences found — the V20 model reads complete sentences (4+ words each). Paste a paragraph or two of connected writing.</div>';
     return;
   }
   var scores = sents.map(function(s, i){
@@ -2531,8 +2538,8 @@ async function runClassifierDetector(){
   var verdict = res.verdict.toUpperCase();
   var confP = res.verdict === 'mixed' ? res.proba.mixed : Math.max(res.proba.human, res.proba.ai);
   var confLabel = confP >= 0.9 ? 'High confidence' : confP >= 0.6 ? 'Medium confidence' : 'Low confidence';
-  renderDetectorResults('Trained on-device model (V18) — ' + pA + '% AI probability · ' + confLabel, pct, verdict, sents, scores.map(function(s){ return s.score; }),
-    'V18, with probabilities calibrated on held-out data: on held-out writing it never trained on, overall accuracy is <strong>86.2%</strong>, GPT-5 detection is <strong>86.8%</strong>, and the false-flag rate on human writing is <strong>4.8%</strong>. V18 was retrained on AI writing rewritten to sound human and catches <strong>61%</strong> of it on a held-out set (V17 caught 0%) — still the hardest call after Mixed, so a Mixed or borderline result means uncertain, not proof. <strong>A score is a signal to review — never proof of who wrote something.</strong>');
+  renderDetectorResults('Trained on-device model (V20) — ' + pA + '% AI probability · ' + confLabel, pct, verdict, sents, scores.map(function(s){ return s.score; }),
+    'V20, with probabilities calibrated on held-out data: on held-out writing it never trained on, overall accuracy is <strong>86.2%</strong>, GPT-5 detection is <strong>91.7%</strong>, and the false-flag rate on human writing is <strong>4.71%</strong>. V20 was retrained on AI writing rewritten to sound human and catches <strong>72%</strong> of it on a held-out set (V18 caught 61%) — still the hardest call after Mixed, so a Mixed or borderline result means uncertain, not proof. <strong>A score is a signal to review — never proof of who wrote something.</strong>');
   if(res.verdict === 'uncertain'){
     $('detectOut').insertAdjacentHTML('afterbegin',
       '<div class="flagbox"><strong>Too close to call — no verdict given.</strong> The model is essentially tied between human and AI on this text, so instead of guessing it abstains: on held-out data these coin-flip calls are wrong about half the time. Read the writing yourself and decide; this screen is not evidence either way.</div>');
@@ -2775,6 +2782,10 @@ async function sendChat(){
 }
 $('chatSendBtn').addEventListener('click', sendChat);
 $('chatInput').addEventListener('keydown', function(e){ if(e.key === 'Enter') sendChat(); });
+/* Iris starter chips: one tap sends a common prompt, so a blank chat box
+   never blocks a new user. The chips only fill the input and send it —
+   Iris answers exactly as if the words had been typed. */
+document.querySelectorAll('.iris-chip').forEach(function(b){ b.addEventListener('click', function(){ $('chatInput').value = b.getAttribute('data-q'); sendChat(); }); });
 function syncOllamaUI(){
   var cloud = OLLAMA_MODE === 'cloud';
   $('cloudKeyRow').hidden = !cloud;
@@ -4362,8 +4373,14 @@ ssRefresh();
    fetched with no-store caching: when a newer build ships, an already-open or
    home-screen copy of an older build sees the newer version number there and
    offers "Update now" (a reload onto the new build). */
-var APP_VERSION = '2.26.0';
+var APP_VERSION = '2.27.0';
 var CHANGELOG = [
+ { v:'2.27.0', date:'Oct 25, 2026', notify:true, notes:[
+   'Detector tab fixed: it still called the live model V18 in four places — the file-scan card, the no-sentences note, the results header, and the per-sentence explanation. It now correctly names the shipped V20 detector with its measured numbers (86.2% overall accuracy, 91.7% GPT-5 detection, 4.71% false-flag rate, 72% humanized catch). The detector itself did not change.',
+   'Focus timer now keeps today’s total: finished focus blocks add up across visits, so the Session log shows “Today so far” even after you close and reopen the tab. Breaks don’t count toward the total.',
+   'Tutor: Iris now has one-tap starter chips under the chat box — quiz me on the key terms, explain this in simple words, or give me a practice problem — instead of typing the prompt yourself.',
+   'Quiz: a live progress line (“Answered 3 of 8 · 2 right so far”) while you work through a quiz, so you always know where you stand before the final score.',
+   'Small cleanup: a never-shown lab photo preview element was removed; nothing visible changes.' ]},
  { v:'2.26.0', date:'Oct 25, 2026', notify:true, notes:[
    'NEW subject pack: Physics Basics \u2014 Newton\u2019s laws, constant-acceleration motion, work and kinetic energy, momentum and impulse, gravitational potential energy, and waves, with fresh-number practice (force, final velocity) and which-law scenarios, never your assignment.',
    'Detector V22 was trained and measured this run but HELD, not shipped: on the frozen probe it tied the shipped V20 (13 of 18 humanized texts) instead of beating it, so V20 stays live until a round genuinely beats it. The round did cut the human false-flag rate (4.71% to 4.59%) and reversed the formal-human false-flag creep.' ]},
@@ -4935,6 +4952,21 @@ function beep(){
     });
   }catch(e){ /* sound is a bonus — the log entry still records the session */ }
 }
+/* ---- Focus: today's total, persisted across visits --------------------
+   Finished focus blocks (breaks excluded) are kept in localStorage under
+   studylens.focus.v1, so the Session log can show today's total even
+   after the tab closes and reopens. Old days are kept, not deleted. */
+function focusTodayKey(){ var d = new Date(); return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate(); }
+function focusTodayLoad(){ try{ var v = JSON.parse(localStorage.getItem('studylens.focus.v1') || '[]'); return Array.isArray(v) ? v : []; }catch(e){ return []; } }
+function focusTodayRender(){
+  var line = $('focusTodayLine'); if(!line) return;
+  var today = focusTodayKey();
+  var list = focusTodayLoad().filter(function(x){ return x.day === today; });
+  var mins = 0; list.forEach(function(x){ mins += x.mins || 0; });
+  line.textContent = list.length
+    ? 'Today so far: ' + mins + ' min of focus across ' + list.length + ' block' + (list.length === 1 ? '' : 's') + ' (breaks not counted).'
+    : 'No focus blocks finished today yet — your total for today will show here.';
+}
 function finishTimer(){
   stopTick();
   FOCUS.left = 0;
@@ -4951,6 +4983,8 @@ function finishTimer(){
   right.textContent = new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
   li.appendChild(left); li.appendChild(right);
   $('focusLog').insertBefore(li, $('focusLog').firstChild);
+  if(FOCUS.mode === 'focus'){ var fl = focusTodayLoad(); fl.push({ day: focusTodayKey(), mins: mins }); try{ localStorage.setItem('studylens.focus.v1', JSON.stringify(fl)); }catch(e){} }
+  focusTodayRender();
   $('timerState').textContent = FOCUS.mode === 'break' ? 'Break over — ready for the next block?' : 'Done. Nice work — take five before the next block.';
   if(FOCUS.mode === 'focus') $('breakBtn').hidden = false;
 }
@@ -4995,6 +5029,7 @@ document.addEventListener('visibilitychange', function(){ if(!document.hidden &&
 $('timerResetBtn').addEventListener('click', function(){ setTimer(FOCUS.total / 60, FOCUS.mode); });
 $('breakBtn').addEventListener('click', function(){ setTimer(5, 'break'); toggleTimer(); });
 renderTimer();
+focusTodayRender();
 
 /* ================= Export ================= */
 function downloadFile(name, content, type){

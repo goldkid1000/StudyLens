@@ -1,9 +1,12 @@
 {
   "notes": [
-    "NEW subject pack: Physics Basics — Newton's laws, constant-acceleration motion, work and kinetic energy, momentum and impulse, gravitational potential energy, and waves, with fresh-number practice (force, final velocity) and which-law scenarios, never your assignment.",
-    "Detector V22 was trained and measured this run but HELD, not shipped: on the frozen probe it tied the shipped V20 (13 of 18 humanized texts) instead of beating it, so V20 stays live until a round genuinely beats it. The round did cut the human false-flag rate (4.71% to 4.59%) and reversed the formal-human false-flag creep."
+    "Detector tab fixed: it still called the live model V18 in four places \u2014 the file-scan card, the no-sentences note, the results header, and the per-sentence explanation. It now correctly names the shipped V20 detector with its measured numbers (86.2% overall accuracy, 91.7% GPT-5 detection, 4.71% false-flag rate, 72% humanized catch). The detector itself did not change.",
+    "Focus timer now keeps today's total: finished focus blocks add up across visits, so the Session log shows \u201cToday so far\u201d even after you close and reopen the tab. Breaks don't count toward the total.",
+    "Tutor: Iris now has one-tap starter chips under the chat box \u2014 quiz me on the key terms, explain this in simple words, or give me a practice problem \u2014 instead of typing the prompt yourself.",
+    "Quiz: a live progress line (\u201cAnswered 3 of 8 \u00b7 2 right so far\u201d) while you work through a quiz, so you always know where you stand before the final score.",
+    "Small cleanup: a never-shown lab photo preview element was removed; nothing visible changes."
   ],
   "notify": true,
   "updated": "2026-10-25",
-  "version": "2.26.0"
+  "version": "2.27.0"
 }
