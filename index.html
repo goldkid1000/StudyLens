@@ -1217,9 +1217,9 @@ input.snap-in{background:var(--surface3);border:1.5px solid var(--line);border-r
         </div>
         <p class="small" id="muNote" role="status"></p>
         <h4 style="margin:16px 0 6px">Your music</h4>
-        <p class="small">Paste a YouTube or Spotify link — a playlist, video, or album — and it plays here in that service's own official player. Spotify plays full songs only when you're signed in to Spotify in this browser with Premium; that's Spotify's rule, not StudyLens's. Only youtube.com and spotify.com links are accepted.</p>
+        <p class="small">Paste a YouTube or Spotify link — or just a YouTube video ID (the 11-character code) — and it plays here in that service's own official player. Paste a single YouTube song and it keeps going after it ends: YouTube's mix plays similar songs next, no playlist needed. Paste a YouTube playlist and it plays that playlist instead. Spotify plays full songs only when you're signed in to Spotify in this browser with Premium; that's Spotify's rule, not StudyLens's. Only youtube.com and spotify.com links are accepted.</p>
         <div class="row">
-          <input type="url" id="muUrl" placeholder="Paste a YouTube or Spotify link…" aria-label="YouTube or Spotify link" style="flex:1;min-width:200px">
+          <input type="url" id="muUrl" placeholder="Paste a YouTube or Spotify link, or a YouTube video ID…" aria-label="YouTube or Spotify link" style="flex:1;min-width:200px">
           <button class="btn" id="muLoadBtn">Load player</button>
         </div>
         <p class="small" id="muEmbedMsg" role="status"></p>
@@ -4362,8 +4362,10 @@ ssRefresh();
    fetched with no-store caching: when a newer build ships, an already-open or
    home-screen copy of an older build sees the newer version number there and
    offers "Update now" (a reload onto the new build). */
-var APP_VERSION = '2.24.0';
+var APP_VERSION = '2.25.0';
 var CHANGELOG = [
+ { v:'2.25.0', date:'Oct 24, 2026', notify:true, notes:[
+   'Focus music: paste a single YouTube song — or just its 11-character video ID — and it keeps playing after it ends. Your song plays first, then YouTube\u2019s mix carries on with similar songs, so there is no playlist to build. Pasted YouTube playlists still play as-is, and Spotify links are untouched.' ]},
  { v:'2.24.0', date:'Oct 24, 2026', notify:true, notes:[
    'NEW subject pack: Psychology Basics \u2014 classical and operant conditioning, reinforcement schedules, neurons and the action potential, memory and forgetting, sleep, and social influence, with scenario practice (which schedule? which principle?) using fresh examples, never your assignment.',
    'Detector V21 was trained and measured this run but HELD, not shipped: on the frozen probe it caught 12 of 18 humanized texts vs 13 for the shipped V20, and its human false-flag rate ticked up slightly (4.75% vs 4.71%). V20 stays live until a round genuinely beats it.' ]},
@@ -7879,23 +7881,44 @@ function muSetVol(v){
   if(a && document.activeElement !== a) a.value = Math.round(MU.vol * 100);
   if(b && document.activeElement !== b) b.value = Math.round(MU.vol * 100);
 }
-/* ---- BYO embeds: strict official-domain validation ---- */
+/* ---- BYO embeds: strict official-domain validation ----
+   Single YouTube songs become a YouTube MIX (list=RD<videoId>): the
+   pasted song plays first, then YouTube's mix keeps going with similar
+   songs — no playlist to build. RD = YouTube's "mix aka radio" list,
+   documented as play-next functional; a video ID in the embed path
+   with the list in the query starts on that video, then continues
+   through the list. If YouTube has no mix for an obscure video, the
+   player just plays that song. Pasted playlists keep playing as-is. */
+function ytMix(id){
+  return { ok: true, kind: 'youtube', mix: true, label: 'YouTube mix',
+    src: 'https://www.youtube.com/embed/' + encodeURIComponent(id)
+      + '?listType=playlist&list=RD' + encodeURIComponent(id) + '&autoplay=1' };
+}
+function ytVideo(id){
+  return { ok: true, kind: 'youtube', label: 'YouTube video', src: 'https://www.youtube.com/embed/' + encodeURIComponent(id) };
+}
 function slMusicEmbed(raw){
+  var input = String(raw || '').trim();
+  /* Bare YouTube video ID (11 letters/digits/_/-), no link needed. */
+  if(/^[\w-]{11}$/.test(input)) return ytMix(input);
   var u;
-  try{ u = new URL(String(raw || '').trim()); }catch(e){ return { ok: false, msg: 'That does not look like a link. Paste the full YouTube or Spotify link.' }; }
+  try{ u = new URL(input); }catch(e){ return { ok: false, msg: 'That does not look like a link. Paste the full YouTube or Spotify link, or just a YouTube video ID (the 11-character code).' }; }
   if(u.protocol !== 'https:' && u.protocol !== 'http:'){ return { ok: false, msg: 'That link is not a web link Iris can play.' }; }
   var host = u.hostname.toLowerCase();
   if(host === 'youtu.be'){
     var id = u.pathname.slice(1).split('/')[0];
-    if(id) return { ok: true, kind: 'youtube', label: 'YouTube video', src: 'https://www.youtube.com/embed/' + encodeURIComponent(id) };
+    if(id && /^[\w-]{11}$/.test(id)) return ytMix(id);
+    if(id) return ytVideo(id);
     return { ok: false, msg: 'That youtu.be link has no video in it. Open the video and copy its link again.' };
   }
   if(host === 'youtube.com' || host === 'www.youtube.com' || host === 'm.youtube.com' || host === 'music.youtube.com'){
     var list = u.searchParams.get('list'), v = u.searchParams.get('v');
     if(list) return { ok: true, kind: 'youtube', label: 'YouTube playlist', src: 'https://www.youtube.com/embed/videoseries?list=' + encodeURIComponent(list) };
-    if(v) return { ok: true, kind: 'youtube', label: 'YouTube video', src: 'https://www.youtube.com/embed/' + encodeURIComponent(v) };
+    if(v && /^[\w-]{11}$/.test(v)) return ytMix(v);
+    if(v) return ytVideo(v);
     var m = u.pathname.match(/^\/(shorts|live)\/([\w-]+)/);
-    if(m) return { ok: true, kind: 'youtube', label: 'YouTube video', src: 'https://www.youtube.com/embed/' + m[2] };
+    if(m && /^[\w-]{11}$/.test(m[2])) return ytMix(m[2]);
+    if(m) return ytVideo(m[2]);
     return { ok: false, msg: 'That YouTube link has no video or playlist in it. Open the video or playlist page and copy the link from there.' };
   }
   if(host === 'open.spotify.com'){
@@ -7924,6 +7947,8 @@ function muLoadEmbed(){
   w.appendChild(f); w.hidden = false;
   msg.textContent = r.kind === 'spotify'
     ? 'Loaded in Spotify\u2019s own player. Full songs play when you are signed in to Spotify in this browser with Premium — that is Spotify\u2019s rule; otherwise it plays previews.'
+    : r.mix
+    ? 'Playing your song in YouTube\u2019s own player — when it ends, the mix keeps going with similar songs, no playlist needed. Press play in the player if it does not start on its own.'
     : 'Loaded in YouTube\u2019s own player. Press play in the player to start.';
   try{ localStorage.setItem('studylens.music.v1', JSON.stringify({ url: $('muUrl').value })); }catch(e){}
   muUi();

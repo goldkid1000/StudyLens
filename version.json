@@ -1,9 +1,8 @@
 {
-  "version": "2.24.0",
-  "updated": "2026-10-24",
-  "notify": true,
   "notes": [
-    "NEW subject pack: Psychology Basics — classical and operant conditioning, reinforcement schedules, neurons and the action potential, memory and forgetting, sleep, and social influence, with scenario practice using fresh examples, never your assignment.",
-    "Detector V21 was trained and measured this run but HELD, not shipped: on the frozen probe it caught 12 of 18 humanized texts vs 13 for the shipped V20, and its human false-flag rate ticked up slightly (4.75% vs 4.71%). V20 stays live until a round genuinely beats it."
-  ]
+    "Focus music: paste a single YouTube song — or just its 11-character video ID — and it keeps playing after it ends. Your song plays first, then YouTube's mix carries on with similar songs, so there is no playlist to build. Pasted YouTube playlists still play as-is, and Spotify links are untouched."
+  ],
+  "notify": true,
+  "updated": "2026-10-24",
+  "version": "2.25.0"
 }
