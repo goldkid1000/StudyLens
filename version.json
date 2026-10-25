@@ -1,10 +1,8 @@
 {
   "notes": [
-    "One AI connection for every tab: the Ollama mode, model, and addresses you set in the Tutor tab now show in an AI chip in the rail (for example “AI: Proxy · qwen2.5vl:7b”), visible on every tab, so you can always tell whether the real model or the built-in tutor is answering. Tutor chat and screen chat already shared the one connection — now you can see it.",
-    "Your mode, model, and addresses are remembered across browser-tab reloads, so only the key or proxy password needs re-pasting. Keys and passwords are still never stored — they live in tab memory only.",
-    "Nothing else changed: the detector, study packs, and tutor rules are untouched."
+    "Fixed: 2.30.0 shipped with a missing function line that broke the Tutor tab script — restored here. No user ever got the broken build (Pages was still serving 2.27.0), and nothing else changed."
   ],
   "notify": true,
   "updated": "2026-10-25",
-  "version": "2.30.0"
+  "version": "2.30.1"
 }

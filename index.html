@@ -2800,6 +2800,7 @@ function syncAiChip(){
     ? (ollamaModeLabel() + ' · ' + OLLAMA_MODEL)
     : 'off (built-in tutor)';
 }
+function ollamaModeLabel(){
   return OLLAMA_MODE === 'local' ? 'Local' : (OLLAMA_MODE === 'proxy' ? 'Proxy' : 'Cloud');
 }
 function ollamaReady(){
@@ -4454,8 +4455,10 @@ ssRefresh();
    fetched with no-store caching: when a newer build ships, an already-open or
    home-screen copy of an older build sees the newer version number there and
    offers "Update now" (a reload onto the new build). */
-var APP_VERSION = '2.30.0';
+var APP_VERSION = '2.30.1';
 var CHANGELOG = [
+ { v:'2.30.1', date:'Oct 25, 2026', notify:true, notes:[
+   'Fixed: 2.30.0 shipped with a missing function line that broke the Tutor tab script — restored here. No user ever got the broken build (Pages was still serving 2.27.0), and nothing else changed.' ]},
  { v:'2.30.0', date:'Oct 25, 2026', notify:true, notes:[
    'One AI connection for every tab: the Ollama mode, model, and addresses you set in the Tutor tab now show in an AI chip in the rail (for example “AI: Proxy · qwen2.5vl:7b”), visible on every tab, so you can always tell whether the real model or the built-in tutor is answering. Tutor chat and screen chat already shared the one connection — now you can see it.',
    'Your mode, model, and addresses are remembered across browser-tab reloads, so only the key or proxy password needs re-pasting. Keys and passwords are still never stored — they live in tab memory only.',
