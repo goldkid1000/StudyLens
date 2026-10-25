@@ -1,10 +1,10 @@
 {
   "notes": [
-    "NEW: Proxy mode for Ollama — if the direct cloud call fails with “Failed to fetch”, pick “Proxy (key on server)” and point it at the included proxy instead. The proxy holds your Ollama key on the server and forwards chats, so the page never touches ollama.com directly and never sees the key. The PC proxy (proxy.py) and Cloudflare Worker version ship in the studylens-ollama-proxy pack.",
-    "Tutor and screen chat both use the new mode, and failures now name it (“Ollama Proxy failed …”) so you can tell which path broke.",
+    "One AI connection for every tab: the Ollama mode, model, and addresses you set in the Tutor tab now show in an AI chip in the rail (for example “AI: Proxy · qwen2.5vl:7b”), visible on every tab, so you can always tell whether the real model or the built-in tutor is answering. Tutor chat and screen chat already shared the one connection — now you can see it.",
+    "Your mode, model, and addresses are remembered across browser-tab reloads, so only the key or proxy password needs re-pasting. Keys and passwords are still never stored — they live in tab memory only.",
     "Nothing else changed: the detector, study packs, and tutor rules are untouched."
   ],
   "notify": true,
   "updated": "2026-10-25",
-  "version": "2.29.0"
+  "version": "2.30.0"
 }

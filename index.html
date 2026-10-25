@@ -611,6 +611,7 @@ input.snap-in{background:var(--surface3);border:1.5px solid var(--line);border-r
       <button class="gnavbtn" data-group="focus">Focus</button>
     </div>
     <div class="rail-ver">Version <b id="railVer"></b></div>
+    <div class="rail-ver">AI: <b id="aiChip">off</b></div>
     <p class="rail-note">Everything runs in this tab — your text is never uploaded by StudyLens. Optional scans you start yourself (GPTZero, Hugging Face, Ollama) go only to the service you picked.</p>
   </nav>
 
@@ -2765,7 +2766,40 @@ var CLOUD_KEY = '';
 var PROXY_URL = '';
 var PROXY_KEY = '';
 var OLLAMA_MODEL = 'qwen2.5vl:7b';
-function ollamaModeLabel(){
+/* ---- One connection for every tab ----
+   The mode, model, and addresses above are page-level: Tutor chat and
+   screen chat already share them, and the AI chip in the rail shows the
+   same state on every tab. Mode/model/addresses (never keys or passwords)
+   are remembered in localStorage, so after a browser-tab reload only the
+   key or password needs re-pasting — the key itself is never stored. */
+var AI_PREF_KEY = 'studylens.ollama.pref.v1';
+function saveAiPref(){
+  try{
+    localStorage.setItem(AI_PREF_KEY, JSON.stringify({
+      mode: OLLAMA_MODE, model: OLLAMA_MODEL,
+      local: OLLAMA, proxy: PROXY_URL }));
+  }catch(e){ /* private mode: prefs just don't persist */ }
+}
+function loadAiPref(){
+  try{
+    var p = JSON.parse(localStorage.getItem(AI_PREF_KEY) || 'null');
+    if(!p) return;
+    if(p.mode === 'cloud' || p.mode === 'local' || p.mode === 'proxy') OLLAMA_MODE = p.mode;
+    if(p.model) OLLAMA_MODEL = p.model;
+    if(typeof p.local === 'string') OLLAMA = p.local;
+    if(typeof p.proxy === 'string') PROXY_URL = p.proxy;
+    if($('ollamaUrl')) $('ollamaUrl').value = OLLAMA;
+    if($('proxyUrl')) $('proxyUrl').value = PROXY_URL;
+    if($('modelPick')) $('modelPick').value = OLLAMA_MODEL;
+  }catch(e){ /* corrupt or missing prefs: defaults stand */ }
+}
+function syncAiChip(){
+  var chip = $('aiChip');
+  if(!chip) return;
+  chip.textContent = ollamaReady()
+    ? (ollamaModeLabel() + ' · ' + OLLAMA_MODEL)
+    : 'off (built-in tutor)';
+}
   return OLLAMA_MODE === 'local' ? 'Local' : (OLLAMA_MODE === 'proxy' ? 'Proxy' : 'Cloud');
 }
 function ollamaReady(){
@@ -2824,36 +2858,42 @@ function syncOllamaUI(){
   $('ollamaModeCloud').classList.toggle('on', OLLAMA_MODE === 'cloud');
   $('ollamaModeLocal').classList.toggle('on', OLLAMA_MODE === 'local');
   $('ollamaModeProxy').classList.toggle('on', OLLAMA_MODE === 'proxy');
+  syncAiChip();
 }
 $('ollamaModeCloud').addEventListener('click', function(){
-  OLLAMA_MODE = 'cloud'; syncOllamaUI();
+  OLLAMA_MODE = 'cloud'; syncOllamaUI(); saveAiPref();
   $('ollamaStatus').textContent = 'Ollama Cloud — paste your key above and the Tutor and screen chat will use ' + OLLAMA_MODEL + ' at ollama.com.';
 });
 $('ollamaModeLocal').addEventListener('click', function(){
-  OLLAMA_MODE = 'local'; syncOllamaUI();
+  OLLAMA_MODE = 'local'; syncOllamaUI(); saveAiPref();
   $('ollamaStatus').textContent = 'Local Ollama — set the address of the Ollama running on your PC above.';
 });
 $('ollamaModeProxy').addEventListener('click', function(){
-  OLLAMA_MODE = 'proxy'; syncOllamaUI();
+  OLLAMA_MODE = 'proxy'; syncOllamaUI(); saveAiPref();
   $('ollamaStatus').textContent = 'Proxy — set the proxy address above. The proxy holds your Ollama key on the server, so this page never sees it.';
 });
 $('proxySaveBtn').addEventListener('click', function(){
   PROXY_URL = $('proxyUrl').value.trim().replace(/\/+$/, '');
   PROXY_KEY = $('proxyKey').value.trim();
+  saveAiPref(); syncAiChip();
   $('ollamaStatus').textContent = PROXY_URL ? 'Set — the Tutor and screen chat will try ' + OLLAMA_MODEL + ' through ' + PROXY_URL + ' first, and fall back to the built-in answers if it doesn\'t respond.' : 'Cleared — using the built-in tutor.';
 });
 $('cloudSaveBtn').addEventListener('click', function(){
   CLOUD_KEY = $('cloudKey').value.trim();
+  saveAiPref(); syncAiChip();
   $('cloudKeyStatus').textContent = CLOUD_KEY ? 'Key ready — it stays in this tab\'s memory only and is sent only to ollama.com when you chat.' : 'Key cleared.';
 });
 $('ollamaSaveBtn').addEventListener('click', function(){
   OLLAMA = $('ollamaUrl').value.trim().replace(/\/+$/, '');
+  saveAiPref(); syncAiChip();
   $('ollamaStatus').textContent = OLLAMA ? 'Set — the Tutor and screen chat will try ' + OLLAMA_MODEL + ' at ' + OLLAMA + ' first, and fall back to the built-in answers if it doesn\'t respond.' : 'Cleared — using the built-in tutor.';
 });
 $('modelPick').addEventListener('change', function(){
   OLLAMA_MODEL = $('modelPick').value.trim() || 'qwen2.5vl:7b';
+  saveAiPref(); syncAiChip();
   $('ollamaStatus').textContent = 'Model set to ' + OLLAMA_MODEL + '. Vision models (qwen2.5vl, llava) can see your screen capture; text-only models read its text instead.';
 });
+loadAiPref();
 syncOllamaUI();
 
 /* ================= Screen See + OCR ================= */
@@ -4414,8 +4454,12 @@ ssRefresh();
    fetched with no-store caching: when a newer build ships, an already-open or
    home-screen copy of an older build sees the newer version number there and
    offers "Update now" (a reload onto the new build). */
-var APP_VERSION = '2.29.0';
+var APP_VERSION = '2.30.0';
 var CHANGELOG = [
+ { v:'2.30.0', date:'Oct 25, 2026', notify:true, notes:[
+   'One AI connection for every tab: the Ollama mode, model, and addresses you set in the Tutor tab now show in an AI chip in the rail (for example “AI: Proxy · qwen2.5vl:7b”), visible on every tab, so you can always tell whether the real model or the built-in tutor is answering. Tutor chat and screen chat already shared the one connection — now you can see it.',
+   'Your mode, model, and addresses are remembered across browser-tab reloads, so only the key or proxy password needs re-pasting. Keys and passwords are still never stored — they live in tab memory only.',
+   'Nothing else changed: the detector, study packs, and tutor rules are untouched.' ]},
  { v:'2.29.0', date:'Oct 25, 2026', notify:true, notes:[
    'NEW: Proxy mode for Ollama — if the direct cloud call fails with “Failed to fetch”, pick “Proxy (key on server)” and point it at the included proxy instead. The proxy holds your Ollama key on the server and forwards chats, so the page never touches ollama.com directly and never sees the key. The PC proxy (proxy.py) and Cloudflare Worker version ship in the studylens-ollama-proxy pack.',
    'Tutor and screen chat both use the new mode, and failures now name it (“Ollama Proxy failed …”) so you can tell which path broke.',
