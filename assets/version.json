@@ -1,8 +1,9 @@
 {
   "notes": [
-    "Fixed: 2.30.0 shipped with a missing function line that broke the Tutor tab script — restored here. No user ever got the broken build (Pages was still serving 2.27.0), and nothing else changed."
+    "NEW subject pack: Economics Basics — scarcity and opportunity cost, supply and demand, elasticity, marginal analysis, GDP, inflation, unemployment, and externalities, with fresh-number practice (elasticity, GDP) and which-idea scenarios, never your assignment.",
+    "Detector V23 was trained and measured this run but HELD, not shipped: on the permanent frozen probe it caught 12 of 18 humanized texts vs 13 for the shipped V20, so V20 stays live until a round genuinely beats it. The round did claw neural-paraphrase detection back to V20’s level and lifted the second probe to 11 of 12."
   ],
   "notify": true,
-  "updated": "2026-10-25",
-  "version": "2.30.1"
+  "updated": "2026-10-26",
+  "version": "2.31.0"
 }

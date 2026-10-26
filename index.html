@@ -4455,8 +4455,11 @@ ssRefresh();
    fetched with no-store caching: when a newer build ships, an already-open or
    home-screen copy of an older build sees the newer version number there and
    offers "Update now" (a reload onto the new build). */
-var APP_VERSION = '2.30.1';
+var APP_VERSION = '2.31.0';
 var CHANGELOG = [
+ { v:'2.31.0', date:'Oct 26, 2026', notify:true, notes:[
+   'NEW subject pack: Economics Basics \u2014 scarcity and opportunity cost, supply and demand, elasticity, marginal analysis, GDP, inflation, unemployment, and externalities, with fresh-number practice (elasticity, GDP) and which-idea scenarios, never your assignment.',
+   'Detector V23 was trained and measured this run but HELD, not shipped: on the permanent frozen probe it caught 12 of 18 humanized texts vs 13 for the shipped V20, so V20 stays live until a round genuinely beats it. The round did claw neural-paraphrase detection back to V20\u2019s level and lifted the second probe to 11 of 12.' ]},
  { v:'2.30.1', date:'Oct 25, 2026', notify:true, notes:[
    'Fixed: 2.30.0 shipped with a missing function line that broke the Tutor tab script — restored here. No user ever got the broken build (Pages was still serving 2.27.0), and nothing else changed.' ]},
  { v:'2.30.0', date:'Oct 25, 2026', notify:true, notes:[
@@ -7810,6 +7813,51 @@ var SL_PACKS = {
         var opts = ['Newton\u2019s first law', 'Newton\u2019s second law', 'Newton\u2019s third law', 'Conservation of momentum'];
         var k = slR(0, 3); opts = opts.slice(k).concat(opts.slice(0, k));
         return { prompt: 'Which law or principle is this? \u2014 ' + it.s, options: opts, answer: it.a, work: it.w };
+      }
+    ]
+  },
+  econ: {
+    title: 'Economics Basics',
+    sources: 'Sources: OpenStax Economics 2e (Principles of Economics); Mankiw, Principles of Economics. Explanations are textbook-level summaries.',
+    concepts: [
+      { term: 'Scarcity and opportunity cost', explain: 'Wants are unlimited but resources (land, labour, capital, time) are limited, so every choice means giving something up. Opportunity cost is the value of the next-best alternative you forgo — the true cost of a choice is not just the money you pay, it is what you could have done instead.' },
+      { term: 'Supply, demand, and equilibrium', explain: 'Demand slopes down: at a higher price, buyers want less (all else equal). Supply slopes up: at a higher price, sellers offer more. Equilibrium is the price where quantity demanded equals quantity supplied. A price above equilibrium leaves a surplus (sellers cut prices); below it leaves a shortage (buyers bid prices up).' },
+      { term: 'Price elasticity of demand', explain: 'Elasticity measures how strongly quantity demanded reacts to a price change: Ed = (% change in quantity demanded) / (% change in price). If |Ed| > 1, demand is elastic (a price rise cuts revenue); if |Ed| < 1, it is inelastic (a price rise raises revenue). Necessities and goods with few substitutes tend to be inelastic.' },
+      { term: 'Marginal analysis', explain: 'Rational decisions compare the extra benefit of one more unit (marginal benefit) with its extra cost (marginal cost). Keep going while MB > MC and stop when MB = MC. Costs already paid and unrecoverable — sunk costs — should be ignored, because they do not change what the next unit costs or gains you.' },
+      { term: 'Gross domestic product (GDP)', explain: 'GDP is the market value of all final goods and services produced within a country in a period. The expenditure approach adds it up as GDP = C + I + G + (X - M): household consumption, business investment, government purchases, plus exports minus imports. Intermediate goods, used goods, and unpaid work are not counted, to avoid double-counting.' },
+      { term: 'Inflation and the CPI', explain: 'Inflation is a sustained rise in the general price level. The Consumer Price Index (CPI) tracks the price of a fixed basket of goods and services a typical household buys; the inflation rate is the percentage change in the CPI. If the CPI rises from 250 to 260, inflation is (260 - 250) / 250 x 100 = 4%.' },
+      { term: 'Unemployment', explain: 'The unemployment rate is (number unemployed / labour force) x 100, where the labour force is the employed plus the unemployed actively looking for work. Frictional unemployment is the short gap between jobs; structural unemployment comes from a mismatch of skills or location; cyclical unemployment rises in recessions. People who stopped looking (discouraged workers) are not counted as unemployed.' },
+      { term: 'Externalities and market failure', explain: 'An externality is a cost or benefit of an activity that falls on someone not party to it — factory pollution (a negative externality) or a neighbour\'s beehive pollinating your orchard (a positive one). With a negative externality the market produces too much, because producers ignore the outside cost; with a positive one it produces too little. That gap between private and social cost or benefit is a classic market failure.' }
+    ],
+    formulas: [
+      { name: 'Price elasticity of demand', form: 'Ed = (% change in quantity demanded) / (% change in price)', note: 'Use absolute values when judging elastic vs inelastic: |Ed| > 1 elastic, |Ed| < 1 inelastic, |Ed| = 1 unit-elastic.' },
+      { name: 'GDP (expenditure approach)', form: 'GDP = C + I + G + (X - M)', note: 'C = consumption, I = investment, G = government purchases, X = exports, M = imports. (X - M) is net exports.' },
+      { name: 'Inflation rate from CPI', form: 'Inflation = (CPI new - CPI old) / CPI old x 100', note: 'Always divide by the OLD (starting) CPI, not the new one — the same rule as any percent change.' }
+    ],
+    gens: [
+      function(){
+        var q = slPick([10, 20, 25, 40, 50]), p = slPick([5, 10, 20, 25]);
+        return { prompt: 'A price rise of ' + p + '% cuts quantity demanded by ' + q + '%. What is the price elasticity of demand (as a positive number)?', answer: slRound(q / p, 2), unit: '', work: 'Ed = % change in quantity / % change in price = ' + q + ' / ' + p + ' = ' + slRound(q / p, 2) + '. (Absolute value: sign dropped.)' };
+      },
+      function(){
+        var c = slR(400, 900), i = slR(100, 300), g = slR(150, 400), x = slR(80, 250), m = slR(60, 220);
+        return { prompt: 'In a year, consumption C = ' + c + ', investment I = ' + i + ', government purchases G = ' + g + ', exports X = ' + x + ', imports M = ' + m + ' (all in $bn). What is GDP in $bn?', answer: c + i + g + (x - m), unit: '$bn', work: 'GDP = C + I + G + (X - M) = ' + c + ' + ' + i + ' + ' + g + ' + (' + x + ' - ' + m + ') = ' + (c + i + g + (x - m)) + ' $bn.' };
+      },
+      function(){
+        var bank = [
+          { s: 'Maya turns down a Saturday shift to study, because the grade she might gain matters more to her than the wages.', a: 'Opportunity cost', w: 'Opportunity cost: the wages she gives up are the next-best alternative forgone by choosing to study.' },
+          { s: 'A student picks the cheaper textbook and skips the concert it would have paid for.', a: 'Opportunity cost', w: 'Opportunity cost: the concert is what the textbook choice costs in forgone alternatives, not just its price tag.' },
+          { s: 'When concert tickets jump 20% in price, sales fall only 5% — fans buy almost as many as before.', a: 'Price elasticity of demand', w: 'Price elasticity of demand: Ed = 5 / 20 = 0.25, inelastic — quantity barely responds to the price rise.' },
+          { s: 'A 10% fare hike on a bus route with many alternatives cuts ridership 30%.', a: 'Price elasticity of demand', w: 'Price elasticity of demand: Ed = 30 / 10 = 3, elastic — riders have substitutes, so quantity falls sharply.' },
+          { s: 'A factory sells cheap paint but the fumes raise the whole street\'s cleaning bills — a cost the buyers and the factory never pay.', a: 'An externality', w: 'An externality: the cleaning bill falls on neighbours who are not party to the sale, so the market price ignores it.' },
+          { s: 'A nightclub\'s bass keeps the whole block awake, but the ticket price covers none of that lost sleep.', a: 'An externality', w: 'An externality: the lost sleep is a cost borne by third parties, outside the buyer-seller deal.' },
+          { s: 'A country\'s factories, shops, and services together produce $500bn of final goods and services in a year.', a: 'GDP', w: 'GDP: the market value of all final goods and services produced within the country in the period.' },
+          { s: 'Economists add up everything households, firms, government, and net exports spent in a year to size the economy.', a: 'GDP', w: 'GDP: that sum — C + I + G + (X - M) — is the expenditure approach to measuring GDP.' }
+        ];
+        var it = slPick(bank);
+        var opts = ['Opportunity cost', 'Price elasticity of demand', 'An externality', 'GDP'];
+        var k = slR(0, 3); opts = opts.slice(k).concat(opts.slice(0, k));
+        return { prompt: 'Which idea is this? — ' + it.s, options: opts, answer: it.a, work: it.w };
       }
     ]
   }
