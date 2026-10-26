@@ -553,6 +553,32 @@ input.snap-in{background:var(--surface3);border:1.5px solid var(--line);border-r
   .snap-layout.snap-show-research .snap-panel#snapNotesPanel{display:none}
   .snap-layout:not(.snap-show-notes):not(.snap-show-research) .snap-side{display:none}
 }
+/* Side layouts (v2.31.1): material/notes live in a side panel with the
+   main content beside it — the same pattern as the Lab's side panels.
+   Desktop: two columns, side left, main right. Phone: one panel at a
+   time, switched with the tabs above (the Lab does the same).
+   The [hidden] rules below beat the display rules above, so a panel
+   marked hidden stays hidden even though its display is set here. */
+.sl-side-layout{display:grid;grid-template-columns:1fr;gap:16px;margin-top:6px}
+.sl-side{display:flex;flex-direction:column;gap:14px;min-width:0}
+.sl-side[hidden]{display:none}
+.sl-main{min-width:0}
+.sl-side-tabs{display:none;gap:8px;margin-top:10px;flex-wrap:wrap;grid-column:1 / -1}
+.sl-side-tabs[hidden]{display:none}
+.sl-side-tabs .btn.sl-on{outline:3px solid var(--acc);outline-offset:1px}
+@media (min-width:960px){
+  .sl-side-layout{grid-template-columns:360px minmax(0,1fr)}
+  .sl-side-layout > .sl-side{grid-column:1}
+  .sl-side-layout > .sl-main{grid-column:2}
+  .sl-side-layout.sl-single{grid-template-columns:1fr}
+  .sl-side-layout.sl-single > .sl-main{grid-column:1}
+  .sl-side-layout.sl-single .sl-side{display:none}
+}
+@media (max-width:959px){
+  .sl-side-tabs{display:flex}
+  .sl-side-layout.sl-show-main .sl-side{display:none}
+  .sl-side-layout.sl-show-side .sl-main{display:none}
+}
 </style>
 </head>
 <body>
@@ -672,6 +698,12 @@ input.snap-in{background:var(--surface3);border:1.5px solid var(--line);border-r
         <p class="small" id="slModeDesc" style="margin:0"></p>
         <div id="slRoute" hidden style="margin-top:10px"></div>
       </div>
+      <div class="sl-side-layout" id="studySideLayout">
+      <div class="sl-side-tabs" id="studySideTabs" hidden>
+        <button class="btn ghost small sl-on" id="studySideBtn">Your material</button>
+        <button class="btn ghost small" id="studyMainBtn">Study pack</button>
+      </div>
+      <div class="sl-side">
       <div class="card">
         <h3>Your material</h3>
         <textarea id="material" placeholder="Paste your study material here — a paragraph or more works best…"></textarea>
@@ -685,6 +717,8 @@ input.snap-in{background:var(--surface3);border:1.5px solid var(--line);border-r
         </div>
         <div class="notice" id="studyNotice" role="status"></div>
       </div>
+      </div>
+      <div class="sl-main">
       <div class="card" id="summaryCard" hidden>
         <h3>Summary</h3>
         <ul class="list" id="summaryList"></ul>
@@ -696,14 +730,16 @@ input.snap-in{background:var(--surface3);border:1.5px solid var(--line);border-r
           <button class="btn ghost small" id="exportCsvBtn">Flashcards for Anki (.csv)</button>
         </div>
       </div>
+      </div>
+      </div>
 
       <!-- ============ SIMPLE STUDY (v2.16.0) ============ -->
       <div class="card" id="simpleCard">
         <h3>Simple Study</h3>
-        <p class="ss-sub">Easy practice, one question at a time, made only from your own material. Add material three ways: paste it above, snap a photo of your notes, or add a file (slides, docs, PDFs, spreadsheets).</p>
+        <p class="ss-sub">Easy practice, one question at a time, made only from your own material. Add material three ways: paste it in Your material, snap a photo of your notes, or add a file (slides, docs, PDFs, spreadsheets).</p>
         <div id="ssTray" style="margin-top:14px;border-top:1px solid var(--line);padding-top:14px">
           <h3 style="font-size:17px;margin:0 0 6px">Build a pack from photos &amp; files</h3>
-          <p class="small">Queue up to 4 photos and up to 6 files (PDF, documents, slides, spreadsheets, text), then tap <strong>Done</strong> when you're ready. Nothing is read until you tap Done — then photos are read, files are read, and everything is combined with whatever you pasted into “Your material” above and built into one study pack. Everything is read right here on this device and never uploaded.</p>
+          <p class="small">Queue up to 4 photos and up to 6 files (PDF, documents, slides, spreadsheets, text), then tap <strong>Done</strong> when you're ready. Nothing is read until you tap Done — then photos are read, files are read, and everything is combined with whatever you pasted into “Your material” and built into one study pack. Everything is read right here on this device and never uploaded.</p>
           <div class="row">
             <label class="btn ghost filelabel" for="ssTrayPhotoInput">Add photo</label>
             <input type="file" id="ssTrayPhotoInput" accept="image/*" multiple hidden>
@@ -763,7 +799,7 @@ input.snap-in{background:var(--surface3);border:1.5px solid var(--line);border-r
         </div>
 
         <div id="ssEmpty">
-          <div class="ss-feed info" style="margin-top:14px">No material yet. Paste your notes in “Your material” above and tap <strong>Generate study pack</strong> — or tap <strong>Snap your material</strong> / <strong>Add a file</strong> and StudyLens will read it for you.</div>
+          <div class="ss-feed info" style="margin-top:14px">No material yet. Paste your notes in “Your material” and tap <strong>Generate study pack</strong> — or tap <strong>Snap your material</strong> / <strong>Add a file</strong> and StudyLens will read it for you.</div>
           <div class="row"><button class="btn" id="ssSampleBtn">Try sample material</button></div>
         </div>
 
@@ -806,6 +842,12 @@ input.snap-in{background:var(--surface3);border:1.5px solid var(--line);border-r
         <h2>Lecture notes</h2>
         <p>Record a lecture or upload its audio. Iris transcribes it, builds structured notes from only what was said, and can look up outside sources that back it up.</p>
       </div>
+      <div class="sl-side-layout sl-single" id="lecSideLayout">
+      <div class="sl-side-tabs" id="lecSideTabs" hidden>
+        <button class="btn ghost small" id="lecSideBtn">Your notes</button>
+        <button class="btn ghost small sl-on" id="lecMainBtn">Lecture</button>
+      </div>
+      <div class="sl-main">
       <div class="card" id="lectureCard">
         <h3>Lecture notes <span class="small mut">— with Iris</span></h3>
         <p class="small">Record a lecture (or upload its audio) and Iris builds structured notes from the transcript: topic sections, key terms with your professor's own definitions, their examples, and anything they flagged for the exam. <strong>Before you record:</strong> check your professor's recording policy — some classes don't allow it.</p>
@@ -860,6 +902,10 @@ input.snap-in{background:var(--surface3);border:1.5px solid var(--line);border-r
           <button class="btn" id="lecNotesBtn">Make my notes</button>
         </div>
         <p class="small" id="lecWhisperStatus" role="status"></p>
+      </div>
+      </div>
+      <div class="sl-side" id="lecNotesSide" hidden>
+      <div class="card">
         <div id="lecNotesCard" hidden>
           <h4 style="margin:14px 0 6px">Your notes (editable — they're yours)</h4>
           <textarea id="lecNotes" style="min-height:180px"></textarea>
@@ -880,6 +926,8 @@ input.snap-in{background:var(--surface3);border:1.5px solid var(--line);border-r
           <div class="row"><button class="btn ghost" id="lecProofBtn">Look up proof &amp; resources</button></div>
           <div id="lecProof" style="margin-top:10px"></div>
         </div>
+      </div>
+      </div>
       </div>
     </section>
 
@@ -4455,8 +4503,12 @@ ssRefresh();
    fetched with no-store caching: when a newer build ships, an already-open or
    home-screen copy of an older build sees the newer version number there and
    offers "Update now" (a reload onto the new build). */
-var APP_VERSION = '2.31.0';
+var APP_VERSION = '2.31.1';
 var CHANGELOG = [
+ { v:'2.31.1', date:'Oct 26, 2026', notify:true, notes:[
+   'NEW layout: the Study and Lecture tabs now use side panels like the Lab \u2014 on a wide screen your material sits in a panel on the left with the study pack beside it, and your lecture notes sit beside the lecture controls. On a phone, one panel shows at a time with tabs to switch (Your material / Study pack, Lecture / Your notes).',
+   'The panels appear when they have something to show: the study-pack panel opens beside your material once a pack is generated, and the notes panel opens beside the lecture once notes are made. On a phone, generating a pack jumps you to it, and making notes jumps you to them.',
+   'Nothing else changed: the detector (V20), study packs, tutor rules, and Ollama connection are untouched.' ]},
  { v:'2.31.0', date:'Oct 26, 2026', notify:true, notes:[
    'NEW subject pack: Economics Basics \u2014 scarcity and opportunity cost, supply and demand, elasticity, marginal analysis, GDP, inflation, unemployment, and externalities, with fresh-number practice (elasticity, GDP) and which-idea scenarios, never your assignment.',
    'Detector V23 was trained and measured this run but HELD, not shipped: on the permanent frozen probe it caught 12 of 18 humanized texts vs 13 for the shipped V20, so V20 stays live until a round genuinely beats it. The round did claw neural-paraphrase detection back to V20\u2019s level and lifted the second probe to 11 of 12.' ]},
@@ -9383,6 +9435,48 @@ window.slNavSync = slNavSync;
     var run = (typeof FOCUS !== 'undefined' && !!FOCUS.running);
     a.hidden = !run;
   }, 1000);
+})();
+</script>
+
+<script>
+/* Side layouts (v2.31.1): one panel at a time on a phone, side by side on
+   desktop. Each layout watches one card: when it appears, the layout
+   stops being single-panel (Lecture) and, on a phone, jumps to the panel
+   that just appeared. Tab buttons switch panels on a phone; on desktop
+   the show classes below only apply under 960px, so both stay visible. */
+(function(){
+  function el(id){ return document.getElementById(id); }
+  function isPhone(){ return window.matchMedia('(max-width: 959px)').matches; }
+  function setPanel(layout, sideBtn, mainBtn, which){
+    layout.classList.toggle('sl-show-side', which === 'side');
+    layout.classList.toggle('sl-show-main', which === 'main');
+    if(sideBtn) sideBtn.classList.toggle('sl-on', which === 'side');
+    if(mainBtn) mainBtn.classList.toggle('sl-on', which === 'main');
+  }
+  function bindLayout(cfg){
+    var layout = el(cfg.layout), watched = el(cfg.watched);
+    if(!layout || !watched) return;
+    var tabs = cfg.tabs ? el(cfg.tabs) : null;
+    var sideBtn = cfg.sideBtn ? el(cfg.sideBtn) : null;
+    var mainBtn = cfg.mainBtn ? el(cfg.mainBtn) : null;
+    var sideWrap = cfg.sideWrapId ? el(cfg.sideWrapId) : null;
+    function sync(){
+      var appeared = !watched.hidden;
+      if(cfg.singleClass) layout.classList.toggle(cfg.singleClass, !appeared);
+      if(sideWrap) sideWrap.hidden = !appeared;
+      if(tabs) tabs.hidden = !appeared;
+      if(appeared && isPhone()) setPanel(layout, sideBtn, mainBtn, cfg.showOnAppear);
+    }
+    if(sideBtn) sideBtn.addEventListener('click', function(){ setPanel(layout, sideBtn, mainBtn, 'side'); });
+    if(mainBtn) mainBtn.addEventListener('click', function(){ setPanel(layout, sideBtn, mainBtn, 'main'); });
+    new MutationObserver(sync).observe(watched, { attributes: true, attributeFilter: ['hidden'] });
+    sync();
+  }
+  bindLayout({ layout: 'studySideLayout', watched: 'summaryCard', tabs: 'studySideTabs',
+    sideBtn: 'studySideBtn', mainBtn: 'studyMainBtn', showOnAppear: 'main' });
+  bindLayout({ layout: 'lecSideLayout', watched: 'lecNotesCard', tabs: 'lecSideTabs',
+    sideBtn: 'lecSideBtn', mainBtn: 'lecMainBtn', showOnAppear: 'side',
+    singleClass: 'sl-single', sideWrapId: 'lecNotesSide' });
 })();
 </script>
 
