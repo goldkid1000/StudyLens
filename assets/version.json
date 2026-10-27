@@ -1,9 +1,9 @@
 {
   "notes": [
-    "NEW subject pack: Economics Basics — scarcity and opportunity cost, supply and demand, elasticity, marginal analysis, GDP, inflation, unemployment, and externalities, with fresh-number practice (elasticity, GDP) and which-idea scenarios, never your assignment.",
-    "Detector V23 was trained and measured this run but HELD, not shipped: on the permanent frozen probe it caught 12 of 18 humanized texts vs 13 for the shipped V20, so V20 stays live until a round genuinely beats it. The round did claw neural-paraphrase detection back to V20’s level and lifted the second probe to 11 of 12."
+    "NEW subject pack: History Basics \u2014 primary vs secondary sources, causation, change and continuity, turning points, the Columbian Exchange, the Industrial Revolution, revolutions and rights, and decolonization, with timeline practice and which-idea scenarios, never your assignment.",
+    "Detector V24 was trained and measured this run but HELD, not shipped: on the permanent frozen probe it caught 12 of 18 humanized texts, the same as V23 and below the shipped V20's 13, so V20 stays live until a round genuinely beats it. V24 did improve the false-flag rate to 4.51% (from V20's 4.71%), restored GPT-5 detection to V20's level, and held the second probe at 11 of 12."
   ],
   "notify": true,
-  "updated": "2026-10-26",
-  "version": "2.31.0"
+  "updated": "2026-10-27",
+  "version": "2.32.0"
 }
