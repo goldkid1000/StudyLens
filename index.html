@@ -4503,8 +4503,11 @@ ssRefresh();
    fetched with no-store caching: when a newer build ships, an already-open or
    home-screen copy of an older build sees the newer version number there and
    offers "Update now" (a reload onto the new build). */
-var APP_VERSION = '2.32.0';
+var APP_VERSION = '2.33.0';
 var CHANGELOG = [
+ { v:'2.33.0', date:'Oct 28, 2026', notify:true, notes:[
+   'NEW subject pack: Sociology Basics \u2014 culture, norms and values, socialization, deviance, social stratification, social institutions, roles and role conflict, and the sociological imagination, with fresh-number practice (survey percentages, response rates) and which-idea scenarios, never your assignment.',
+   'Detector V25 was trained and measured this run but HELD, not shipped: on the permanent frozen probe it caught 13 of 18 humanized texts, tying the shipped V20, so V20 stays live until a round genuinely beats it. The audit-driven round did move two deep misses (food waste apps and night trains now caught) but lost beekeeping, and it improved the false-flag rate to 4.50% (from V20\u2019s 4.71%) and neural-paraphrase detection to 53.3% (from 51.1%).' ]},
  { v:'2.32.0', date:'Oct 27, 2026', notify:true, notes:[
    'NEW subject pack: History Basics \u2014 primary vs secondary sources, causation, change and continuity, turning points, the Columbian Exchange, the Industrial Revolution, revolutions and rights, and decolonization, with timeline practice and which-idea scenarios, never your assignment.',
    'Detector V24 was trained and measured this run but HELD, not shipped: on the permanent frozen probe it caught 12 of 18 humanized texts, the same as V23 and below the shipped V20\u2019s 13, so V20 stays live until a round genuinely beats it. V24 did improve the false-flag rate to 4.51% (from V20\u2019s 4.71%), restored GPT-5 detection to V20\u2019s level, and held the second probe at 11 of 12.' ]},
@@ -7964,6 +7967,62 @@ var SL_PACKS = {
         while(keep.length < 4) keep.push(others.splice(slR(0, others.length - 1), 1)[0]);
         var k = slR(0, 3); keep = keep.slice(k).concat(keep.slice(0, k));
         return { prompt: 'Which idea is this? \u2014 ' + it.s, options: keep, answer: it.a, work: it.w };
+      }
+    ]
+  },
+  soc: {
+    title: 'Sociology Basics',
+    sources: 'Sources: OpenStax Introduction to Sociology (3rd ed.); C. Wright Mills, The Sociological Imagination. Explanations are textbook-level summaries.',
+    concepts: [
+      { term: 'Culture', explain: 'Culture is the shared way of life of a group: its beliefs, values, norms, symbols, language, and material objects. It is learned, not inborn, and it shapes what feels normal — from greetings and food to ideas about fairness.' },
+      { term: 'Norms and values', explain: 'Norms are the expected behaviours in a situation — queuing, speaking quietly in a library, shaking hands on meeting. Values are the deeper ideals behind them, like honesty or freedom. Norms can be informal customs or formal laws, and breaking them brings reactions from a frown to a fine.' },
+      { term: 'Socialization', explain: 'Socialization is the lifelong process of learning the norms, values, and skills of your society — first in the family, then through school, friends, workplaces, and media. It is how a child learns to share, wait a turn, and read a room, and how adults keep adjusting to new roles.' },
+      { term: 'Deviance', explain: 'Deviance is behaviour that violates a group’s norms. It is not the same as crime: a crime breaks a law, while deviance breaks an expectation, and what counts as deviant changes by place and time. Sociologists ask who gets labelled deviant, and why, rather than just condemning the act.' },
+      { term: 'Social stratification', explain: 'Stratification is the ranking of people into layers by wealth, power, and prestige. Where you are born in that ranking shapes access to good schools, healthcare, and jobs — and sociologists study how open or closed the layers are, that is, how much people can move between them.' },
+      { term: 'Social institutions', explain: 'Institutions are the stable patterns that organise social life: family, education, religion, the economy, and government. Each meets a need — raising children, passing on knowledge, settling disputes — and each shapes, and is shaped by, the others.' },
+      { term: 'Roles and role conflict', explain: 'A status is a position you hold (student, employee, parent); a role is the behaviour expected of someone in that status. Role conflict happens when two roles pull against each other — an exam revision session clashing with a work shift you cannot swap — and people cope by negotiating, prioritising, or changing a role.' },
+      { term: 'The sociological imagination', explain: 'C. Wright Mills argued that personal troubles (one graduate failing to find work) often have public causes (a whole job market shrinking). The sociological imagination is the habit of connecting your own biography to the history and structure of your society, instead of blaming only yourself — or only the system.' }
+    ],
+    formulas: [
+      { name: 'Reading a survey result', form: 'Who was sampled? How many? What exactly was asked?', note: 'A result means little without its sample: a poll of 40 volunteers is not the same evidence as a random sample of 4,000.' },
+      { name: 'Response rate', form: 'Response rate = returned / sent x 100', note: 'Low response rates warn you the missing people may differ from the ones who replied.' },
+      { name: 'Rate per 1,000 people', form: 'Rate = count / population x 1,000', note: 'Rates let you compare groups of different sizes fairly — raw counts alone mislead when one group is much bigger.' }
+    ],
+    gens: [
+      function(){
+        var n = slPick([200, 400, 500, 1000]);
+        var pct = slPick([12, 25, 40, 55, 68, 75, 80]);
+        var x = n * pct / 100;
+        return { prompt: 'In a survey of ' + n + ' people, ' + x + ' agreed with the statement. What percentage agreed?', answer: pct, unit: '%', work: x + ' / ' + n + ' x 100 = ' + pct + '%.' };
+      },
+      function(){
+        var sent = slPick([300, 400, 500, 800]);
+        var rate = slPick([45, 60, 65, 70, 80]);
+        var ret = sent * rate / 100;
+        return { prompt: 'A researcher sends ' + sent + ' questionnaires and ' + ret + ' come back. What is the response rate?', answer: rate, unit: '%', work: ret + ' / ' + sent + ' x 100 = ' + rate + '%.' };
+      },
+      function(){
+        var bank = [
+          { s: 'A newcomer learns the local greeting, the foods people share at festivals, and the stories everyone quotes.', a: 'Culture', w: 'Culture: the shared beliefs, symbols, and practices a group learns together.' },
+          { s: 'Everyone in the library speaks quietly — not because a sign orders it, but because that is simply what people do there.', a: 'Norms and values', w: 'Norms and values: the expected behaviour (quiet) reflects a shared ideal (respect for others).' },
+          { s: 'A child learns to share, say please, and wait for a turn — first at home, then at school.', a: 'Socialization', w: 'Socialization: learning the norms and skills of society, starting in the family and continuing at school.' },
+          { s: 'A teenager dyes her hair bright green for a school with a strict dress code, knowing teachers will object.', a: 'Deviance', w: 'Deviance: behaviour that violates a group norm — here a dress-code expectation, not a law.' },
+          { s: 'Two neighbourhoods in one city: one has well-funded schools and clinics, the other does not, and family wealth largely decides which children grow up where.', a: 'Social stratification', w: 'Social stratification: ranking into layers by wealth and prestige, shaping access to schools and healthcare.' },
+          { s: 'A town\'s schools, clinics, places of worship, and council together teach children, care for the sick, and settle disputes.', a: 'Social institutions', w: 'Social institutions: the stable patterns — education, health, religion, government — that organise social life.' },
+          { s: 'A student is also a weekend shift worker, and an exam revision session clashes with a shift she cannot swap.', a: 'Roles and role conflict', w: 'Roles and role conflict: two roles (student, worker) pull against each other at the same time.' },
+          { s: 'A graduate cannot find work, then realises thousands of graduates in her year face the same closed job market.', a: 'The sociological imagination', w: 'The sociological imagination: a personal trouble (no job) traced to a public cause (a shrinking job market).' },
+          { s: 'At a family meal, everyone waits until the eldest person starts eating — an unwritten rule nobody had to explain.', a: 'Norms and values', w: 'Norms and values: an unwritten expected behaviour, backed by a shared value (respect for elders).' },
+          { s: 'A man retires after forty years at one firm and must learn a whole new daily routine and a new sense of who he is.', a: 'Socialization', w: 'Socialization: it is lifelong — new roles (retiree) mean learning new norms at any age.' },
+          { s: 'In one decade a hairstyle is shocking, in the next it is ordinary — the act never changed, only the reaction to it.', a: 'Deviance', w: 'Deviance: what counts as deviant changes by place and time; the label, not just the act, matters.' },
+          { s: 'Children of university-educated parents are far more likely to attend university themselves, whatever their exam results.', a: 'Social stratification', w: 'Social stratification: family position in the ranking shapes the next generation\'s chances, not just individual effort.' }
+        ];
+        var it = slPick(bank);
+        var opts = ['Culture', 'Norms and values', 'Socialization', 'Deviance', 'Social stratification', 'Social institutions', 'Roles and role conflict', 'The sociological imagination'];
+        var keep = [it.a];
+        var others = opts.filter(function(o){ return o !== it.a; });
+        while(keep.length < 4) keep.push(others.splice(slR(0, others.length - 1), 1)[0]);
+        var k = slR(0, 3); keep = keep.slice(k).concat(keep.slice(0, k));
+        return { prompt: 'Which idea is this? — ' + it.s, options: keep, answer: it.a, work: it.w };
       }
     ]
   }
