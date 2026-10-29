@@ -4503,8 +4503,11 @@ ssRefresh();
    fetched with no-store caching: when a newer build ships, an already-open or
    home-screen copy of an older build sees the newer version number there and
    offers "Update now" (a reload onto the new build). */
-var APP_VERSION = '2.33.0';
+var APP_VERSION = '2.34.0';
 var CHANGELOG = [
+ { v:'2.34.0', date:'Oct 29, 2026', notify:true, notes:[
+   'NEW subject pack: Philosophy Basics \u2014 empiricism, rationalism, utilitarianism, deontology, virtue ethics, social contract, existentialism, and the mind-body problem, with which-idea, fallacy-spotting, and valid-or-invalid argument practice, never your assignment.',
+   'Detector V26 was trained and measured this run but HELD, not shipped: on the permanent frozen probe it caught 12 of 18 humanized texts, below the shipped V20\u2019s 13, so V20 stays live until a round genuinely beats it. The round did improve the false-flag rate to 4.53% (from V20\u2019s 4.71%), neural-paraphrase detection to 54.3% (from 51.1%), and GPT-5 detection to 92.6% (from 91.7%), and held the second probe at 11 of 12.' ]},
  { v:'2.33.0', date:'Oct 28, 2026', notify:true, notes:[
    'NEW subject pack: Sociology Basics \u2014 culture, norms and values, socialization, deviance, social stratification, social institutions, roles and role conflict, and the sociological imagination, with fresh-number practice (survey percentages, response rates) and which-idea scenarios, never your assignment.',
    'Detector V25 was trained and measured this run but HELD, not shipped: on the permanent frozen probe it caught 13 of 18 humanized texts, tying the shipped V20, so V20 stays live until a round genuinely beats it. The audit-driven round did move two deep misses (food waste apps and night trains now caught) but lost beekeeping, and it improved the false-flag rate to 4.50% (from V20\u2019s 4.71%) and neural-paraphrase detection to 53.3% (from 51.1%).' ]},
@@ -8025,7 +8028,81 @@ var SL_PACKS = {
         return { prompt: 'Which idea is this? — ' + it.s, options: keep, answer: it.a, work: it.w };
       }
     ]
+  },
+  phil: {
+    title: 'Philosophy Basics',
+    sources: 'Sources: OpenStax Introduction to Philosophy; classic primary texts (Descartes, Hume, Kant, Mill, Aristotle). Explanations are textbook-level summaries.',
+    concepts: [
+      { term: 'Empiricism', explain: 'Empiricism is the view that knowledge comes mainly from experience — what we see, hear, and test. John Locke pictured the mind as a blank slate written on by experience; David Hume argued that even cause and effect is something we learn from repeated observation, not from reason alone.' },
+      { term: 'Rationalism', explain: 'Rationalism is the view that reason itself is a source of knowledge, independent of experience. Rene Descartes doubted everything he could doubt until he reached one certainty — I think, therefore I am — and tried to rebuild knowledge from that starting point using reason alone.' },
+      { term: 'Utilitarianism', explain: 'Utilitarianism judges an action by its consequences: the right action is the one that produces the greatest happiness for the greatest number. Jeremy Bentham and John Stuart Mill argued that pleasure and the avoidance of pain are the measure, so an act that helps many but harms a few must be weighed by its total outcome.' },
+      { term: 'Deontology', explain: 'Deontology judges an action by duty and rules, not by its outcome. Immanuel Kant argued that some acts are wrong no matter the result — lying, for example — and that people must always be treated as ends in themselves, never merely as tools for someone else’s goal.' },
+      { term: 'Virtue ethics', explain: 'Virtue ethics asks what kind of person to be, rather than which rule to follow. Aristotle argued that a good life comes from practising virtues — courage, honesty, generosity, practical wisdom — until they become character, and that flourishing (eudaimonia) is the goal of that character.' },
+      { term: 'Social contract', explain: 'Social contract theory says legitimate government rests on an agreement: people give up some freedom in exchange for protection and order. Thomas Hobbes stressed security, John Locke stressed natural rights to life, liberty, and property, and Jean-Jacques Rousseau stressed the general will of the people.' },
+      { term: 'Existentialism', explain: 'Existentialism holds that existence comes before essence: there is no built-in purpose handed to us, so we create meaning through our choices. Jean-Paul Sartre argued that this freedom is heavy — we are responsible for who we become — and that living authentically means owning those choices instead of blaming fate or the crowd.' },
+      { term: 'Mind-body problem', explain: 'The mind-body problem asks how mental experience relates to the physical brain. Dualists say mind and body are different kinds of stuff; physicalists say mental life is brain activity. The hard part is subjective experience itself — why seeing red feels like anything at all, not just neurons firing.' }
+    ],
+    formulas: [
+      { name: 'Testing an argument', form: 'Find the premises and the conclusion. Valid = the conclusion MUST follow if the premises are true. Sound = valid AND the premises are actually true.', note: 'A valid argument can still have false premises — validity checks the shape, soundness checks the shape and the facts.' },
+      { name: 'Spotting a fallacy', form: 'Attack the reasoning, not the speaker. Ask: does this point actually support the conclusion, or does it distract, misrepresent, or force a false choice?', note: 'Naming a fallacy is the start, not the finish — explain why the reasoning fails before moving on.' },
+      { name: 'The thought-experiment test', form: 'Change one factor and ask what your judgement does. If it flips, that factor was doing the work.', note: 'Thought experiments like the trolley problem or the veil of ignorance isolate one moral intuition at a time.' }
+    ],
+    gens: [
+      function(){
+        var bank = [
+          { s: 'A student says she only trusts what she can observe and test — if nobody has seen it happen, she will not believe it yet.', a: 'Empiricism', w: 'Empiricism: knowledge comes mainly from experience and observation.' },
+          { s: 'A philosopher argues that even locked in a room with no senses, he could still know that two plus two equals four, because reason alone proves it.', a: 'Rationalism', w: 'Rationalism: reason itself is a source of knowledge, independent of experience.' },
+          { s: 'A town votes to build a noisy road because it will shorten journeys for 10,000 people, even though 20 nearby homes will suffer — the total happiness wins.', a: 'Utilitarianism', w: 'Utilitarianism: judge by consequences — the greatest happiness for the greatest number.' },
+          { s: 'A shopkeeper refuses to lie to a customer even though a small lie would save the sale, because lying is wrong as a rule, whatever the payoff.', a: 'Deontology', w: 'Deontology: duty and rules decide, not the outcome — some acts are wrong regardless.' },
+          { s: 'A teenager practises speaking up kindly every day, not because a rule tells her to, but because she wants to become a brave and honest person.', a: 'Virtue ethics', w: 'Virtue ethics: the question is what kind of person to be — character built by practising virtues.' },
+          { s: 'Citizens agree to pay taxes and obey laws in return for roads, courts, and protection — the deal is what makes the government legitimate.', a: 'Social contract', w: 'Social contract: government is legitimate because people agree to it in exchange for order and protection.' },
+          { s: 'A graduate turns down a safe career path and says: nobody handed me a purpose, so I have to choose one and own the choice.', a: 'Existentialism', w: 'Existentialism: existence before essence — we create meaning through choices we own.' },
+          { s: 'A scientist can map every neuron that fires when someone sees red, but still cannot explain from the map alone what seeing red feels like from the inside.', a: 'Mind-body problem', w: 'Mind-body problem: how does subjective experience relate to physical brain activity?' },
+          { s: 'A researcher insists a claim about a new drug is unproven until trials show it working — no elegant theory counts without evidence.', a: 'Empiricism', w: 'Empiricism: experience and testing, not theory alone, settle the claim.' },
+          { s: 'A debater says a policy is wrong because it breaks a promise to voters, even though breaking it would help more people — the duty stands.', a: 'Deontology', w: 'Deontology: the duty not to break the promise decides, not the better outcome.' },
+          { s: 'A coach praises a player not for one good match but for the patience and fairness she shows season after season — her character is the point.', a: 'Virtue ethics', w: 'Virtue ethics: steady character over time, not a single act, is what is praised.' },
+          { s: 'A community writes a charter: we give up settling disputes by force, and in return the town council keeps the peace for everyone.', a: 'Social contract', w: 'Social contract: giving up some freedom in exchange for protection and order.' }
+        ];
+        var it = slPick(bank);
+        var opts = ['Empiricism', 'Rationalism', 'Utilitarianism', 'Deontology', 'Virtue ethics', 'Social contract', 'Existentialism', 'Mind-body problem'];
+        var keep = [it.a];
+        var others = opts.filter(function(o){ return o !== it.a; });
+        while(keep.length < 4) keep.push(others.splice(slR(0, others.length - 1), 1)[0]);
+        var k = slR(0, 3); keep = keep.slice(k).concat(keep.slice(0, k));
+        return { prompt: 'Which idea is this? — ' + it.s, options: keep, answer: it.a, work: it.w };
+      },
+      function(){
+        var bank = [
+          { s: 'You cannot trust her climate argument — she failed science at school.', a: 'Ad hominem', w: 'Ad hominem: attacking the person instead of the argument. Her school record says nothing about whether the argument is sound.' },
+          { s: 'So you think we should fund libraries? You want to ban every other kind of spending, then.', a: 'Straw man', w: 'Straw man: misrepresenting the position (funding libraries is not banning all other spending) and attacking the misrepresentation.' },
+          { s: 'Either we ban all cars tomorrow or we accept choking cities — there is no middle ground.', a: 'False dilemma', w: 'False dilemma: forcing two extreme options while real middle options (cleaner cars, better buses) exist.' },
+          { s: 'Everyone in town is buying this phone, so it must be the best phone.', a: 'Appeal to popularity', w: 'Appeal to popularity: popularity is not evidence of quality — the crowd can be wrong.' },
+          { s: 'If we allow school uniforms, next they will dictate hairstyles, then thoughts — where does it end?', a: 'Slippery slope', w: 'Slippery slope: claiming one step must lead to extreme steps without showing the chain actually follows.' },
+          { s: 'I met two rude tourists, so tourists from that country are all rude.', a: 'Hasty generalization', w: 'Hasty generalization: a tiny sample cannot support a claim about a whole group.' }
+        ];
+        var it = slPick(bank);
+        var opts = ['Ad hominem', 'Straw man', 'False dilemma', 'Appeal to popularity', 'Slippery slope', 'Hasty generalization'];
+        var keep = [it.a];
+        var others = opts.filter(function(o){ return o !== it.a; });
+        while(keep.length < 4) keep.push(others.splice(slR(0, others.length - 1), 1)[0]);
+        var k = slR(0, 3); keep = keep.slice(k).concat(keep.slice(0, k));
+        return { prompt: 'Which fallacy is this? — ' + it.s, options: keep, answer: it.a, work: it.w };
+      },
+      function(){
+        var bank = [
+          { s: 'If it rains, the match is cancelled. It is raining. So the match is cancelled.', a: 'Valid', w: 'Valid (modus ponens): the premise gives if-then, the second premise affirms the if-part, so the then-part must follow.' },
+          { s: 'If it rains, the match is cancelled. The match is cancelled. So it must be raining.', a: 'Invalid', w: 'Invalid (affirming the consequent): the match could be cancelled for another reason — the then-part does not prove the if-part.' },
+          { s: 'If it rains, the match is cancelled. It is not raining. So the match is not cancelled.', a: 'Invalid', w: 'Invalid (denying the antecedent): no rain does not rule out other reasons for cancellation.' },
+          { s: 'If it rains, the match is cancelled. The match is not cancelled. So it is not raining.', a: 'Valid', w: 'Valid (modus tollens): if rain meant cancellation, and there is no cancellation, there is no rain.' },
+          { s: 'Either the key is in the drawer or in the coat. It is not in the drawer. So it is in the coat.', a: 'Valid', w: 'Valid (disjunctive syllogism): ruling out one option of an either-or leaves the other.' },
+          { s: 'All sprinters train hard. Maya trains hard. So Maya is a sprinter.', a: 'Invalid', w: 'Invalid: many people train hard without being sprinters — the premises do not force the conclusion.' }
+        ];
+        var it = slPick(bank);
+        return { prompt: 'Valid or invalid? — ' + it.s, options: ['Valid', 'Invalid'], answer: it.a, work: it.w };
+      }
+    ]
   }
+
 };
 
 /* Ask a pack: explanations + analogous examples only. A request carrying

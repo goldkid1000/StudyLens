@@ -1,9 +1,9 @@
 {
   "notes": [
-    "NEW subject pack: Sociology Basics — culture, norms and values, socialization, deviance, social stratification, social institutions, roles and role conflict, and the sociological imagination, with fresh-number practice (survey percentages, response rates) and which-idea scenarios, never your assignment.",
-    "Detector V25 was trained and measured this run but HELD, not shipped: on the permanent frozen probe it caught 13 of 18 humanized texts, tying the shipped V20, so V20 stays live until a round genuinely beats it. The audit-driven round did move two deep misses (food waste apps and night trains now caught) but lost beekeeping, and it improved the false-flag rate to 4.50% (from V20’s 4.71%) and neural-paraphrase detection to 53.3% (from 51.1%)."
+    "NEW subject pack: Philosophy Basics — empiricism, rationalism, utilitarianism, deontology, virtue ethics, social contract, existentialism, and the mind-body problem, with which-idea, fallacy-spotting, and valid-or-invalid argument practice, never your assignment.",
+    "Detector V26 was trained and measured this run but HELD, not shipped: on the permanent frozen probe it caught 12 of 18 humanized texts, below the shipped V20's 13, so V20 stays live until a round genuinely beats it. The round did improve the false-flag rate to 4.53% (from V20's 4.71%), neural-paraphrase detection to 54.3% (from 51.1%), and GPT-5 detection to 92.6% (from 91.7%), and held the second probe at 11 of 12."
   ],
   "notify": true,
-  "updated": "2026-10-28",
-  "version": "2.33.0"
+  "updated": "2026-10-29",
+  "version": "2.34.0"
 }
