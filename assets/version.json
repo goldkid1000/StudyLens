@@ -1,9 +1,9 @@
 {
   "notes": [
-    "NEW subject pack: Computer Science Basics \u2014 binary and bits, algorithms, data structures, Boolean logic, Big-O complexity, networks and the internet, databases, and cybersecurity basics, with which-idea, binary-to-decimal, and loop-tracing practice, never your assignment.",
-    "Detector V27 was trained and measured this run but HELD, not shipped: on the permanent frozen probe it caught 12 of 18 humanized texts, the same as V26 and below the shipped V20\u2019s 13, so V20 stays live until a round genuinely beats it. The second-family round lifted the second probe to 12 of 12, neural-paraphrase detection to a best-yet 55.4% (from 51.1%), and held GPT-5 detection at 92.6%, with the false-flag rate at 4.56%, still below V20\u2019s 4.71%."
+    "NEW: Learning Profile — optional study supports in the Study tab, all off by default and kept on this device only: small steps (one quiz question and one summary point at a time, with a “Got it — next step” check), read-aloud Listen buttons (quiz, flashcards, summary, using your device’s built-in speech), extra time (1.5×) and untimed practice for Exam Rounds, plain language + highlights presentation, vocabulary pre-teach from your own material, encouragement in quiz feedback, a graphic organizer, and settings import/export.",
+    "Nothing else changed: the detector (V20), study packs, tutor rules, and Ollama connection are untouched. This release brings the Learning Profile to the v2.36.0 build, including the Computer Science Basics pack."
   ],
   "notify": true,
   "updated": "2026-10-30",
-  "version": "2.36.0"
+  "version": "2.37.0"
 }

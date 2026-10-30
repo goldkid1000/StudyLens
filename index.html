@@ -579,6 +579,16 @@ input.snap-in{background:var(--surface3);border:1.5px solid var(--line);border-r
   .sl-side-layout.sl-show-main .sl-side{display:none}
   .sl-side-layout.sl-show-side .sl-main{display:none}
 }
+/* ---- Learning Profile (generic, opt-in; all settings off by default) ---- */
+.lp-row{display:flex;gap:10px;align-items:flex-start;margin:9px 0;font-size:15px;line-height:1.5}
+.lp-row input[type=checkbox]{width:20px;height:20px;flex:none;margin-top:2px;accent-color:var(--acc)}
+.lp-row b{display:block}
+.lp-row span{color:var(--mut);font-size:13px}
+.lp-org input[type=text]{width:100%;margin:5px 0}
+body.lp-plain .card p,body.lp-plain .card li,body.lp-plain .ss-instr{line-height:1.9;font-size:16px}
+body.lp-plain strong,body.lp-plain b{background:rgba(255,220,100,.35);padding:0 3px;border-radius:4px}
+body.lp-plain .pill{font-weight:700}
+.lp-check{border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:10px 0;background:var(--surface3)}
 </style>
 </head>
 <body>
@@ -697,6 +707,42 @@ input.snap-in{background:var(--surface3);border:1.5px solid var(--line);border-r
         </div>
         <p class="small" id="slModeDesc" style="margin:0"></p>
         <div id="slRoute" hidden style="margin-top:10px"></div>
+      </div>
+      <div class="card" id="lpCard">
+        <h3>Learning Profile</h3>
+        <p class="small">Optional study supports. Everything here is off unless you turn it on, and it lives on this device only — nothing is uploaded or sent anywhere. Export the settings to carry them to another device; import accepts a settings file only.</p>
+        <label class="lp-row"><input type="checkbox" id="lpSmallSteps"><span><b>Small steps</b><br>Study content shows one chunk at a time, with a “Got it — next step” check after each one.</span></label>
+        <label class="lp-row"><input type="checkbox" id="lpReadAloud"><span><b>Read aloud</b><br>Adds a Listen button that reads passages and questions out loud, using your device's built-in speech.</span></label>
+        <label class="lp-row"><input type="checkbox" id="lpExtraTime"><span><b>Extra time (1.5×)</b><br>Timed rounds give one and a half times the usual clock.</span></label>
+        <label class="lp-row"><input type="checkbox" id="lpUntimed"><span><b>Untimed practice</b><br>Timed rounds run with no clock at all — a round only ends when you finish it.</span></label>
+        <label class="lp-row"><input type="checkbox" id="lpPlainLang"><span><b>Plain language + highlights</b><br>Roomier text with key words highlighted. This only changes how things look — it never rewrites your material.</span></label>
+        <label class="lp-row"><input type="checkbox" id="lpVocab"><span><b>Vocabulary pre-teach</b><br>Before a new study set, shows its key terms with a plain sentence from your own material for each one.</span></label>
+        <label class="lp-row"><input type="checkbox" id="lpEncourage"><span><b>Encouragement</b><br>Quiz feedback reminds you to take your time and trust your first answer.</span></label>
+        <details style="margin-top:10px">
+          <summary class="small">Where each support works — and where it doesn't</summary>
+          <div class="small" style="margin-top:6px">
+            <p style="margin:4px 0"><b>Small steps:</b> the Quiz tab (one question at a time) and the study-pack Summary (one point at a time). Flashcards and Simple Study rounds already show one item at a time, so they are unchanged. Photo/file intake merges and weak-spot lists still render in full.</p>
+            <p style="margin:4px 0"><b>Read aloud:</b> quiz questions, flashcard fronts, and the study-pack Summary. Simple Study rounds, tutor chat, and lecture notes do not get Listen buttons in this version.</p>
+            <p style="margin:4px 0"><b>Extra time / untimed:</b> Simple Study Exam Rounds only. The Quiz tab has no clock, and the Focus timer is a work timer you set yourself, so neither changes.</p>
+            <p style="margin:4px 0"><b>Plain language + highlights:</b> presentation only, everywhere in the app. It never rewrites, simplifies, or replaces your material.</p>
+            <p style="margin:4px 0"><b>Vocabulary pre-teach:</b> appears when a study pack is generated from the Study tab. Definitions are sentences taken from your own material, not written by the app.</p>
+          </div>
+        </details>
+        <h3 style="font-size:16px;margin-top:16px">Graphic organizer</h3>
+        <p class="small">Plan a piece of writing before you start: one main idea, then the points that support it. Kept on this device only.</p>
+        <input type="text" id="lpOrgMain" placeholder="Main idea">
+        <div id="lpOrgPoints"></div>
+        <div class="row">
+          <button class="btn ghost small" id="lpOrgAddBtn">Add a supporting point</button>
+          <button class="btn plain small" id="lpOrgClearBtn">Clear organizer</button>
+        </div>
+        <div class="row" style="margin-top:12px">
+          <button class="btn ghost small" id="lpExportBtn">Export profile (.json)</button>
+          <label class="btn ghost small filelabel" for="lpImportInput">Import profile</label>
+          <input type="file" id="lpImportInput" accept=".json,application/json" hidden>
+          <button class="btn plain small" id="lpResetBtn">Turn everything off</button>
+          <span class="small" id="lpStatus" role="status"></span>
+        </div>
       </div>
       <div class="sl-side-layout" id="studySideLayout">
       <div class="sl-side-tabs" id="studySideTabs" hidden>
@@ -955,6 +1001,7 @@ input.snap-in{background:var(--surface3);border:1.5px solid var(--line);border-r
           <span class="pill" id="flashPos"></span>
           <button class="btn ghost small" id="nextCardBtn">Next →</button>
           <button class="btn plain small" id="shuffleBtn">Shuffle</button>
+          <button class="btn ghost small" id="lpCardListenBtn" hidden>🔊 Listen</button>
         </div>
         <div class="grade-row" id="gradeRow" hidden>
           <button class="grade again" id="gradeAgain">Again<small>back in ~10 min</small></button>
@@ -1769,6 +1816,9 @@ function generateStudy(){
   S.terms = cleanTerms(extractTerms(text, S.sentences));
   $('termsBox').innerHTML = S.terms.map(function(t){ return '<span class="pill">' + esc(t) + '</span>'; }).join('') || '<span class="mut">No clear key terms found — try more material.</span>';
   $('summaryCard').hidden = false;
+  /* Learning Profile: vocabulary pre-teach, small-steps summary, and the
+     summary Listen button all attach to the fresh pack here. */
+  try{ if(window.LP) LP.afterPack(); }catch(e){}
   buildCards(); buildQuiz();
   SESSION.packs += 1; renderSessionStats(); bumpStreak();
   $('cardsHint').textContent = S.cards.length + ' flashcards ready. Browse them freely, or hit Review due to grade cards and space the repeats out.';
@@ -2086,8 +2136,11 @@ function buildQuiz(){
 }
 function renderQuiz(){
   var box = $('quizBox');
-  $('quizScoreCard').hidden = true;
-  $('quizProgLine').hidden = true;
+  /* Learning Profile, small steps: one question at a time. The score
+     card is left alone in that mode so a finished round keeps its score
+     visible while the step view shows its own done card. */
+  var steps = window.LP && LP.on('smallSteps') && S.quiz.length > 0;
+  if(!steps){ $('quizScoreCard').hidden = true; $('quizProgLine').hidden = true; }
   if(!S.quiz.length){
     box.innerHTML = '<div class="card"><p class="mut">' + (S.sentences.length
       ? 'Not enough material to build a quiz yet — add more text with several distinct ideas on the Study tab, then generate again.'
@@ -2097,9 +2150,12 @@ function renderQuiz(){
     if(qb) qb.addEventListener('click', function(){ showTab('study'); });
     return;
   }
+  if(steps){ LP.renderQuizSteps(); return; }
+  var listen = window.LP && LP.on('readAloud');
   box.innerHTML = S.quiz.map(function(q, qi){
     return '<div class="card"><h3 style="font-size:16px">' + (qi + 1) + '. ' + esc(q.q) + '</h3>' +
       q.opts.map(function(o, oi){ return '<button class="opt" data-q="' + qi + '" data-o="' + oi + '">' + esc(o) + '</button>'; }).join('') +
+      (listen ? '<div class="row"><button class="btn ghost small lp-listen" data-lp-q="' + qi + '">🔊 Listen</button></div>' : '') +
       '<div class="small" id="qfb' + qi + '"></div></div>';
   }).join('');
   box.querySelectorAll('.opt').forEach(function(btn){
@@ -2112,7 +2168,14 @@ function answerQuiz(qi, oi, el){
   var q = S.quiz[qi], correct = q.opts[oi] === q.answer;
   el.classList.add(correct ? 'correct' : 'wrong');
   el.parentElement.querySelectorAll('.opt').forEach(function(b){ b.disabled = true; });
-  $('qfb' + qi).textContent = correct ? 'Correct.' : (q.fb || ('Not quite — the matching statement is: ' + q.answer));
+  $('qfb' + qi).textContent = (function(){
+    var t = correct ? 'Correct.' : (q.fb || ('Not quite — the matching statement is: ' + q.answer));
+    if(window.LP && LP.on('encouragement')) t = correct
+      ? 'Correct. Nice work — take your time, and trust your first answer.'
+      : 'Not quite — no rush. Take your time, re-read it, and trust your first instinct. ' + t;
+    return t;
+  })();
+  if(window.LP && LP.on('smallSteps')) LP.afterQuizAnswer(qi);
   var done = Object.keys(S.quizAnswered).length;
   var right = S.quiz.filter(function(x, i){ return S.quizAnswered[i] !== undefined && x.opts[S.quizAnswered[i]] === x.answer; }).length;
   var prog = $('quizProgLine'); if(prog){ prog.hidden = false; prog.textContent = 'Answered ' + done + ' of ' + S.quiz.length + ' · ' + right + ' right so far.'; }
@@ -4503,8 +4566,11 @@ ssRefresh();
    fetched with no-store caching: when a newer build ships, an already-open or
    home-screen copy of an older build sees the newer version number there and
    offers "Update now" (a reload onto the new build). */
-var APP_VERSION = '2.36.0';
+var APP_VERSION = '2.37.0';
 var CHANGELOG = [
+ { v:'2.37.0', date:'Oct 30, 2026', notify:true, notes:[
+   'NEW: Learning Profile \u2014 optional study supports in the Study tab, all off by default and kept on this device only: small steps (one quiz question and one summary point at a time, with a \u201cGot it \u2014 next step\u201d check), read-aloud Listen buttons (quiz, flashcards, summary, using your device\u2019s built-in speech), extra time (1.5\u00d7) and untimed practice for Exam Rounds, plain language + highlights presentation, vocabulary pre-teach from your own material, encouragement in quiz feedback, a graphic organizer, and settings import/export.',
+   'Nothing else changed: the detector (V20), study packs, tutor rules, and Ollama connection are untouched.' ]},
  { v:'2.36.0', date:'Oct 30, 2026', notify:true, notes:[
    'NEW subject pack: Computer Science Basics \u2014 binary and bits, algorithms, data structures, Boolean logic, Big-O complexity, networks and the internet, databases, and cybersecurity basics, with which-idea, binary-to-decimal, and loop-tracing practice, never your assignment.',
    'Detector V27 was trained and measured this run but HELD, not shipped: on the permanent frozen probe it caught 12 of 18 humanized texts, the same as V26 and below the shipped V20’s 13, so V20 stays live until a round genuinely beats it. The second-family round lifted the second probe to 12 of 12, neural-paraphrase detection to a best-yet 55.4% (from 51.1%), and held GPT-5 detection at 92.6%, with the false-flag rate at 4.56%, still below V20’s 4.71%.' ]},
@@ -7374,7 +7440,9 @@ function slStartExam(){
   SS.qs = qs; SS.idx = 0; SS.score = 0; SS.answered = false; SS.picked = null;
   SS.matchSel = null; SS.matchDone = 0; SS.matchMiss = 0; SS.missed = [];
   SS.mode = qs[0].kind;
-  SS.examLeft = qs.length * 45;
+  /* Learning Profile, extra time: 1.5x the usual 45 seconds per question.
+     Untimed is handled in slExamTick, which skips the countdown entirely. */
+  SS.examLeft = (window.LP && LP.on('extraTime')) ? Math.round(qs.length * 45 * 1.5) : qs.length * 45;
   $('ssPicker').hidden = true;
   $('ssEmpty').hidden = true;
   $('ssConfirm').hidden = true;
@@ -7390,6 +7458,9 @@ function slExamStop(){ if(typeof SS !== 'undefined' && SS.examTimer){ clearInter
 function slExamTick(renderOnly){
   if(!SS.exam){ slExamStop(); return; }
   var c = $('ssExamClock');
+  /* Learning Profile, untimed practice: no countdown, no auto-submit —
+     the round ends only when its questions run out. */
+  if(window.LP && LP.on('untimed')){ if(c) c.textContent = 'No clock — take your time'; return; }
   if(c) c.textContent = '\u23F1 ' + Math.floor(Math.max(0, SS.examLeft) / 60) + ':' + ('0' + (Math.max(0, SS.examLeft) % 60)).slice(-2);
   if(renderOnly) return;
   SS.examLeft -= 1;
@@ -9741,6 +9812,300 @@ window.slNavSync = slNavSync;
   bindLayout({ layout: 'lecSideLayout', watched: 'lecNotesCard', tabs: 'lecSideTabs',
     sideBtn: 'lecSideBtn', mainBtn: 'lecMainBtn', showOnAppear: 'side',
     singleClass: 'sl-single', sideWrapId: 'lecNotesSide' });
+})();
+</script>
+
+<script>
+'use strict';
+/* ================= Learning Profile (generic, opt-in) =================
+   A settings section for learners who study better with small steps,
+   read-aloud, extra time, plain presentation, vocabulary first, and
+   encouragement. Fully generic: no personal data of any kind lives here,
+   in the settings file, or in the version notes.
+   Storage: localStorage key 'sl_learning_profile' (settings only) and
+   'sl_lp_organizer' (the learner's own organizer words). Both stay on
+   this device; this code makes no network request and calls no service.
+   Defaults: every support OFF until the learner turns it on.
+   Coverage (see also the details block in the Learning Profile card):
+   - Small steps: Quiz tab (one question at a time) + study-pack Summary
+     (one point at a time). Flashcards and Simple Study rounds already
+     show one item at a time; intake merges and weak-spot lists are out.
+   - Read aloud: quiz questions, flashcard fronts, study-pack Summary.
+     Uses only the browser's built-in speechSynthesis (on-device).
+   - Extra time (1.5x) / untimed: Simple Study Exam Rounds only. The Quiz
+     tab has no clock and the Focus timer is user-set, so neither changes.
+     Slow answers are never penalised: untimed rounds never auto-submit.
+   - Plain language + highlights: presentation only (spacing, emphasis).
+     It never rewrites, simplifies, or replaces the learner's material.
+   - Vocabulary pre-teach: definitions are sentences taken from the
+     learner's own material (first sentence containing the term).
+   - Encouragement: quiz feedback only.
+   Import accepts ONLY the settings schema below (known keys, booleans);
+   anything else is rejected and nothing changes. */
+var LP = (function(){
+  var KEY = 'sl_learning_profile';
+  var ORG_KEY = 'sl_lp_organizer';
+  var FIELDS = ['smallSteps', 'readAloud', 'extraTime', 'untimed', 'plainLang', 'vocab', 'encouragement'];
+  var IDS = { smallSteps: 'lpSmallSteps', readAloud: 'lpReadAloud', extraTime: 'lpExtraTime', untimed: 'lpUntimed', plainLang: 'lpPlainLang', vocab: 'lpVocab', encouragement: 'lpEncourage' };
+  var settings = {};
+  var quizStep = 0, quizFp = '';
+  function defaults(){ var d = {}; FIELDS.forEach(function(f){ d[f] = false; }); return d; }
+  function load(){
+    settings = defaults();
+    try{
+      var p = JSON.parse(localStorage.getItem(KEY) || 'null');
+      if(p && typeof p === 'object' && !Array.isArray(p)){
+        FIELDS.forEach(function(f){ if(typeof p[f] === 'boolean') settings[f] = p[f]; });
+      }
+    }catch(e){}
+  }
+  function save(){ try{ localStorage.setItem(KEY, JSON.stringify(settings)); }catch(e){} }
+  function on(f){ return !!settings[f]; }
+  function setStatus(msg){ var el = $('lpStatus'); if(el) el.textContent = msg; }
+  function speak(text){
+    try{
+      if(!('speechSynthesis' in window) || !text) return;
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.speak(new SpeechSynthesisUtterance(text));
+    }catch(e){}
+  }
+  function firstUnanswered(){
+    for(var i = 0; i < S.quiz.length; i++){ if(S.quizAnswered[i] === undefined) return i; }
+    return S.quiz.length;
+  }
+  function fbTextFor(q, correct){
+    var t = correct ? 'Correct.' : (q.fb || ('Not quite — the matching statement is: ' + q.answer));
+    if(settings.encouragement) t = correct
+      ? 'Correct. Nice work — take your time, and trust your first answer.'
+      : 'Not quite — no rush. Take your time, re-read it, and trust your first instinct. ' + t;
+    return t;
+  }
+  /* Small steps, Quiz tab: one question card, a check-for-understanding
+     prompt after each answer, and a "Got it — next step" button. */
+  function renderQuizSteps(){
+    var box = $('quizBox'); if(!box || !S.quiz.length) return;
+    var fp = S.quiz.length + '|' + (S.quiz[0] ? S.quiz[0].q : '');
+    if(fp !== quizFp){ quizFp = fp; quizStep = firstUnanswered(); }
+    if(quizStep == null || quizStep < 0 || quizStep > S.quiz.length) quizStep = firstUnanswered();
+    var prog = $('quizProgLine');
+    if(quizStep >= S.quiz.length){
+      box.innerHTML = '<div class="card"><h3 style="font-size:16px">All done — nice work.</h3>' +
+        '<p class="small">Take your time and look over your score below.</p>' +
+        '<div class="row"><button class="btn ghost small" id="lpStepsScoreBtn">See my score</button></div></div>';
+      var sb = $('lpStepsScoreBtn');
+      if(sb) sb.addEventListener('click', function(){ var sc = $('quizScoreCard'); if(sc){ sc.hidden = false; sc.scrollIntoView(); } });
+      if(prog){ prog.hidden = false; prog.textContent = 'Answered ' + S.quiz.length + ' of ' + S.quiz.length + '.'; }
+      return;
+    }
+    var qi = quizStep, q = S.quiz[qi];
+    var answered = S.quizAnswered[qi] !== undefined;
+    box.innerHTML = '<div class="card"><h3 style="font-size:16px">Step ' + (qi + 1) + ' of ' + S.quiz.length + ': ' + esc(q.q) + '</h3>' +
+      q.opts.map(function(o, oi){ return '<button class="opt" data-q="' + qi + '" data-o="' + oi + '"' + (answered ? ' disabled' : '') + '>' + esc(o) + '</button>'; }).join('') +
+      (settings.readAloud ? '<div class="row"><button class="btn ghost small lp-listen" data-lp-q="' + qi + '">🔊 Listen</button></div>' : '') +
+      '<div class="small" id="qfb' + qi + '"></div></div>';
+    if(prog){ prog.hidden = false; prog.textContent = 'Step ' + (qi + 1) + ' of ' + S.quiz.length + '.'; }
+    box.querySelectorAll('.opt').forEach(function(btn){
+      btn.addEventListener('click', function(){ answerQuiz(parseInt(btn.getAttribute('data-q'), 10), parseInt(btn.getAttribute('data-o'), 10), btn); });
+    });
+    if(answered){
+      var chosen = S.quizAnswered[qi];
+      var cb = box.querySelector('[data-o="' + chosen + '"]');
+      if(cb) cb.classList.add(S.quiz[qi].opts[chosen] === S.quiz[qi].answer ? 'correct' : 'wrong');
+      var fb = $('qfb' + qi);
+      if(fb) fb.textContent = fbTextFor(q, S.quiz[qi].opts[chosen] === S.quiz[qi].answer);
+      afterQuizAnswer(qi);
+    }
+  }
+  /* Appends the check prompt + "Got it — next step" button after an
+     answer in small-steps mode. Guarded so it is added exactly once. */
+  function afterQuizAnswer(qi){
+    var fb = $('qfb' + qi); if(!fb || fb.getAttribute('data-lp-got')) return;
+    fb.setAttribute('data-lp-got', '1');
+    var p = document.createElement('p'); p.className = 'small'; p.style.marginTop = '8px';
+    p.textContent = 'Quick check: can you say in your own words what this question was about? Take your time.';
+    var b = document.createElement('button'); b.className = 'btn ghost small'; b.style.marginTop = '6px';
+    b.textContent = 'Got it — next step';
+    b.addEventListener('click', function(){ quizStep = qi + 1; renderQuiz(); });
+    fb.appendChild(p); fb.appendChild(b);
+  }
+  /* Study-pack hooks: runs after generateStudy builds a fresh pack, and
+     again whenever a toggle changes with a pack on screen. Idempotent:
+     earlier Learning Profile additions are removed before re-adding. */
+  function afterPack(){
+    var card = $('summaryCard'); if(!card || card.hidden) return;
+    ['lpPreteach', 'lpSummaryListenWrap', 'lpSumSteps'].forEach(function(id){
+      var el = $(id); if(el && el.parentNode) el.parentNode.removeChild(el);
+    });
+    var list = $('summaryList');
+    if(list){ for(var i = 0; i < list.children.length; i++) list.children[i].hidden = false; }
+    if(settings.vocab) showPreteach(card);
+    if(settings.readAloud) addSummaryListen(card);
+    if(settings.smallSteps) applySummarySteps();
+  }
+  function showPreteach(card){
+    if(!S.terms || !S.terms.length || !S.sentences || !S.sentences.length) return;
+    var items = [];
+    S.terms.slice(0, 12).forEach(function(t){
+      for(var i = 0; i < S.sentences.length; i++){
+        if(sentenceHasTerm(S.sentences[i], t)){ items.push({ t: t, s: S.sentences[i] }); break; }
+      }
+    });
+    if(!items.length) return;
+    var div = document.createElement('div'); div.id = 'lpPreteach'; div.className = 'lp-check';
+    div.innerHTML = '<h3 style="font-size:16px;margin:0 0 6px">Before you start — key words</h3>' +
+      '<p class="small" style="margin:0 0 8px">Each word below comes with a sentence from your own material. Read them first, then start studying.</p>' +
+      items.map(function(it){ return '<p style="margin:6px 0"><strong>' + esc(it.t) + '</strong> — ' + esc(it.s) + '</p>'; }).join('') +
+      '<div class="row"><button class="btn ghost small" id="lpPreteachDoneBtn">Got it — start studying</button></div>';
+    card.insertBefore(div, card.firstChild);
+    var b = $('lpPreteachDoneBtn');
+    if(b) b.addEventListener('click', function(){ div.hidden = true; });
+  }
+  function addSummaryListen(card){
+    if(!S.summary || !S.summary.length) return;
+    var wrap = document.createElement('div'); wrap.id = 'lpSummaryListenWrap'; wrap.className = 'row';
+    wrap.innerHTML = '<button class="btn ghost small" id="lpSummaryListenBtn">🔊 Listen to summary</button>';
+    card.appendChild(wrap);
+    var b = $('lpSummaryListenBtn');
+    if(b) b.addEventListener('click', function(){ speak(S.summary.join(' ')); });
+  }
+  /* Small steps, Summary: one bullet at a time with a check prompt.
+     Finishing restores the full list. */
+  function applySummarySteps(){
+    var list = $('summaryList'); if(!list || !list.children.length) return;
+    var items = list.children, step = 0;
+    var wrap = document.createElement('div'); wrap.id = 'lpSumSteps';
+    wrap.innerHTML = '<p class="small" id="lpSumCheck" style="margin:10px 0 4px"></p>' +
+      '<div class="row"><button class="btn ghost small" id="lpSumNextBtn">Got it — next step</button> <span class="small" id="lpSumProg"></span></div>';
+    list.parentNode.insertBefore(wrap, list.nextSibling);
+    function paint(){
+      for(var i = 0; i < items.length; i++) items[i].hidden = (i !== step);
+      var prog = $('lpSumProg'); if(prog) prog.textContent = 'Step ' + (step + 1) + ' of ' + items.length + '.';
+      var btn = $('lpSumNextBtn'); if(btn) btn.textContent = step >= items.length - 1 ? 'Got it — done' : 'Got it — next step';
+      var chk = $('lpSumCheck'); if(chk) chk.textContent = step >= items.length - 1
+        ? 'Last point — take your time, then you are done with the summary.'
+        : 'Quick check: can you say this point in your own words? Take your time.';
+    }
+    $('lpSumNextBtn').addEventListener('click', function(){
+      if(step >= items.length - 1){
+        for(var i = 0; i < items.length; i++) items[i].hidden = false;
+        wrap.hidden = true;
+      } else { step += 1; paint(); }
+    });
+    paint();
+  }
+  /* Graphic organizer: the learner's own words, device-only. */
+  function orgLoad(){
+    try{
+      var p = JSON.parse(localStorage.getItem(ORG_KEY) || 'null');
+      if(p && typeof p.main === 'string' && Array.isArray(p.points)) return p;
+    }catch(e){}
+    return { main: '', points: [''] };
+  }
+  function orgSave(){
+    var main = $('lpOrgMain') ? $('lpOrgMain').value : '';
+    var pts = [];
+    var box = $('lpOrgPoints');
+    if(box) box.querySelectorAll('input').forEach(function(inp){ pts.push(inp.value); });
+    try{ localStorage.setItem(ORG_KEY, JSON.stringify({ main: main, points: pts })); }catch(e){}
+  }
+  function orgAddPoint(val){
+    var box = $('lpOrgPoints'); if(!box) return;
+    var inp = document.createElement('input'); inp.type = 'text';
+    inp.placeholder = 'A point that supports the main idea';
+    inp.value = val || '';
+    inp.addEventListener('input', orgSave);
+    box.appendChild(inp);
+  }
+  function orgRender(){
+    var o = orgLoad();
+    var main = $('lpOrgMain'); if(main) main.value = o.main;
+    var box = $('lpOrgPoints'); if(!box) return;
+    box.innerHTML = '';
+    o.points.forEach(function(p){ orgAddPoint(p); });
+    if(!o.points.length) orgAddPoint('');
+  }
+  /* Import/export: the file holds settings ONLY. Import rejects anything
+     that is not exactly the settings schema (known keys, booleans). */
+  function validateImport(data){
+    if(!data || typeof data !== 'object' || Array.isArray(data)) return null;
+    var s = data.settings;
+    if(!s || typeof s !== 'object' || Array.isArray(s)) return null;
+    var out = defaults();
+    for(var k in s){
+      if(FIELDS.indexOf(k) < 0) return null;
+      if(typeof s[k] !== 'boolean') return null;
+      out[k] = s[k];
+    }
+    return out;
+  }
+  function exportProfile(){
+    var data = { format: 'studylens-learning-profile', version: 1, settings: settings };
+    var blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = 'studylens-learning-profile.json';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setStatus('Profile exported — the file holds settings only, nothing else.');
+  }
+  function importProfile(file){
+    if(!file) return;
+    var r = new FileReader();
+    r.onload = function(){
+      try{
+        var v = validateImport(JSON.parse(r.result));
+        if(!v){ setStatus('That file is not a Learning Profile settings file — nothing was changed.'); return; }
+        settings = v; save(); apply(); refreshViews();
+        setStatus('Profile imported.');
+      }catch(e){ setStatus('That file could not be read — nothing was changed.'); }
+    };
+    r.readAsText(file);
+  }
+  function refreshViews(){
+    try{ if(typeof renderQuiz === 'function' && typeof S !== 'undefined' && S.quiz && S.quiz.length) renderQuiz(); }catch(e){}
+    try{ var card = $('summaryCard'); if(card && !card.hidden) afterPack(); }catch(e){}
+  }
+  function apply(){
+    document.body.classList.toggle('lp-plain', !!settings.plainLang);
+    FIELDS.forEach(function(f){ var el = $(IDS[f]); if(el) el.checked = !!settings[f]; });
+    var cardBtn = $('lpCardListenBtn'); if(cardBtn) cardBtn.hidden = !settings.readAloud;
+  }
+  function bind(){
+    FIELDS.forEach(function(f){
+      var el = $(IDS[f]);
+      if(el) el.addEventListener('change', function(){ settings[f] = el.checked; save(); apply(); refreshViews(); });
+    });
+    var cardBtn = $('lpCardListenBtn');
+    if(cardBtn) cardBtn.addEventListener('click', function(){
+      try{
+        var c = S.cards[currentCardIdx()]; if(!c) return;
+        speak(c.q + (S.cardFlipped ? ' ' + c.a : ''));
+      }catch(e){}
+    });
+    var qb = $('quizBox');
+    if(qb) qb.addEventListener('click', function(e){
+      var t = e.target;
+      if(t && t.classList && t.classList.contains('lp-listen')){
+        var qi = parseInt(t.getAttribute('data-lp-q'), 10);
+        if(S.quiz[qi]) speak(S.quiz[qi].q + '. ' + S.quiz[qi].opts.join('. '));
+      }
+    });
+    var main = $('lpOrgMain'); if(main) main.addEventListener('input', orgSave);
+    var add = $('lpOrgAddBtn'); if(add) add.addEventListener('click', function(){ orgAddPoint(''); orgSave(); });
+    var clr = $('lpOrgClearBtn');
+    if(clr) clr.addEventListener('click', function(){
+      try{ localStorage.removeItem(ORG_KEY); }catch(e){}
+      orgRender(); setStatus('Organizer cleared.');
+    });
+    var exp = $('lpExportBtn'); if(exp) exp.addEventListener('click', exportProfile);
+    var imp = $('lpImportInput');
+    if(imp) imp.addEventListener('change', function(){ importProfile(imp.files[0]); imp.value = ''; });
+    var rst = $('lpResetBtn');
+    if(rst) rst.addEventListener('click', function(){
+      settings = defaults(); save(); apply(); refreshViews();
+      setStatus('All Learning Profile supports are off.');
+    });
+  }
+  load(); apply(); orgRender(); bind();
+  return { on: on, speak: speak, renderQuizSteps: renderQuizSteps, afterQuizAnswer: afterQuizAnswer, afterPack: afterPack, validateImport: validateImport };
 })();
 </script>
 
