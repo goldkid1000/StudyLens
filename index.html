@@ -589,6 +589,34 @@ body.lp-plain .card p,body.lp-plain .card li,body.lp-plain .ss-instr{line-height
 body.lp-plain strong,body.lp-plain b{background:rgba(255,220,100,.35);padding:0 3px;border-radius:4px}
 body.lp-plain .pill{font-weight:700}
 .lp-check{border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:10px 0;background:var(--surface3)}
+/* ===== v2.38.0: animation polish (CSS-only, GPU-light) ===== */
+.lp-row input[type=checkbox]{appearance:none;-webkit-appearance:none;width:46px;height:26px;flex:0 0 46px;border-radius:99px;background:var(--surface3);border:1.5px solid var(--line);position:relative;cursor:pointer;transition:background .22s var(--ease),border-color .22s var(--ease);margin-top:2px}
+.lp-row input[type=checkbox]::after{content:"";position:absolute;top:2px;left:2px;width:19px;height:19px;border-radius:50%;background:var(--mut);transition:transform .22s var(--ease),background .22s var(--ease)}
+.lp-row input[type=checkbox]:checked{background:var(--acc);border-color:var(--acc)}
+.lp-row input[type=checkbox]:checked::after{transform:translateX(20px);background:var(--acc-ink)}
+.sl-side{animation:slPanelIn .3s var(--ease) both}
+@keyframes slPanelIn{from{opacity:0;transform:translateX(10px)}to{opacity:1;transform:none}}
+.lec-lesson-step{animation:slStepIn .28s var(--ease) both}
+@keyframes slStepIn{from{opacity:0;transform:translateX(14px)}to{opacity:1;transform:none}}
+.qfb-why{animation:slFbIn .3s var(--ease) both}
+@keyframes slFbIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.opt:active{transform:scale(.985)}
+.mode-btn:active{transform:scale(.96)}
+.update-banner{animation:slBannerIn .4s var(--ease) both}
+@keyframes slBannerIn{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:none}}
+.lesson-dot{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--mut);flex:0 0 10px}
+.lesson-dot.playing{background:#3fb27f;animation:slPulse 1.2s ease-in-out infinite}
+@keyframes slPulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.5);opacity:.6}}
+.lec-lesson-bar{height:8px;border-radius:6px;background:var(--surface3);overflow:hidden;margin-top:8px}
+#lecLessonBarFill{height:100%;width:0%;background:#3fb27f;transition:width .3s var(--ease)}
+.quiz-prog{height:8px;border-radius:6px;background:var(--surface3);overflow:hidden;margin:6px 0 10px}
+#quizProgFill{height:100%;width:0%;background:var(--acc);transition:width .3s var(--ease)}
+@media (prefers-reduced-motion: reduce){
+  .lp-row input[type=checkbox],.lp-row input[type=checkbox]::after{transition:none}
+  .sl-side,.lec-lesson-step,.qfb-why,.update-banner{animation:none}
+  .lesson-dot.playing{animation:none}
+  #lecLessonBarFill,#quizProgFill{transition:none}
+}
 </style>
 </head>
 <body>
@@ -929,6 +957,21 @@ body.lp-plain .pill{font-weight:700}
           <label class="btn ghost filelabel" for="lecTextInput">Upload transcript</label>
           <input type="file" id="lecTextInput" accept=".txt,.md,text/plain" hidden>
         </div>
+        <div id="lecYtBlock" style="margin-top:14px;border-top:1.5px solid var(--line);padding-top:12px">
+          <h4 style="margin:6px 0">From a YouTube lecture</h4>
+          <p class="small">StudyLens can't fetch a YouTube video itself — that would need a server, and your material never leaves this device. Instead: open the video, copy YouTube's own transcript, paste it below, and the notes, flashcards, quiz, and Ask Iris pipeline takes over from there.</p>
+          <div class="row" style="margin-top:8px">
+            <input type="url" id="lecYtUrl" placeholder="Paste the YouTube link here…" aria-label="YouTube link" style="flex:1;min-width:200px">
+            <button class="btn ghost" id="lecYtOpenBtn">Open video on YouTube</button>
+          </div>
+          <ol class="small" style="margin:8px 0 0;padding-left:20px">
+            <li>On the video page, open the description and tap “Show transcript”.</li>
+            <li>Copy the transcript text (timestamps come along — keep them).</li>
+            <li>Paste it below and tap “Use this transcript”.</li>
+          </ol>
+          <textarea id="lecYtTranscript" style="min-height:100px;margin-top:10px" placeholder="Paste the YouTube transcript here…"></textarea>
+          <div class="row" style="margin-top:8px"><button class="btn" id="lecYtUseBtn">Use this transcript</button><span class="small" id="lecYtStatus" role="status"></span></div>
+        </div>
         <p class="small" id="lecRecStatus" role="status" style="margin-top:8px"></p>
         <div id="lecAudioWrap" hidden style="margin-top:8px"></div>
         <div class="row" style="margin-top:6px"><button class="btn plain small" id="lecDeleteAudioBtn" hidden>Delete saved audio</button></div>
@@ -961,6 +1004,25 @@ body.lp-plain .pill{font-weight:700}
             <button class="btn small ghost" id="lecQueueBtn">Add terms to review queue</button>
             <button class="btn small plain" id="lecListenBtn">Listen to my notes</button>
           </div>
+          <div class="row" style="margin-top:8px">
+            <button class="btn small" id="lecLessonOpenBtn">Lesson player</button>
+            <button class="btn small ghost" id="lecLessonStartBtn">Start bite-sized lesson</button>
+          </div>
+          <div id="lecLessonPlayer" hidden style="margin-top:10px">
+            <div class="row" style="align-items:center">
+              <span class="lesson-dot" id="lecLessonDot" aria-hidden="true"></span>
+              <span class="small" id="lecLessonPos" style="font-weight:700"></span>
+            </div>
+            <div class="lec-lesson-bar"><div id="lecLessonBarFill"></div></div>
+            <div class="row" style="margin-top:8px">
+              <button class="btn small ghost" id="lecLessonPrevBtn">← Prev section</button>
+              <button class="btn small" id="lecLessonPlayBtn">▶ Play</button>
+              <button class="btn small ghost" id="lecLessonNextBtn">Next section →</button>
+              <button class="btn small plain" id="lecLessonStopBtn">Stop</button>
+            </div>
+            <p class="small" id="lecLessonStatus" role="status"></p>
+          </div>
+          <div id="lecLessonView" hidden style="margin-top:10px"></div>
           <h4 style="margin:14px 0 6px">Ask Iris about this lecture</h4>
           <div class="row">
             <input type="text" id="lecAskInput" placeholder="Ask about this lecture — answers quote the transcript, with timestamps…" aria-label="Ask about this lecture" style="flex:1;min-width:200px">
@@ -988,6 +1050,7 @@ body.lp-plain .pill{font-weight:700}
           <button class="mode-btn on" id="modeBrowseBtn">Browse all</button>
           <button class="mode-btn" id="modeReviewBtn">Review due</button>
           <button class="mode-btn" id="modeWeakBtn">Weak areas</button>
+          <button class="mode-btn" id="cardDirBtn">Direction: term → definition</button>
         </div>
         <div id="weakPanel" hidden style="margin-bottom:12px"></div>
         <div class="flash" id="flashBox" hidden role="button" tabindex="0" aria-label="Flashcard — activate to flip">
@@ -1025,6 +1088,7 @@ body.lp-plain .pill{font-weight:700}
         <p id="quizHint">Generate a study pack first. Every question is built from your own material.</p>
       </div>
       <p class="small" id="quizProgLine" hidden></p>
+      <div class="quiz-prog" id="quizProgBar" hidden><div id="quizProgFill"></div></div>
       <div id="quizBox"></div>
       <div class="card" id="quizScoreCard" hidden>
         <h3 id="quizScore"></h3>
@@ -1912,6 +1976,7 @@ function currentCardIdx(){
   if(S.cardMode === 'review' && S.reviewQueue.length) return S.reviewQueue[Math.min(S.reviewPos, S.reviewQueue.length - 1)];
   return S.cardIdx;
 }
+var CARD_DIR = 'fwd';
 function renderCard(){
   var has = S.cards.length > 0;
   var inReview = S.cardMode === 'review';
@@ -1940,10 +2005,11 @@ function renderCard(){
     return;
   }
   var c = S.cards[currentCardIdx()];
-  $('flashQ').textContent = c.q;
-  $('flashA').textContent = c.a;
+  var rev = (CARD_DIR === 'rev');
+  $('flashQ').textContent = rev ? c.a : c.q;
+  $('flashA').textContent = rev ? c.q : c.a;
   $('flashA').hidden = !S.cardFlipped;
-  $('flashHint').textContent = S.cardFlipped ? (inReview ? 'Grade yourself honestly below' : 'Tap to hide the answer') : 'Tap to reveal the answer';
+  $('flashHint').textContent = S.cardFlipped ? (inReview ? 'Grade yourself honestly below' : 'Tap to hide the answer') : (rev ? 'Tap to reveal the term' : 'Tap to reveal the answer');
   var fh = $('flashModeHint');
   if(fh){ var cc = S.cards[currentCardIdx()]; var showHint = (typeof SLM !== 'undefined' && SLM === 'guided' && cc && cc.hint && !S.cardFlipped && !reviewDone); fh.hidden = !showHint; fh.textContent = showHint ? 'Hint: ' + cc.hint : ''; }
   $('flashBox').setAttribute('aria-pressed', S.cardFlipped ? 'true' : 'false');
@@ -1974,6 +2040,11 @@ $('prevCardBtn').addEventListener('click', function(){ if(!S.cards.length) retur
 $('shuffleBtn').addEventListener('click', function(){
   for(var i = S.cards.length - 1; i > 0; i--){ var j = Math.floor(Math.random() * (i + 1)); var t = S.cards[i]; S.cards[i] = S.cards[j]; S.cards[j] = t; }
   S.cardIdx = 0; S.cardFlipped = false; renderCard();
+});
+$('cardDirBtn').addEventListener('click', function(){
+  CARD_DIR = (CARD_DIR === 'rev') ? 'fwd' : 'rev';
+  this.textContent = CARD_DIR === 'rev' ? 'Direction: definition → term' : 'Direction: term → definition';
+  S.cardFlipped = false; renderCard();
 });
 
 /* ================= weak areas (Cards tab) =================
@@ -2161,6 +2232,15 @@ function renderQuiz(){
   box.querySelectorAll('.opt').forEach(function(btn){
     btn.addEventListener('click', function(){ answerQuiz(parseInt(btn.getAttribute('data-q'), 10), parseInt(btn.getAttribute('data-o'), 10), btn); });
   });
+  quizProgBarUpdate();
+}
+function quizProgBarUpdate(){
+  var bar = $('quizProgBar'), fill = $('quizProgFill');
+  if(!bar || !fill) return;
+  if(!S.quiz.length){ bar.hidden = true; return; }
+  var done = Object.keys(S.quizAnswered).length;
+  bar.hidden = false;
+  fill.style.width = Math.round((done / S.quiz.length) * 100) + '%';
 }
 function answerQuiz(qi, oi, el){
   if(S.quizAnswered[qi] !== undefined) return;
@@ -2168,13 +2248,21 @@ function answerQuiz(qi, oi, el){
   var q = S.quiz[qi], correct = q.opts[oi] === q.answer;
   el.classList.add(correct ? 'correct' : 'wrong');
   el.parentElement.querySelectorAll('.opt').forEach(function(b){ b.disabled = true; });
-  $('qfb' + qi).textContent = (function(){
+  var qfbEl = $('qfb' + qi);
+  qfbEl.textContent = (function(){
     var t = correct ? 'Correct.' : (q.fb || ('Not quite — the matching statement is: ' + q.answer));
     if(window.LP && LP.on('encouragement')) t = correct
       ? 'Correct. Nice work — take your time, and trust your first answer.'
       : 'Not quite — no rush. Take your time, re-read it, and trust your first instinct. ' + t;
     return t;
   })();
+  if(q && q.w){
+    var why = document.createElement('p');
+    why.className = 'small qfb-why'; why.style.marginTop = '6px';
+    why.textContent = 'Why: ' + q.w;
+    qfbEl.appendChild(why);
+  }
+  quizProgBarUpdate();
   if(window.LP && LP.on('smallSteps')) LP.afterQuizAnswer(qi);
   var done = Object.keys(S.quizAnswered).length;
   var right = S.quiz.filter(function(x, i){ return S.quizAnswered[i] !== undefined && x.opts[S.quizAnswered[i]] === x.answer; }).length;
@@ -4566,8 +4654,16 @@ ssRefresh();
    fetched with no-store caching: when a newer build ships, an already-open or
    home-screen copy of an older build sees the newer version number there and
    offers "Update now" (a reload onto the new build). */
-var APP_VERSION = '2.37.0';
+var APP_VERSION = '2.38.0';
 var CHANGELOG = [
+ { v:'2.38.0', date:'Oct 30, 2026', notify:true, notes:[
+   'NEW in Lecture notes: a YouTube lecture step — open the video on YouTube, copy YouTube\u2019s own transcript, paste it here, and the notes, flashcards, quiz, and Ask Iris pipeline takes over. StudyLens never fetches the video itself, so your material still never leaves this device.',
+   'NEW: audio lesson player for lecture notes — your device\u2019s built-in speech reads one section at a time, with play/pause, prev/next section, a progress bar, and a pulsing playing dot. If Learning Profile read-aloud is on, the player opens on its own when notes are made.',
+   'NEW: bite-sized lessons — walk through lecture notes one section at a time, each followed by up to two questions built only from that section\u2019s own key terms and your professor\u2019s own definitions. Sections with no key terms get a say-it-back prompt instead of a made-up question.',
+   'NEW: flashcards now flip both ways — a direction toggle in the Cards tab switches term \u2192 definition and definition \u2192 term, in Browse and Review alike.',
+   'NEW: quiz answers now show the why-line the question generator already carries, when one exists — never invented. The study streak and review-due count you already had on the Study tab are untouched.',
+   'UI + motion polish, CSS only: Learning Profile switches animate on and off, side panels glide open, lesson steps slide between sections, quiz feedback and the new quiz progress bar animate in, buttons give a subtle press, and the update banner slides in. Everything switches off under reduced-motion settings, and tap targets stay 44px.',
+   'Nothing else changed: the detector (V20), the review queue, tutor rules, and Ollama connection are untouched, and no new server calls were added.' ]},
  { v:'2.37.0', date:'Oct 30, 2026', notify:true, notes:[
    'NEW: Learning Profile \u2014 optional study supports in the Study tab, all off by default and kept on this device only: small steps (one quiz question and one summary point at a time, with a \u201cGot it \u2014 next step\u201d check), read-aloud Listen buttons (quiz, flashcards, summary, using your device\u2019s built-in speech), extra time (1.5\u00d7) and untimed practice for Exam Rounds, plain language + highlights presentation, vocabulary pre-teach from your own material, encouragement in quiz feedback, a graphic organizer, and settings import/export.',
    'Nothing else changed: the detector (V20), study packs, tutor rules, and Ollama connection are untouched.' ]},
@@ -9453,6 +9549,7 @@ function lecBuild(){
   $('lecNotes').value = lecNotesText(n);
   $('lecNotesCard').hidden = false;
   LEC.lastNotes = n;
+  if(window.LP && LP.on('readAloud') && window.slLesson) window.slLesson.open();
   lecSave();
   return n;
 }
@@ -9572,6 +9669,167 @@ function lecSave(){
       if(saved.notes){ $('lecNotes').value = saved.notes; $('lecNotesCard').hidden = false; }
     }
   }catch(e){}
+  /* ---- v2.38.0: YouTube lecture step (paste-transcript path) ---- */
+  (function(){
+    var openBtn = $('lecYtOpenBtn'), useBtn = $('lecYtUseBtn'); if(!openBtn || !useBtn) return;
+    openBtn.addEventListener('click', function(){
+      var raw = ($('lecYtUrl').value || '').trim();
+      var st = $('lecYtStatus');
+      try{
+        var u = new URL(raw);
+        var host = u.hostname.replace(/^www\./, '');
+        if(host !== 'youtube.com' && host !== 'youtu.be' && host !== 'music.youtube.com' && host !== 'm.youtube.com'){ st.textContent = 'That doesn\u2019t look like a YouTube link — paste the video\u2019s YouTube link.'; return; }
+        window.open(u.href, '_blank', 'noopener');
+        st.textContent = 'Video opened on YouTube. On the video page, open the description and tap \u201CShow transcript\u201D, copy it, and paste it below.';
+      }catch(err){ st.textContent = 'That doesn\u2019t look like a link — paste the full YouTube link.'; }
+    });
+    useBtn.addEventListener('click', function(){
+      var pasted = ($('lecYtTranscript').value || '').trim();
+      var st = $('lecYtStatus');
+      if(pasted.length < 60){ st.textContent = 'That transcript looks too short — copy the full transcript from YouTube first.'; return; }
+      $('lecTranscript').value = pasted;
+      lecSave();
+      st.textContent = 'Transcript pasted into the Transcript box above — hit \u201CMake my notes\u201D to build notes, flashcards, and a quiz from it.';
+    });
+  })();
+  /* ---- v2.38.0: audio lesson player + bite-sized lessons ---- */
+  var LEC_LESSON = { sections: [], idx: 0, playing: false };
+  function lecLessonSections(){
+    if(typeof LEC !== 'undefined' && LEC.lastNotes && LEC.lastNotes.sections && LEC.lastNotes.sections.length) return LEC.lastNotes.sections;
+    var txt = ($('lecNotes') || {}).value || '';
+    var secs = [], cur = null;
+    txt.split(/\n/).forEach(function(line){
+      var hm = line.match(/^##\s+(.+)$/);
+      if(hm){ cur = { title: hm[1].trim(), items: [] }; secs.push(cur); return; }
+      var im = line.match(/^-\s+(?:\[[^\]]*\]\s+)?(.+)$/);
+      if(im && cur) cur.items.push({ text: im[1].trim(), t: '' });
+    });
+    return secs.filter(function(s){ return s.items.length; });
+  }
+  function lecLessonSectionText(sec){
+    return sec.title + '. ' + sec.items.map(function(s){ return s.text; }).join(' ');
+  }
+  function lecLessonRender(){
+    var secs = LEC_LESSON.sections, pos = $('lecLessonPos'), fill = $('lecLessonBarFill'), dot = $('lecLessonDot');
+    if(!secs.length){ if(pos) pos.textContent = 'No lecture notes yet — make notes first.'; return; }
+    var sec = secs[LEC_LESSON.idx];
+    if(pos) pos.textContent = 'Section ' + (LEC_LESSON.idx + 1) + ' of ' + secs.length + ' — ' + sec.title;
+    if(fill) fill.style.width = Math.round(((LEC_LESSON.idx + 1) / secs.length) * 100) + '%';
+    if(dot) dot.classList.toggle('playing', LEC_LESSON.playing);
+    var pb = $('lecLessonPlayBtn'); if(pb) pb.textContent = LEC_LESSON.playing ? '⏸ Pause' : '▶ Play';
+  }
+  function lecLessonStopSpeak(){ try{ if(window.speechSynthesis) speechSynthesis.cancel(); }catch(e){} }
+  function lecLessonSpeak(){
+    if(!window.speechSynthesis){ $('lecLessonStatus').textContent = 'Listening needs a browser with speech built in.'; return; }
+    var secs = LEC_LESSON.sections; if(!secs.length) return;
+    lecLessonStopSpeak();
+    var u = new SpeechSynthesisUtterance(lecLessonSectionText(secs[LEC_LESSON.idx]));
+    u.onend = function(){
+      if(!LEC_LESSON.playing) return;
+      if(LEC_LESSON.idx < secs.length - 1){ LEC_LESSON.idx++; lecLessonRender(); lecLessonSpeak(); }
+      else { LEC_LESSON.playing = false; lecLessonRender(); $('lecLessonStatus').textContent = 'Lesson finished — nice work.'; }
+    };
+    u.onerror = function(){ LEC_LESSON.playing = false; lecLessonRender(); };
+    speechSynthesis.speak(u);
+  }
+  function lecLessonOpen(){
+    LEC_LESSON.sections = lecLessonSections();
+    LEC_LESSON.idx = 0;
+    var p = $('lecLessonPlayer'); if(p) p.hidden = false;
+    lecLessonRender();
+    if(!LEC_LESSON.sections.length) $('lecLessonStatus').textContent = 'No notes to play yet — hit \u201CMake my notes\u201D first.';
+  }
+  (function(){
+    var openBtn = $('lecLessonOpenBtn'); if(!openBtn) return;
+    openBtn.addEventListener('click', lecLessonOpen);
+    $('lecLessonPlayBtn').addEventListener('click', function(){
+      if(!LEC_LESSON.sections.length) lecLessonOpen();
+      if(!LEC_LESSON.sections.length) return;
+      LEC_LESSON.playing = !LEC_LESSON.playing;
+      if(LEC_LESSON.playing) lecLessonSpeak(); else lecLessonStopSpeak();
+      lecLessonRender();
+    });
+    $('lecLessonPrevBtn').addEventListener('click', function(){
+      if(!LEC_LESSON.sections.length) return;
+      var was = LEC_LESSON.playing; lecLessonStopSpeak();
+      LEC_LESSON.idx = (LEC_LESSON.idx - 1 + LEC_LESSON.sections.length) % LEC_LESSON.sections.length;
+      lecLessonRender(); if(was) lecLessonSpeak();
+    });
+    $('lecLessonNextBtn').addEventListener('click', function(){
+      if(!LEC_LESSON.sections.length) return;
+      var was = LEC_LESSON.playing; lecLessonStopSpeak();
+      LEC_LESSON.idx = (LEC_LESSON.idx + 1) % LEC_LESSON.sections.length;
+      lecLessonRender(); if(was) lecLessonSpeak();
+    });
+    $('lecLessonStopBtn').addEventListener('click', function(){ LEC_LESSON.playing = false; lecLessonStopSpeak(); lecLessonRender(); });
+  })();
+  window.slLesson = { open: lecLessonOpen, sections: lecLessonSections };
+  var LEC_BITE = { sections: [], idx: 0 };
+  function lecBiteTermsInSection(sec){
+    if(typeof LEC === 'undefined' || !LEC.lastNotes || !LEC.lastNotes.terms) return [];
+    var ts = {};
+    sec.items.forEach(function(s){ if(s.t) ts[s.t] = 1; });
+    return LEC.lastNotes.terms.filter(function(x){ return ts[x.t]; });
+  }
+  function lecBiteRender(){
+    var view = $('lecLessonView'); if(!view) return;
+    var secs = LEC_BITE.sections;
+    if(!secs.length){ view.innerHTML = '<p class="small">No notes to learn from yet — hit \u201CMake my notes\u201D first.</p>'; return; }
+    var sec = secs[LEC_BITE.idx];
+    var allTerms = (typeof LEC !== 'undefined' && LEC.lastNotes && LEC.lastNotes.terms) || [];
+    var inSec = lecBiteTermsInSection(sec);
+    var html = '<div class="lec-lesson-step"><h4 style="margin:6px 0">Section ' + (LEC_BITE.idx + 1) + ' of ' + secs.length + ' — ' + esc(sec.title) + '</h4>';
+    html += '<ul class="list">' + sec.items.map(function(s){ return '<li>' + esc(s.text) + '</li>'; }).join('') + '</ul>';
+    var qs = [];
+    if(inSec.length && allTerms.length >= 2){
+      var pool = shuffleArr(allTerms.slice());
+      inSec.slice(0, 2).forEach(function(term){
+        var distract = pool.filter(function(t){ return t.term !== term.term; }).slice(0, 3);
+        if(!distract.length) return;
+        qs.push({ term: term.term, answer: term.def, opts: shuffleArr([term.def].concat(distract.map(function(t){ return t.def; }))) });
+      });
+    }
+    if(qs.length){
+      html += '<h4 style="margin:12px 0 6px">Quick check — from this section only</h4>';
+      qs.forEach(function(q, qi){
+        html += '<div class="card" style="padding:14px"><p style="margin:0 0 8px"><strong>What does \u201C' + esc(q.term) + '\u201D mean, as your professor stated it?</strong></p>';
+        q.opts.forEach(function(o, oi){
+          html += '<button class="opt lec-bite-opt" data-qi="' + qi + '" data-oi="' + oi + '">' + esc(o) + '</button>';
+        });
+        html += '<div class="small" id="lecBiteFb' + qi + '"></div></div>';
+      });
+    } else {
+      html += '<div class="card" style="padding:14px"><p style="margin:0"><strong>Say it back:</strong> explain this section in your own words before moving on — no question here, because this section has no key terms to quiz from.</p></div>';
+    }
+    html += '<div class="row" style="margin-top:10px">';
+    if(LEC_BITE.idx > 0) html += '<button class="btn ghost small" id="lecBitePrevBtn">← Prev section</button>';
+    if(LEC_BITE.idx < secs.length - 1) html += '<button class="btn small" id="lecBiteNextBtn">Next section →</button>';
+    else html += '<button class="btn small" id="lecBiteDoneBtn">Done — back to my notes</button>';
+    html += '</div></div>';
+    view.innerHTML = html;
+    view.querySelectorAll('.lec-bite-opt').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var qi = parseInt(btn.getAttribute('data-qi'), 10), oi = parseInt(btn.getAttribute('data-oi'), 10);
+        var q = qs[qi]; if(!q) return;
+        var ok = q.opts[oi] === q.answer;
+        btn.classList.add(ok ? 'correct' : 'wrong');
+        btn.parentElement.querySelectorAll('.lec-bite-opt').forEach(function(b){ b.disabled = true; });
+        $('lecBiteFb' + qi).textContent = ok ? 'Correct.' : 'Not quite — as your professor stated it: ' + q.answer;
+      });
+    });
+    var prev = $('lecBitePrevBtn'); if(prev) prev.addEventListener('click', function(){ LEC_BITE.idx--; lecBiteRender(); });
+    var next = $('lecBiteNextBtn'); if(next) next.addEventListener('click', function(){ LEC_BITE.idx++; lecBiteRender(); });
+    var done = $('lecBiteDoneBtn'); if(done) done.addEventListener('click', function(){ view.hidden = true; });
+  }
+  (function(){
+    var startBtn = $('lecLessonStartBtn'); if(!startBtn) return;
+    startBtn.addEventListener('click', function(){
+      LEC_BITE.sections = lecLessonSections();
+      LEC_BITE.idx = 0;
+      var view = $('lecLessonView'); if(view) view.hidden = false;
+      lecBiteRender();
+    });
+  })();
 })();
 </script>
 
@@ -9878,6 +10136,7 @@ var LP = (function(){
     if(settings.encouragement) t = correct
       ? 'Correct. Nice work — take your time, and trust your first answer.'
       : 'Not quite — no rush. Take your time, re-read it, and trust your first instinct. ' + t;
+    if(q.w) t += ' Why: ' + q.w;
     return t;
   }
   /* Small steps, Quiz tab: one question card, a check-for-understanding

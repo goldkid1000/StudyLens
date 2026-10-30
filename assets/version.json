@@ -1,9 +1,14 @@
 {
   "notes": [
-    "NEW: Learning Profile — optional study supports in the Study tab, all off by default and kept on this device only: small steps (one quiz question and one summary point at a time, with a “Got it — next step” check), read-aloud Listen buttons (quiz, flashcards, summary, using your device’s built-in speech), extra time (1.5×) and untimed practice for Exam Rounds, plain language + highlights presentation, vocabulary pre-teach from your own material, encouragement in quiz feedback, a graphic organizer, and settings import/export.",
-    "Nothing else changed: the detector (V20), study packs, tutor rules, and Ollama connection are untouched. This release brings the Learning Profile to the v2.36.0 build, including the Computer Science Basics pack."
+    "NEW in Lecture notes: a YouTube lecture step — open the video on YouTube, copy YouTube's own transcript, paste it here, and the notes, flashcards, quiz, and Ask Iris pipeline takes over. StudyLens never fetches the video itself, so your material still never leaves this device.",
+    "NEW: audio lesson player for lecture notes — your device's built-in speech reads one section at a time, with play/pause, prev/next section, a progress bar, and a pulsing playing dot. If Learning Profile read-aloud is on, the player opens on its own when notes are made.",
+    "NEW: bite-sized lessons — walk through lecture notes one section at a time, each followed by up to two questions built only from that section's own key terms and your professor's own definitions. Sections with no key terms get a say-it-back prompt instead of a made-up question.",
+    "NEW: flashcards now flip both ways — a direction toggle in the Cards tab switches term → definition and definition → term, in Browse and Review alike.",
+    "NEW: quiz answers now show the why-line the question generator already carries, when one exists — never invented. The study streak and review-due count you already had on the Study tab are untouched.",
+    "UI + motion polish, CSS only: Learning Profile switches animate on and off, side panels glide open, lesson steps slide between sections, quiz feedback and the new quiz progress bar animate in, buttons give a subtle press, and the update banner slides in. Everything switches off under reduced-motion settings, and tap targets stay 44px.",
+    "Nothing else changed: the detector (V20), the review queue, tutor rules, and Ollama connection are untouched, and no new server calls were added."
   ],
   "notify": true,
   "updated": "2026-10-30",
-  "version": "2.37.0"
+  "version": "2.38.0"
 }
