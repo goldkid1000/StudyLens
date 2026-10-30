@@ -1,9 +1,9 @@
 {
   "notes": [
-    "NEW subject pack: Philosophy Basics — empiricism, rationalism, utilitarianism, deontology, virtue ethics, social contract, existentialism, and the mind-body problem, with which-idea, fallacy-spotting, and valid-or-invalid argument practice, never your assignment.",
-    "Detector V26 was trained and measured this run but HELD, not shipped: on the permanent frozen probe it caught 12 of 18 humanized texts, below the shipped V20's 13, so V20 stays live until a round genuinely beats it. The round did improve the false-flag rate to 4.53% (from V20's 4.71%), neural-paraphrase detection to 54.3% (from 51.1%), and GPT-5 detection to 92.6% (from 91.7%), and held the second probe at 11 of 12."
+    "NEW subject pack: Computer Science Basics \u2014 binary and bits, algorithms, data structures, Boolean logic, Big-O complexity, networks and the internet, databases, and cybersecurity basics, with which-idea, binary-to-decimal, and loop-tracing practice, never your assignment.",
+    "Detector V27 was trained and measured this run but HELD, not shipped: on the permanent frozen probe it caught 12 of 18 humanized texts, the same as V26 and below the shipped V20\u2019s 13, so V20 stays live until a round genuinely beats it. The second-family round lifted the second probe to 12 of 12, neural-paraphrase detection to a best-yet 55.4% (from 51.1%), and held GPT-5 detection at 92.6%, with the false-flag rate at 4.56%, still below V20\u2019s 4.71%."
   ],
   "notify": true,
-  "updated": "2026-10-29",
-  "version": "2.34.0"
+  "updated": "2026-10-30",
+  "version": "2.36.0"
 }

@@ -4503,8 +4503,11 @@ ssRefresh();
    fetched with no-store caching: when a newer build ships, an already-open or
    home-screen copy of an older build sees the newer version number there and
    offers "Update now" (a reload onto the new build). */
-var APP_VERSION = '2.34.0';
+var APP_VERSION = '2.36.0';
 var CHANGELOG = [
+ { v:'2.36.0', date:'Oct 30, 2026', notify:true, notes:[
+   'NEW subject pack: Computer Science Basics \u2014 binary and bits, algorithms, data structures, Boolean logic, Big-O complexity, networks and the internet, databases, and cybersecurity basics, with which-idea, binary-to-decimal, and loop-tracing practice, never your assignment.',
+   'Detector V27 was trained and measured this run but HELD, not shipped: on the permanent frozen probe it caught 12 of 18 humanized texts, the same as V26 and below the shipped V20’s 13, so V20 stays live until a round genuinely beats it. The second-family round lifted the second probe to 12 of 12, neural-paraphrase detection to a best-yet 55.4% (from 51.1%), and held GPT-5 detection at 92.6%, with the false-flag rate at 4.56%, still below V20’s 4.71%.' ]},
  { v:'2.34.0', date:'Oct 29, 2026', notify:true, notes:[
    'NEW subject pack: Philosophy Basics \u2014 empiricism, rationalism, utilitarianism, deontology, virtue ethics, social contract, existentialism, and the mind-body problem, with which-idea, fallacy-spotting, and valid-or-invalid argument practice, never your assignment.',
    'Detector V26 was trained and measured this run but HELD, not shipped: on the permanent frozen probe it caught 12 of 18 humanized texts, below the shipped V20\u2019s 13, so V20 stays live until a round genuinely beats it. The round did improve the false-flag rate to 4.53% (from V20\u2019s 4.71%), neural-paraphrase detection to 54.3% (from 51.1%), and GPT-5 detection to 92.6% (from 91.7%), and held the second probe at 11 of 12.' ]},
@@ -8101,7 +8104,78 @@ var SL_PACKS = {
         return { prompt: 'Valid or invalid? — ' + it.s, options: ['Valid', 'Invalid'], answer: it.a, work: it.w };
       }
     ]
-  }
+  },
+  cs: {
+    title: 'Computer Science Basics',
+    sources: 'Sources: OpenStax Introduction to Computer Science concepts; classic references (Turing, Knuth, Cormen et al.). Explanations are textbook-level summaries.',
+    concepts: [
+      { term: 'Binary and bits', explain: 'Computers store everything as bits — switches that are either 0 or 1. Eight bits make one byte, which can hold 256 different values (0 to 255). Text, images, sound, and video are all just long strings of bits, interpreted by agreed rules: for example, the letter A is the byte 01000001.' },
+      { term: 'Algorithms', explain: 'An algorithm is a step-by-step procedure that solves a problem and always finishes. A recipe is an algorithm; so is a sorting method. A good algorithm is judged on two things: correctness (does it always give the right answer?) and efficiency (how much time and memory does it use as the input grows?).' },
+      { term: 'Data structures', explain: 'A data structure is a way of organizing data so the operations you need are fast. An array gives instant access by position but slow insertion in the middle; a linked list inserts anywhere cheaply but must be walked step by step; a stack is last-in-first-out (like a pile of plates) and a queue is first-in-first-out (like a line at a shop).' },
+      { term: 'Boolean logic', explain: 'Boolean logic works with just two values, true and false, combined by AND, OR, and NOT. AND is true only when both sides are true; OR is true when at least one side is true; NOT flips a value. Every if-statement and search filter in software is built from these three operations.' },
+      { term: 'Big-O complexity', explain: 'Big-O describes how an algorithm’s running time grows as its input grows. O(1) means constant time whatever the size; O(log n) grows very slowly (halving the problem each step, like binary search); O(n) grows in step with the input; O(n²) grows with the square, so doubling the input quadruples the time.' },
+      { term: 'Networks and the internet', explain: 'The internet moves data in small packets, each labelled with a destination address (an IP address). Routers forward packets hop by hop until they arrive, and the receiving computer reassembles them in order. DNS is the phone book: it turns a name you type, like a website address, into the IP address the network needs.' },
+      { term: 'Databases', explain: 'A database stores information in tables of rows and columns — for example, a students table with one row per student. Each row has a key that identifies it uniquely, and tables link together through shared keys (a loan row points to the student who borrowed the book). A query (in SQL, for instance) asks the database to find, filter, and combine rows.' },
+      { term: 'Cybersecurity basics', explain: 'Two ideas protect data: encryption scrambles data so only someone with the key can read it, and hashing turns data into a fixed-size fingerprint that cannot be turned back. Passwords should be stored as hashes, never as plain text — and most real break-ins use phishing (tricking a person) rather than breaking the maths.' }
+    ],
+    formulas: [
+      { name: 'Binary to decimal', form: 'Write the place values right to left: 1, 2, 4, 8, 16, 32… Add the place values under every 1 bit; ignore the 0 bits.', note: 'Example: 1011 = 8 + 0 + 2 + 1 = 11. The leftmost bit is worth the most, so reading the bits backwards gives a different number.' },
+      { name: 'Tracing a loop', form: 'Make a small table: one column per variable, one row per pass through the loop. Update each column before moving on — never jump ahead.', note: 'Most loop bugs come from the starting value or the stopping condition, not the body. Check both before you trust the trace.' },
+      { name: 'Comparing Big-O', form: 'Double the input and watch the time: O(1) stays the same, O(log n) adds about one step, O(n) doubles, O(n²) quadruples.', note: 'For large inputs the growth class matters far more than the constant factors — an O(n) method beats an O(n²) method long before the code is tuned.' }
+    ],
+    gens: [
+      function(){
+        var bank = [
+          { s: 'A photo file is stored as millions of 0s and 1s, grouped into bytes that a viewer program turns back into colours.', a: 'Binary and bits', w: 'Binary and bits: everything a computer stores is bits — 0s and 1s — grouped into bytes.' },
+          { s: 'A navigation app finds the shortest route by trying roads in a fixed order of steps that always ends with an answer.', a: 'Algorithms', w: 'Algorithms: a step-by-step procedure that solves a problem and always finishes.' },
+          { s: 'A music player keeps its “up next” songs in a structure where adding a song to the front is instant but jumping to song 50 means walking through 49 entries.', a: 'Data structures', w: 'Data structures: the choice (here, a linked list) trades fast insertion for slow access by position.' },
+          { s: 'A search filter shows only jackets that are red AND waterproof — an item must satisfy both conditions to appear.', a: 'Boolean logic', w: 'Boolean logic: AND is true only when both sides are true.' },
+          { s: 'A sorting method takes four times as long when the list doubles in length, because it compares nearly every pair.', a: 'Big-O complexity', w: 'Big-O complexity: doubling the input quadruples the time, which is the signature of O(n²) growth.' },
+          { s: 'A video call breaks the picture into small addressed packets that travel different routes and are reassembled at the other end.', a: 'Networks and the internet', w: 'Networks and the internet: data travels as packets, forwarded by address and reassembled on arrival.' },
+          { s: 'A library keeps one table of members and one table of loans, linked by member number, so a query can list everything one member borrowed.', a: 'Databases', w: 'Databases: tables linked by keys, queried to find and combine rows.' },
+          { s: 'A website stores passwords as one-way fingerprints so that even a stolen database does not reveal the passwords themselves.', a: 'Cybersecurity basics', w: 'Cybersecurity basics: hashing turns a password into a fingerprint that cannot be turned back into the password.' },
+          { s: 'A program checks “age over 18 OR has parental consent” — either condition alone is enough to proceed.', a: 'Boolean logic', w: 'Boolean logic: OR is true when at least one side is true.' },
+          { s: 'A phone book app looks up a name by halving the remaining entries each step, so even a million names take only about twenty steps.', a: 'Big-O complexity', w: 'Big-O complexity: halving the problem each step is O(log n) — very slow growth.' },
+          { s: 'A printer holds jobs in order and always prints the one that has waited longest, like a queue at a shop counter.', a: 'Data structures', w: 'Data structures: a queue is first-in-first-out — the longest-waiting item goes first.' },
+          { s: 'An email claims your account will close unless you click a link and sign in — the link leads to a fake login page that steals passwords.', a: 'Cybersecurity basics', w: 'Cybersecurity basics: phishing tricks the person, not the maths — a fake page harvests credentials.' }
+        ];
+        var it = slPick(bank);
+        var opts = ['Binary and bits', 'Algorithms', 'Data structures', 'Boolean logic', 'Big-O complexity', 'Networks and the internet', 'Databases', 'Cybersecurity basics'];
+        var keep = [it.a];
+        var others = opts.filter(function(o){ return o !== it.a; });
+        while(keep.length < 4) keep.push(others.splice(slR(0, others.length - 1), 1)[0]);
+        var k = slR(0, 3); keep = keep.slice(k).concat(keep.slice(0, k));
+        return { prompt: 'Which idea is this? — ' + it.s, options: keep, answer: it.a, work: it.w };
+      },
+      function(){
+        var nbits = 4 + slR(0, 3);
+        var bits = '';
+        for(var i = 0; i < nbits; i++) bits += (i === 0 || Math.random() < 0.5) ? '1' : '0';
+        var val = parseInt(bits, 2);
+        var rev = parseInt(bits.split('').reverse().join(''), 2);
+        var cands = [val, val + 1, rev, val + 2];
+        var opts = [];
+        cands.forEach(function(c){ if(opts.indexOf(c) < 0) opts.push(c); });
+        var d = val + 4;
+        while(opts.length < 4){ if(opts.indexOf(d) < 0) opts.push(d); d++; }
+        var k = slR(0, 3); opts = opts.slice(k).concat(opts.slice(0, k));
+        return { prompt: 'What decimal number is the binary value ' + bits + '?', options: opts, answer: val, work: 'Place values right to left are 1, 2, 4, 8… Add the place values under every 1 bit: ' + bits + ' = ' + val + '.' };
+      },
+      function(){
+        var a = 2 + slR(0, 8);
+        var b = 2 + slR(0, 5);
+        var n = 3 + slR(0, 4);
+        var val = a + n * b;
+        var opts = [val, a + n, a * b, val + b];
+        var uniq = [];
+        opts.forEach(function(o){ if(uniq.indexOf(o) < 0) uniq.push(o); });
+        var d = val + 1;
+        while(uniq.length < 4){ if(uniq.indexOf(d) < 0) uniq.push(d); d++; }
+        var k = slR(0, 3); uniq = uniq.slice(k).concat(uniq.slice(0, k));
+        return { prompt: 'Trace this loop: x starts at ' + a + '. Repeat ' + n + ' times: x = x + ' + b + '. What is x at the end?', options: uniq, answer: val, work: 'Each pass adds ' + b + ', and there are ' + n + ' passes, so x = ' + a + ' + ' + n + ' × ' + b + ' = ' + val + '.' };
+      }
+    ]
+  },
 
 };
 
