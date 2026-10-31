@@ -4654,8 +4654,11 @@ ssRefresh();
    fetched with no-store caching: when a newer build ships, an already-open or
    home-screen copy of an older build sees the newer version number there and
    offers "Update now" (a reload onto the new build). */
-var APP_VERSION = '2.38.0';
+var APP_VERSION = '2.39.0';
 var CHANGELOG = [
+ { v:'2.39.0', date:'Oct 31, 2026', notify:true, notes:[
+   'NEW subject pack: Political Science Basics \u2014 democracy, federalism, separation of powers, political parties, elections and voting systems, public opinion, civil liberties and civil rights, and interest groups, with which-idea, majority-threshold, and voter-turnout practice, never your assignment.',
+   'Detector V28 was trained and measured this run but HELD, not shipped: on the permanent frozen probe it caught 12 of 18 humanized texts, below the shipped V20\u2019s 13, so V20 stays live until a round genuinely beats it. The round held the second probe at 12 of 12 and the false-flag rate at 4.47% (below V20\u2019s 4.71%), with GPT-5 detection at 91.2% and neural-paraphrase detection at 50.0%.' ]},
  { v:'2.38.0', date:'Oct 30, 2026', notify:true, notes:[
    'NEW in Lecture notes: a YouTube lecture step — open the video on YouTube, copy YouTube\u2019s own transcript, paste it here, and the notes, flashcards, quiz, and Ask Iris pipeline takes over. StudyLens never fetches the video itself, so your material still never leaves this device.',
    'NEW: audio lesson player for lecture notes — your device\u2019s built-in speech reads one section at a time, with play/pause, prev/next section, a progress bar, and a pulsing playing dot. If Learning Profile read-aloud is on, the player opens on its own when notes are made.',
@@ -8340,6 +8343,73 @@ var SL_PACKS = {
         while(uniq.length < 4){ if(uniq.indexOf(d) < 0) uniq.push(d); d++; }
         var k = slR(0, 3); uniq = uniq.slice(k).concat(uniq.slice(0, k));
         return { prompt: 'Trace this loop: x starts at ' + a + '. Repeat ' + n + ' times: x = x + ' + b + '. What is x at the end?', options: uniq, answer: val, work: 'Each pass adds ' + b + ', and there are ' + n + ' passes, so x = ' + a + ' + ' + n + ' × ' + b + ' = ' + val + '.' };
+      }
+    ]
+  },
+  polisci: {
+    title: 'Political Science Basics',
+    sources: 'Sources: OpenStax American Government 3e; standard introductory political science (Dahl, Lowi et al.). Explanations are textbook-level summaries.',
+    concepts: [
+      { term: 'Democracy', explain: 'Rule by the people: citizens choose their leaders in free and fair elections, and those leaders govern within limits set by law. Democracy needs more than voting — it needs free speech, a free press, and the right to oppose the government without punishment.' },
+      { term: 'Federalism', explain: 'A system that divides power between a national government and smaller regional governments (states or provinces), each with its own responsibilities. In the United States, the national government handles matters like defense and interstate commerce, while states run most policing, education, and local administration — and both levels share some powers, like taxation.' },
+      { term: 'Separation of powers', explain: 'Splitting government into branches — legislature (makes laws), executive (carries them out), and judiciary (interprets them) — so no one branch holds all power. Checks and balances let each branch limit the others: a president can veto a law, a legislature can override the veto or control funding, and courts can strike down laws that violate the constitution.' },
+      { term: 'Political parties', explain: 'Organizations that recruit candidates, bundle positions into a platform, and try to win elections so they can govern. Parties simplify choices for voters: a party label signals a bundle of positions, so a voter does not have to research every candidate from scratch. Two-party systems (like the United States) and multi-party systems differ in how many serious contenders compete.' },
+      { term: 'Elections and voting systems', explain: 'Elections translate votes into winners, and the rules matter. In first-past-the-post, the candidate with the most votes in a district wins, even without a majority; in proportional systems, seats are shared out in proportion to votes. Rules like registration deadlines, voter ID, and how districts are drawn all shape who actually votes and whose vote counts most.' },
+      { term: 'Public opinion', explain: 'What the public thinks about issues and leaders, usually measured by polls. Good polls use a random sample of the population — a small but representative slice — so results come with a margin of error. Opinion is not fixed: it moves with events, elite cues from leaders and media, and personal experience, and it is often less detailed than the policy debate itself.' },
+      { term: 'Civil liberties and civil rights', explain: 'Civil liberties are freedoms the government must not take away — speech, religion, assembly, due process. Civil rights are guarantees of equal treatment — the government must not discriminate on grounds like race or sex. Liberties protect you FROM government power; rights guarantee you equal access TO its protection.' },
+      { term: 'Interest groups', explain: 'Organizations that try to influence policy without running candidates themselves — business associations, unions, environmental groups, professional bodies. They lobby officials, fund campaigns, mobilize members, and sometimes sue. Pluralists argue many competing groups keep any one of them from dominating; critics note that well-funded groups are heard far more loudly than unorganized citizens.' }
+    ],
+    formulas: [
+      { name: 'Majority threshold', form: 'In a body of N voters, a majority needs floor(N / 2) + 1 votes — more than half, not just half. For N = 100, that is 51; for N = 435, it is 218.', note: 'A tie is not a majority. In a 100-seat chamber, 50–50 fails; the motion needs 51.' },
+      { name: 'Voter turnout', form: 'Turnout (%) = (votes cast / eligible voters) × 100. If 60 million of 100 million eligible voters cast ballots, turnout is 60%.', note: 'Turnout can be measured against all eligible voters or only registered voters — the two denominators give different numbers, so always check which one a headline uses.' },
+      { name: 'Two-thirds supermajority', form: 'A two-thirds vote needs ceil(2N / 3) votes. For N = 100, that is 67; for N = 435, it is 290.', note: 'Supermajorities protect minorities by making big changes harder — but they also let a minority block action, which is why they are reserved for special cases like constitutional amendments and treaty approval.' }
+    ],
+    gens: [
+      function(){
+        var bank = [
+          { s: 'Citizens vote every few years to choose who governs, and anyone may criticize the government in public without being arrested for it.', a: 'Democracy', w: 'Democracy: citizens choose leaders in free elections, with free speech and the right to oppose.' },
+          { s: 'The national government runs the army, while each state runs its own schools and police — and both levels collect taxes.', a: 'Federalism', w: 'Federalism: power is divided between national and regional governments, each with its own responsibilities.' },
+          { s: 'The president vetoes a bill, the legislature votes to override the veto, and a court later strikes the law down as unconstitutional.', a: 'Separation of powers', w: 'Separation of powers: each branch can limit the others — veto, override, and judicial review.' },
+          { s: 'A party publishes a platform, runs candidates under one label, and voters pick the label as a shortcut for a bundle of positions.', a: 'Political parties', w: 'Political parties: organizations that bundle positions, recruit candidates, and try to win office.' },
+          { s: 'In a district race the candidate with the most votes wins the seat, even with only 38% of the vote, because no majority is required.', a: 'Elections and voting systems', w: 'Elections and voting systems: first-past-the-post awards the seat to the most votes, majority or not.' },
+          { s: 'A poll of 1,000 randomly chosen adults finds 52% support for a policy, with a margin of error of about 3 points either way.', a: 'Public opinion', w: 'Public opinion: a random-sample poll estimates what the public thinks, within a margin of error.' },
+          { s: 'A court rules that the government may not punish a newspaper for criticizing officials — a freedom the government must not take away.', a: 'Civil liberties and civil rights', w: 'Civil liberties and civil rights: liberties are freedoms government must not infringe; rights guarantee equal treatment.' },
+          { s: 'A union of nurses lobbies lawmakers, runs ads, and organizes members to write letters, trying to change a health bill without fielding a candidate.', a: 'Interest groups', w: 'Interest groups: organizations that influence policy without running candidates.' },
+          { s: 'A law guarantees that hiring cannot be refused on the basis of race — the government must treat people equally under the law.', a: 'Civil liberties and civil rights', w: 'Civil liberties and civil rights: equal treatment is a right; freedom from interference is a liberty.' },
+          { s: 'Seats in a legislature are handed out in proportion to each party\u2019s share of the national vote, so a party with 30% of votes gets about 30% of seats.', a: 'Elections and voting systems', w: 'Elections and voting systems: proportional systems share seats in proportion to votes.' },
+          { s: 'A poll moves sharply after a major event, as leaders and media frame what happened — showing opinion follows events and cues, not just fixed beliefs.', a: 'Public opinion', w: 'Public opinion: opinion moves with events, elite cues, and personal experience.' },
+          { s: 'A business association funds a campaign and meets privately with committee chairs to shape a tax bill, while unorganized consumers have no lobbyist at all.', a: 'Interest groups', w: 'Interest groups: well-funded groups are heard more loudly than unorganized citizens — the pluralist worry.' }
+        ];
+        var it = slPick(bank);
+        var opts = ['Democracy', 'Federalism', 'Separation of powers', 'Political parties', 'Elections and voting systems', 'Public opinion', 'Civil liberties and civil rights', 'Interest groups'];
+        var keep = [it.a];
+        var others = opts.filter(function(o){ return o !== it.a; });
+        while(keep.length < 4) keep.push(others.splice(slR(0, others.length - 1), 1)[0]);
+        var k = slR(0, 3); keep = keep.slice(k).concat(keep.slice(0, k));
+        return { prompt: 'Which idea is this? — ' + it.s, options: keep, answer: it.a, work: it.w };
+      },
+      function(){
+        var n = 20 + slR(0, 480);
+        var val = Math.floor(n / 2) + 1;
+        var opts = [val, Math.floor(n / 2), val + 1, Math.ceil(n * 2 / 3)];
+        var uniq = [];
+        opts.forEach(function(o){ if(uniq.indexOf(o) < 0) uniq.push(o); });
+        var d = val + 2;
+        while(uniq.length < 4){ if(uniq.indexOf(d) < 0) uniq.push(d); d++; }
+        var k = slR(0, 3); uniq = uniq.slice(k).concat(uniq.slice(0, k));
+        return { prompt: 'A council has ' + n + ' members. How many votes are needed for a majority?', options: uniq, answer: val, work: 'A majority is more than half: floor(' + n + ' / 2) + 1 = ' + val + '. Half alone (' + Math.floor(n / 2) + ') is a tie, not a majority.' };
+      },
+      function(){
+        var elig = (20 + slR(0, 80)) * 1000000;
+        var pct = 35 + slR(0, 55);
+        var cast = Math.round(elig * pct / 100);
+        var opts = [pct, pct + 3, pct - 4, Math.round(cast / elig * 100) + 1];
+        var uniq = [];
+        opts.forEach(function(o){ if(uniq.indexOf(o) < 0) uniq.push(o); });
+        var d = pct + 7;
+        while(uniq.length < 4){ if(uniq.indexOf(d) < 0) uniq.push(d); d++; }
+        var k = slR(0, 3); uniq = uniq.slice(k).concat(uniq.slice(0, k));
+        return { prompt: 'In an election, ' + cast.toLocaleString('en-US') + ' ballots were cast out of ' + elig.toLocaleString('en-US') + ' eligible voters. What was turnout, in percent?', options: uniq, answer: pct, unit: '%', work: 'Turnout = (votes cast / eligible voters) × 100 = (' + cast.toLocaleString('en-US') + ' / ' + elig.toLocaleString('en-US') + ') × 100 = ' + pct + '%.' };
       }
     ]
   },
