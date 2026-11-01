@@ -4654,8 +4654,11 @@ ssRefresh();
    fetched with no-store caching: when a newer build ships, an already-open or
    home-screen copy of an older build sees the newer version number there and
    offers "Update now" (a reload onto the new build). */
-var APP_VERSION = '2.39.0';
+var APP_VERSION = '2.40.0';
 var CHANGELOG = [
+ { v:'2.40.0', date:'Nov 1, 2026', notify:true, notes:[
+   'NEW subject pack: Geography Basics \\u2014 latitude and longitude, map projections, climate zones, population density, migration, urbanization, GIS and remote sensing, and development indicators, with which-idea, map-scale-distance, and population-density practice, never your assignment.',
+   'Detector V29 was trained and measured this run but HELD, not shipped: on the permanent frozen probe it caught 12 of 18 humanized texts, below the shipped V20\u2019s 13, so V20 stays live until a round genuinely beats it. The round held the second probe at 12 of 12 and the false-flag rate at 4.63% (below V20\u2019s 4.71%), with GPT-5 detection at 92.2% and neural-paraphrase detection at 52.2%.' ]},
  { v:'2.39.0', date:'Oct 31, 2026', notify:true, notes:[
    'NEW subject pack: Political Science Basics \u2014 democracy, federalism, separation of powers, political parties, elections and voting systems, public opinion, civil liberties and civil rights, and interest groups, with which-idea, majority-threshold, and voter-turnout practice, never your assignment.',
    'Detector V28 was trained and measured this run but HELD, not shipped: on the permanent frozen probe it caught 12 of 18 humanized texts, below the shipped V20\u2019s 13, so V20 stays live until a round genuinely beats it. The round held the second probe at 12 of 12 and the false-flag rate at 4.47% (below V20\u2019s 4.71%), with GPT-5 detection at 91.2% and neural-paraphrase detection at 50.0%.' ]},
@@ -8410,6 +8413,64 @@ var SL_PACKS = {
         while(uniq.length < 4){ if(uniq.indexOf(d) < 0) uniq.push(d); d++; }
         var k = slR(0, 3); uniq = uniq.slice(k).concat(uniq.slice(0, k));
         return { prompt: 'In an election, ' + cast.toLocaleString('en-US') + ' ballots were cast out of ' + elig.toLocaleString('en-US') + ' eligible voters. What was turnout, in percent?', options: uniq, answer: pct, unit: '%', work: 'Turnout = (votes cast / eligible voters) × 100 = (' + cast.toLocaleString('en-US') + ' / ' + elig.toLocaleString('en-US') + ') × 100 = ' + pct + '%.' };
+      }
+    ]
+  },
+  geog: {
+    title: 'Geography Basics',
+    sources: 'Sources: standard introductory geography (National Geographic Society; OpenStax-style physical and human geography). Explanations are textbook-level summaries.',
+    concepts: [
+      { term: 'Latitude and longitude', explain: 'The grid that locates any point on Earth. Latitude measures degrees north or south of the equator (0\u00b0 to 90\u00b0); longitude measures degrees east or west of the prime meridian through Greenwich (0\u00b0 to 180\u00b0). Together they give an absolute location: the equator and the prime meridian are the two zero lines everything else is measured from.' },
+      { term: 'Map projections', explain: 'Ways of drawing the round Earth on a flat map. Every projection distorts something \u2014 area, shape, distance, or direction \u2014 because a sphere cannot be flattened without stretching. A Mercator map keeps local shapes and compass bearings true but inflates areas near the poles; an equal-area projection keeps sizes honest but bends shapes. There is no perfect flat map, only trade-offs chosen for the job.' },
+      { term: 'Climate zones', explain: 'Broad bands of climate set mainly by latitude, then modified by elevation, ocean currents, and wind patterns. The tropics near the equator stay warm year-round; temperate zones have distinct seasons; polar zones stay cold. A mountain town on the equator can be cool because elevation, not just latitude, sets its temperature.' },
+      { term: 'Population density', explain: 'How crowded a place is: people per unit of land area. Arithmetic density divides total population by total land area, which can hide empty land; physiological density divides by farmland only, showing pressure on the land that actually feeds people. A desert country and a farming country can share an arithmetic density and feel completely different.' },
+      { term: 'Migration', explain: 'People moving from one place to another, driven by push factors that drive them out (war, drought, unemployment) and pull factors that draw them in (jobs, safety, family). Voluntary migration is a choice; forced migration is flight from danger. Most migration is internal \u2014 within one country, usually toward cities \u2014 not across borders.' },
+      { term: 'Urbanization', explain: 'The growing share of people living in towns and cities, driven by jobs, services, and rural push factors. Cities grow outward (sprawl) and upward, and the largest \u2014 megacities of over 10 million \u2014 face shared strains: housing, transport, water, and waste. Urban hierarchy ranks settlements from hamlets to world cities by the range of services they offer.' },
+      { term: 'GIS and remote sensing', explain: 'GIS (geographic information systems) layers spatial data \u2014 roads, rivers, soils, populations \u2014 on one map so patterns can be compared and queried. Remote sensing reads the Earth from a distance, usually by satellite imagery: the same field looks different in visible light and infrared, so crop health, deforestation, and flood extent can be measured without visiting every hectare.' },
+      { term: 'Development indicators', explain: 'Measures used to compare how developed places are: GDP per capita (average economic output per person), life expectancy, literacy, and the Human Development Index, which combines income, health, and education. Core-periphery patterns describe how wealthy core regions concentrate investment and services while peripheral regions supply labor and raw materials.' }
+    ],
+    formulas: [
+      { name: 'Map scale distance', form: 'Ground distance = map distance \u00d7 scale factor. On a 1:50,000 map, 1 cm on the map = 50,000 cm on the ground = 0.5 km. So 4 cm on that map is 2 km on the ground.', note: 'The scale ratio is in the same units on both sides: 1:50,000 means 1 cm stands for 50,000 cm, not 50,000 km.' },
+      { name: 'Population density', form: 'Density = population / land area. A region with 600,000 people on 3,000 square kilometres has a density of 200 people per square kilometre.', note: 'Always state the area unit \u2014 people per square kilometre and people per square mile are different numbers for the same place.' },
+      { name: 'Rule of 70 (doubling time)', form: 'Doubling time in years \u2248 70 / annual growth rate (%). A population growing at 2% a year doubles in about 35 years; at 3.5%, in about 20 years.', note: 'The rule of 70 is an approximation for steady exponential growth \u2014 handy for estimates, not exact forecasts.' }
+    ],
+    gens: [
+      function(){
+        var bank = [
+          { s: 'A hiker reads a location as 44\u00b0N, 73\u00b0W \u2014 degrees north of the equator and west of the Greenwich line.', a: 'Latitude and longitude', w: 'Latitude and longitude: degrees from the equator and the prime meridian give an absolute location.' },
+          { s: 'A world map makes Greenland look as big as Africa, though Africa is really about 14 times larger \u2014 the map stretched polar areas to keep shapes true.', a: 'Map projections', w: 'Map projections: flattening a sphere distorts something; Mercator keeps shape but inflates polar areas.' },
+          { s: 'A town on the equator sits high in the mountains and stays cool all year, because height above sea level matters as well as latitude.', a: 'Climate zones', w: 'Climate zones: latitude sets the band, elevation and currents modify it.' },
+          { s: 'A farming district has 90,000 people on 450 square kilometres of farmland, so its farmland feels far more crowded than its total-area figure suggests.', a: 'Population density', w: 'Population density: physiological density divides by farmland, showing pressure on food-producing land.' },
+          { s: 'After a factory closes, families leave a mining town for jobs in a port city, while others flee a drought in the same region for safety.', a: 'Migration', w: 'Migration: push factors drive people out, pull factors draw them in; most moves are internal.' },
+          { s: 'A city of 12 million struggles with traffic, housing prices, and water supply, while nearby villages empty as young workers move in.', a: 'Urbanization', w: 'Urbanization: megacities concentrate people, jobs, and strains like housing and transport.' },
+          { s: 'Analysts overlay soil maps, rainfall maps, and road maps in one system to pick the best site for a clinic, then check crop health from satellite images.', a: 'GIS and remote sensing', w: 'GIS and remote sensing: layered spatial data plus satellite imagery reveal patterns no single map shows.' },
+          { s: 'Two countries have similar GDP per person, but one has far higher life expectancy and schooling, so a combined index ranks it more developed.', a: 'Development indicators', w: 'Development indicators: the Human Development Index combines income, health, and education.' },
+          { s: 'A pilot navigates by compass bearing on a map that keeps bearings true, accepting that polar landmasses look oversized.', a: 'Map projections', w: 'Map projections: Mercator keeps bearings true at the cost of polar area distortion.' },
+          { s: 'A coastal city stays mild in winter because a warm ocean current flows past it, even though it sits at a high latitude.', a: 'Climate zones', w: 'Climate zones: ocean currents modify what latitude alone would predict.' },
+          { s: 'A region counts 2 million people spread over 40,000 square kilometres of mostly empty desert, so its average density hides how crowded its one oasis city is.', a: 'Population density', w: 'Population density: arithmetic density averages over all land, including empty land.' },
+          { s: 'Investment, headquarters, and universities cluster in one wealthy region, while a poorer region mainly supplies workers and raw materials to it.', a: 'Development indicators', w: 'Development indicators: core-periphery patterns describe that concentration of wealth and services.' }
+        ];
+        var it = slPick(bank);
+        var opts = ['Latitude and longitude', 'Map projections', 'Climate zones', 'Population density', 'Migration', 'Urbanization', 'GIS and remote sensing', 'Development indicators'];
+        var keep = [it.a];
+        var others = opts.filter(function(o){ return o !== it.a; });
+        while(keep.length < 4) keep.push(others.splice(slR(0, others.length - 1), 1)[0]);
+        var k = slR(0, 3); keep = keep.slice(k).concat(keep.slice(0, k));
+        return { prompt: 'Which idea is this? \u2014 ' + it.s, options: keep, answer: it.a, work: it.w };
+      },
+      function(){
+        var scales = [25000, 50000, 100000, 200000];
+        var sc = scales[slR(0, scales.length - 1)];
+        var cm = 2 + slR(0, 10);
+        var kmPerCm = sc / 100000;
+        var val = cm * kmPerCm;
+        return { prompt: 'On a 1:' + sc.toLocaleString('en-US') + ' map, two landmarks are ' + cm + ' cm apart. How far apart are they on the ground, in kilometres?', answer: val, unit: 'km', work: 'On a 1:' + sc.toLocaleString('en-US') + ' map, 1 cm = ' + kmPerCm + ' km, so ' + cm + ' cm \u00d7 ' + kmPerCm + ' km = ' + val + ' km.' };
+      },
+      function(){
+        var area = (2 + slR(0, 18)) * 100;
+        var dens = 20 + slR(0, 380);
+        var pop = area * dens;
+        return { prompt: 'A region has ' + pop.toLocaleString('en-US') + ' people living on ' + area.toLocaleString('en-US') + ' square kilometres of land. What is its population density, in people per square kilometre?', answer: dens, unit: 'people/km\u00b2', work: 'Density = population / land area = ' + pop.toLocaleString('en-US') + ' / ' + area.toLocaleString('en-US') + ' = ' + dens + ' people per square kilometre.' };
       }
     ]
   },
