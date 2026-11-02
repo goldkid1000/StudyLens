@@ -617,6 +617,30 @@ body.lp-plain .pill{font-weight:700}
   .lesson-dot.playing{animation:none}
   #lecLessonBarFill,#quizProgFill{transition:none}
 }
+
+/* v2.42.0 — Look it up + phone layout of the update banner */
+.lk-row{display:flex;gap:8px;margin-top:8px}
+.lk-row input{flex:1;min-width:0}
+.lk-block{margin-top:12px;padding:14px;border:1px solid var(--line);border-radius:12px;background:var(--surface3)}
+.lk-word{font-size:18px;display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.lk-word b{font-family:var(--serif)}
+.lk-phon{color:var(--mut);font-size:14px}
+.lk-pos{margin-top:10px;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--acc)}
+.lk-defs{margin:4px 0 0;padding-left:20px;line-height:1.55}
+.lk-defs li{margin:4px 0}
+.lk-ex{color:var(--mut);font-style:italic;font-size:13.5px;margin-top:2px}
+.lk-extract{line-height:1.6;margin:8px 0}
+.lk-src{color:var(--mut-2);margin:8px 0 0}
+.lk-src a{color:var(--acc)}
+.lk-chip{background:var(--surface2);color:var(--ink);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font:inherit;font-size:12.5px;cursor:pointer;margin:2px 0}
+.lk-msg{margin-top:12px}
+#termsBox .pill{cursor:pointer}
+#termsBox .pill:hover{border-color:var(--acc)}
+.update-banner .ub-notes{max-height:42vh;overflow:auto}
+@media (max-width:640px){
+  .update-banner .ub-text{flex:1 1 100%;min-width:0}
+  .update-banner .btn{flex:1}
+}
 </style>
 </head>
 <body>
@@ -676,7 +700,7 @@ body.lp-plain .pill{font-weight:700}
     </div>
     <div class="rail-ver">Version <b id="railVer"></b></div>
     <div class="rail-ver">AI: <b id="aiChip">off</b></div>
-    <p class="rail-note">Everything runs in this tab — your text is never uploaded by StudyLens. Optional scans you start yourself (GPTZero, Hugging Face, Ollama) go only to the service you picked.</p>
+    <p class="rail-note">Everything runs in this tab — your text is never uploaded by StudyLens. Optional scans you start yourself (GPTZero, Hugging Face, Ollama) go only to the service you picked, and Look it up sends only the single term you type.
   </nav>
 
   <main>
@@ -805,6 +829,20 @@ body.lp-plain .pill{font-weight:700}
         </div>
       </div>
       </div>
+      </div>
+
+      <div class="card" id="lookupCard">
+        <h3>Look it up</h3>
+        <p class="small">Real definitions and a short encyclopedia summary for any word or topic. Only the term you type is sent — to the Free Dictionary and Wikipedia — never your notes. Tip: select a word in Your material, or tap a key term after you generate a pack.</p>
+        <div class="lk-row">
+          <input type="text" inputmode="search" id="lkInput" placeholder="e.g. photosynthesis, mitochondria, Treaty of Versailles" autocomplete="off" enterkeyhint="search" aria-label="Word or topic to look up">
+          <button class="btn" id="lkBtn">Look up</button>
+        </div>
+        <div class="row" style="margin-top:6px">
+          <button class="btn plain small" id="lkSelBtn">Use selected word</button>
+          <span class="small" id="lkStatus" role="status"></span>
+        </div>
+        <div id="lkOut" aria-live="polite"></div>
       </div>
 
       <!-- ============ SIMPLE STUDY (v2.16.0) ============ -->
@@ -4654,8 +4692,12 @@ ssRefresh();
    fetched with no-store caching: when a newer build ships, an already-open or
    home-screen copy of an older build sees the newer version number there and
    offers "Update now" (a reload onto the new build). */
-var APP_VERSION = '2.41.0';
+var APP_VERSION = '2.42.0';
 var CHANGELOG = [
+ { v:'2.42.0', date:'Nov 2, 2026', notify:true, notes:[
+   "NEW Look it up (Study tab): type any word or topic \u2014 or select a word in Your material, or tap a key term after generating a pack \u2014 and get a real dictionary entry (pronunciation you can play, part of speech, definitions, examples, similar words) plus a short Wikipedia summary with a link to the full article. One tap adds the definition to your material so it lands in your next study pack. Only the term you look up is sent (to the Free Dictionary and Wikipedia), never your notes; offline it says so plainly.",
+   "Fixed the update box on phones: the Got it / Update buttons sat beside the notes and squeezed them into a narrow column. They now sit underneath at full width, and long notes scroll inside the box."
+ ]},
  { v:'2.41.0', date:'Nov 2, 2026', notify:true, notes:[
    'NEW subject pack: Music Basics \u2014 rhythm and meter, scales and keys, intervals, chords and triads, dynamics and tempo, melody and harmony, musical form, and timbre and texture, with which-idea, beat-duration-from-tempo, and note-value practice, never your assignment.',
    'Detector V30 was trained and measured this run but HELD, not shipped: on the permanent frozen probe it caught 12 of 18 humanized texts, below the shipped V20’s 13, so V20 stays live until a round genuinely beats it. The vocabulary diagnosis from this round found the detector top AI signals are informal-voice markers themselves (actually, just, honestly, my, me), which real informal human writing shares — the next lever must break that confounding, not add more data. The round held the second probe at 12 of 12 and the false-flag rate at 4.46% (below V20’s 4.71%), with GPT-5 detection at 92.2% and neural-paraphrase detection at 54.4%.' ]},
@@ -10558,6 +10600,147 @@ var LP = (function(){
   }
   load(); apply(); orgRender(); bind();
   return { on: on, speak: speak, renderQuizSteps: renderQuizSteps, afterQuizAnswer: afterQuizAnswer, afterPack: afterPack, validateImport: validateImport };
+})();
+</script>
+
+<script>
+/* ---------- Look it up (v2.42.0) ----------
+   Real reference data for one term at a time:
+   - Free Dictionary API (api.dictionaryapi.dev) for single words:
+     pronunciation, part of speech, definitions, examples, synonyms.
+   - Wikipedia (search API + REST page summary) for topics and phrases.
+   Both are free, keyless and CORS-open. Only the typed term is sent. */
+(function(){
+  'use strict';
+  function $(id){ return document.getElementById(id); }
+  if(!$('lkBtn')) return;
+  function esc(s){ return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+  var cache = {};
+  var lastResult = null;
+  function getJSON(url, ms){
+    var ctrl = typeof AbortController !== 'undefined' ? new AbortController() : null;
+    var t = setTimeout(function(){ if(ctrl) ctrl.abort(); }, ms || 9000);
+    return fetch(url, { signal: ctrl ? ctrl.signal : undefined }).then(function(r){
+      clearTimeout(t);
+      if(r.status === 404) return null;
+      if(!r.ok) throw new Error('HTTP ' + r.status);
+      return r.json();
+    });
+  }
+  function dictLookup(term){
+    if(!/^[A-Za-z][A-Za-z'\-]{0,40}$/.test(term)) return Promise.resolve(null); /* single words only */
+    return getJSON('https://api.dictionaryapi.dev/api/v2/entries/en/' + encodeURIComponent(term.toLowerCase()))
+      .then(function(d){ return Array.isArray(d) && d.length ? d : null; })
+      .catch(function(){ return { error: true }; });
+  }
+  function wikiLookup(term){
+    var s = 'https://en.wikipedia.org/w/api.php?action=query&list=search&format=json&origin=*&srlimit=1&srsearch=' + encodeURIComponent(term);
+    return getJSON(s).then(function(d){
+      var hit = d && d.query && d.query.search && d.query.search[0];
+      if(!hit) return null;
+      return getJSON('https://en.wikipedia.org/api/rest_v1/page/summary/' + encodeURIComponent(hit.title.replace(/ /g, '_')) + '?redirect=true');
+    }).then(function(p){
+      if(!p || !p.extract) return null;
+      if(p.type === 'disambiguation') return { disamb: true, title: p.title, url: p.content_urls && p.content_urls.desktop && p.content_urls.desktop.page };
+      return { title: p.title, desc: p.description || '', extract: p.extract, url: p.content_urls && p.content_urls.desktop && p.content_urls.desktop.page };
+    }).catch(function(){ return { error: true }; });
+  }
+  function renderDict(d){
+    if(!d || d.error) return '';
+    var e = d[0], phon = e.phonetic || '', audio = '';
+    (e.phonetics || []).forEach(function(p){ if(!phon && p.text) phon = p.text; if(!audio && p.audio) audio = p.audio; });
+    var meanings = [];
+    d.forEach(function(entry){ (entry.meanings || []).forEach(function(m){ meanings.push(m); }); });
+    var syn = {};
+    var html = '<div class="lk-block"><div class="lk-word"><b>' + esc(e.word) + '</b>' + (phon ? ' <span class="lk-phon">' + esc(phon) + '</span>' : '') +
+      (audio && /^https:\/\//.test(audio) ? ' <button class="btn ghost small" data-lk-audio="' + esc(audio) + '" aria-label="Play pronunciation">🔊</button>' : '') + '</div>';
+    var shown = 0;
+    meanings.slice(0, 4).forEach(function(m){
+      if(shown >= 5) return;
+      html += '<div class="lk-pos">' + esc(m.partOfSpeech || '') + '</div><ol class="lk-defs">';
+      (m.definitions || []).slice(0, 2).forEach(function(df){
+        if(shown >= 5) return; shown++;
+        html += '<li>' + esc(df.definition) + (df.example ? '<div class="lk-ex">“' + esc(df.example) + '”</div>' : '') + '</li>';
+        (df.synonyms || []).forEach(function(s){ syn[s] = 1; });
+      });
+      (m.synonyms || []).forEach(function(s){ syn[s] = 1; });
+      html += '</ol>';
+    });
+    var syns = Object.keys(syn).slice(0, 8);
+    if(syns.length) html += '<p class="small lk-syn">Similar: ' + syns.map(function(s){ return '<button class="lk-chip" data-lk-term="' + esc(s) + '">' + esc(s) + '</button>'; }).join(' ') + '</p>';
+    html += '<p class="small lk-src">Source: Free Dictionary (Wiktionary data)</p></div>';
+    return html;
+  }
+  function renderWiki(w){
+    if(!w || w.error) return '';
+    if(w.disamb) return '<div class="lk-block"><p class="small">“' + esc(w.title) + '” can mean several things on Wikipedia — try a more specific term.' + (w.url ? ' <a href="' + esc(w.url) + '" target="_blank" rel="noopener">See the options</a>' : '') + '</p></div>';
+    return '<div class="lk-block"><div class="lk-word"><b>' + esc(w.title) + '</b>' + (w.desc ? ' <span class="lk-phon">' + esc(w.desc) + '</span>' : '') + '</div>' +
+      '<p class="lk-extract">' + esc(w.extract) + '</p>' +
+      '<p class="small lk-src">Source: Wikipedia' + (w.url ? ' · <a href="' + esc(w.url) + '" target="_blank" rel="noopener">Read the full article</a>' : '') + ' · Check facts against your class materials.</p></div>';
+  }
+  function bestDefinition(){
+    if(!lastResult) return '';
+    var d = lastResult.dict;
+    if(d && !d.error && d[0] && d[0].meanings && d[0].meanings[0] && d[0].meanings[0].definitions[0])
+      return d[0].meanings[0].definitions[0].definition;
+    var w = lastResult.wiki;
+    if(w && w.extract){ var mm = w.extract.match(/^[\s\S]*?[.!?](?=\s|$)/), first = mm ? mm[0] : w.extract; return first.length > 300 ? first.slice(0, 297) + '…' : first; }
+    return '';
+  }
+  function run(term){
+    term = String(term || '').trim().replace(/\s+/g, ' ').slice(0, 80);
+    if(!term){ $('lkStatus').textContent = 'Type a word or topic first.'; return; }
+    $('lkInput').value = term;
+    $('lkStatus').textContent = '';
+    if(!navigator.onLine){ $('lkOut').innerHTML = '<p class="small lk-msg">You\'re offline — Look it up needs the internet. Everything else in StudyLens still works.</p>'; return; }
+    $('lkOut').innerHTML = '<div class="sl-shimmer" aria-label="Looking up"></div><p class="small">Looking up “' + esc(term) + '”…</p>';
+    var key = term.toLowerCase();
+    var p = cache[key] ? Promise.resolve(cache[key]) : Promise.all([dictLookup(term), wikiLookup(term)]).then(function(r){ var o = { term: term, dict: r[0], wiki: r[1] }; cache[key] = o; return o; });
+    p.then(function(o){
+      lastResult = o;
+      var html = renderDict(o.dict) + renderWiki(o.wiki);
+      if(!html){
+        var failed = (o.dict && o.dict.error) || (o.wiki && o.wiki.error);
+        $('lkOut').innerHTML = '<p class="small lk-msg">' + (failed ? 'Couldn\'t reach the dictionary or Wikipedia right now. Try again in a moment.' : 'No definition or article found for “' + esc(term) + '”. Check the spelling or try a broader term.') + '</p>';
+        return;
+      }
+      html += '<div class="row"><button class="btn ghost small" id="lkAddBtn">＋ Add to my material</button><span class="small" id="lkAddMsg"></span></div>';
+      $('lkOut').innerHTML = html;
+    });
+  }
+  $('lkBtn').addEventListener('click', function(){ run($('lkInput').value); });
+  $('lkInput').addEventListener('keydown', function(e){ if(e.key === 'Enter'){ e.preventDefault(); run(this.value); } });
+  $('lkSelBtn').addEventListener('click', function(){
+    var m = $('material'), sel = '';
+    if(m && m.selectionEnd > m.selectionStart) sel = m.value.slice(m.selectionStart, m.selectionEnd);
+    if(!sel && window.getSelection) sel = String(window.getSelection());
+    sel = sel.trim();
+    if(!sel){ $('lkStatus').textContent = 'Select a word in Your material first.'; return; }
+    run(sel);
+  });
+  $('lkOut').addEventListener('click', function(e){
+    var a = e.target.closest('[data-lk-audio]');
+    if(a){ try{ new Audio(a.getAttribute('data-lk-audio')).play(); }catch(err){} return; }
+    var c = e.target.closest('[data-lk-term]');
+    if(c){ run(c.getAttribute('data-lk-term')); return; }
+    if(e.target.id === 'lkAddBtn'){
+      var def = bestDefinition(), m = $('material');
+      if(!def || !m) return;
+      var line = lastResult.term.charAt(0).toUpperCase() + lastResult.term.slice(1) + ' — ' + def.replace(/\s+$/, '');
+      if(!/[.!?…]$/.test(line)) line += '.';
+      m.value = (m.value.replace(/\s+$/, '') ? m.value.replace(/\s+$/, '') + '\n\n' : '') + line;
+      m.dispatchEvent(new Event('input', { bubbles: true }));
+      $('lkAddMsg').textContent = 'Added — it\'ll be in your next study pack.';
+    }
+  });
+  /* Tap a key term pill after generating a pack to look it up. */
+  var tb = $('termsBox');
+  if(tb) tb.addEventListener('click', function(e){
+    var p = e.target.closest('.pill'); if(!p) return;
+    run(p.textContent);
+    $('lookupCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+  window.StudyLensLookup = { run: run };
 })();
 </script>
 
