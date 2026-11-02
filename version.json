@@ -1,10 +1,10 @@
 {
   "notes": [
-    "NEW subject pack: Geography Basics — latitude and longitude, map projections, climate zones, population density, migration, urbanization, GIS and remote sensing, and development indicators, with which-idea, map-scale-distance, and population-density practice, never your assignment.",
-    "Detector V29 was trained and measured this run but HELD, not shipped: on the permanent frozen probe it caught 12 of 18 humanized texts, below the shipped V20’s 13, so V20 stays live until a round genuinely beats it. The round held the second probe at 12 of 12 and the false-flag rate at 4.63% (below V20’s 4.71%), with GPT-5 detection at 92.2% and neural-paraphrase detection at 52.2%.",
+    "NEW subject pack: Music Basics \u2014 rhythm and meter, scales and keys, intervals, chords and triads, dynamics and tempo, melody and harmony, musical form, and timbre and texture, with which-idea, beat-duration-from-tempo, and note-value practice, never your assignment.",
+    "Detector V30 was trained and measured this run but HELD, not shipped: on the permanent frozen probe it caught 12 of 18 humanized texts, below the shipped V20\u2019s 13, so V20 stays live until a round genuinely beats it. The vocabulary diagnosis from this round found the detector top AI signals are informal-voice markers themselves (actually, just, honestly, my, me), which real informal human writing shares \u2014 the next lever must break that confounding, not add more data. The round held the second probe at 12 of 12 and the false-flag rate at 4.46% (below V20\u2019s 4.71%), with GPT-5 detection at 92.2% and neural-paraphrase detection at 54.4%.",
     "Nothing else changed: the detector (V20), the review queue, tutor rules, and Ollama connection are untouched, and no new server calls were added."
   ],
   "notify": true,
-  "updated": "2026-11-01",
-  "version": "2.40.0"
+  "updated": "2026-11-02",
+  "version": "2.41.0"
 }

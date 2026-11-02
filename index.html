@@ -4654,8 +4654,11 @@ ssRefresh();
    fetched with no-store caching: when a newer build ships, an already-open or
    home-screen copy of an older build sees the newer version number there and
    offers "Update now" (a reload onto the new build). */
-var APP_VERSION = '2.40.0';
+var APP_VERSION = '2.41.0';
 var CHANGELOG = [
+ { v:'2.41.0', date:'Nov 2, 2026', notify:true, notes:[
+   'NEW subject pack: Music Basics \u2014 rhythm and meter, scales and keys, intervals, chords and triads, dynamics and tempo, melody and harmony, musical form, and timbre and texture, with which-idea, beat-duration-from-tempo, and note-value practice, never your assignment.',
+   'Detector V30 was trained and measured this run but HELD, not shipped: on the permanent frozen probe it caught 12 of 18 humanized texts, below the shipped V20’s 13, so V20 stays live until a round genuinely beats it. The vocabulary diagnosis from this round found the detector top AI signals are informal-voice markers themselves (actually, just, honestly, my, me), which real informal human writing shares — the next lever must break that confounding, not add more data. The round held the second probe at 12 of 12 and the false-flag rate at 4.46% (below V20’s 4.71%), with GPT-5 detection at 92.2% and neural-paraphrase detection at 54.4%.' ]},
  { v:'2.40.0', date:'Nov 1, 2026', notify:true, notes:[
    'NEW subject pack: Geography Basics \\u2014 latitude and longitude, map projections, climate zones, population density, migration, urbanization, GIS and remote sensing, and development indicators, with which-idea, map-scale-distance, and population-density practice, never your assignment.',
    'Detector V29 was trained and measured this run but HELD, not shipped: on the permanent frozen probe it caught 12 of 18 humanized texts, below the shipped V20\u2019s 13, so V20 stays live until a round genuinely beats it. The round held the second probe at 12 of 12 and the false-flag rate at 4.63% (below V20\u2019s 4.71%), with GPT-5 detection at 92.2% and neural-paraphrase detection at 52.2%.' ]},
@@ -8474,7 +8477,66 @@ var SL_PACKS = {
       }
     ]
   },
-
+  music: {
+    title: 'Music Basics',
+    sources: 'Sources: standard introductory music theory (OpenStax-style music appreciation; standard theory references). Explanations are textbook-level summaries.',
+    concepts: [
+      { term: 'Rhythm and meter', explain: 'Rhythm is how sounds are organized in time; meter is the repeating pattern of strong and weak beats that groups those sounds into bars. A 4/4 time signature means four beats per bar with the quarter note getting one beat; 3/4 gives three beats per bar, the feel of a waltz. The downbeat \\u2014 beat one \\u2014 is where the pattern resets and the foot taps hardest.' },
+      { term: 'Scales and keys', explain: 'A scale is an ordered set of pitches, and a key names the scale a piece is built on. A major scale follows whole-whole-half-whole-whole-whole-half steps (W-W-H-W-W-W-H); the natural minor scale follows W-H-W-W-H-W-W. The key signature at the start of the staff tells players which notes are sharp or flat throughout, so the scale, not a single note, is the home base.' },
+      { term: 'Intervals', explain: 'An interval is the distance between two pitches, measured in semitones (half steps) and named by letter distance. A perfect fifth spans 7 semitones, a major third 4, a minor third 3, and an octave 12. The same letter distance can be major or minor depending on semitones: C to E is a major third (4 semitones), C to E-flat is a minor third (3).' },
+      { term: 'Chords and triads', explain: 'A chord sounds three or more pitches together; a triad is the simplest chord, built by stacking thirds. A major triad is root + major third + perfect fifth (C-E-G); a minor triad lowers the middle note a semitone (C-E-flat-G), which is why it sounds darker. In a key, the triads built on the first, fourth, and fifth scale degrees (I, IV, V) carry most of a song\\u2019s harmony.' },
+      { term: 'Dynamics and tempo', explain: 'Dynamics say how loud or soft music is played, from pianissimo (very soft, pp) through mezzo-forte (medium loud, mf) to fortissimo (very loud, ff); a crescendo grows louder gradually. Tempo says how fast the beat moves, in beats per minute (BPM): largo is slow and broad, andante walks along, allegro is fast and lively. A metronome marking like quarter note = 120 sets the beat to 120 per minute.' },
+      { term: 'Melody and harmony', explain: 'Melody is a tune: pitches in succession that a listener can sing back. Harmony is pitches sounding together underneath or around it, usually as chords. A melody can be conjunct (moving by small steps) or disjunct (leaping); harmony can be consonant (stable, restful) or dissonant (tense, wanting to resolve). The same melody over different chords feels like a different song.' },
+      { term: 'Musical form', explain: 'Form is how a piece is put together from sections. Binary form is two sections (A-B); ternary form returns home (A-B-A); strophic form repeats the same music for each verse of a song. Most pop songs use verse-chorus form: verses tell the story, the chorus repeats the hook, and a bridge offers one contrasting section before the final chorus.' },
+      { term: 'Timbre and texture', explain: 'Timbre (tone color) is what makes a violin sound different from a trumpet playing the same pitch \\u2014 the blend of overtones each instrument produces. Texture is how many voices or lines sound at once: monophonic is one line alone, homophonic is a melody plus accompaniment, and polyphonic is several independent melodies woven together, as in a fugue.' }
+    ],
+    formulas: [
+      { name: 'Beat duration from tempo', form: 'One beat lasts 60 / BPM seconds. At 120 BPM a beat is 0.5 seconds; at 60 BPM it is a full second. Faster tempo means shorter beats.', note: 'BPM counts quarter-note beats per minute by default, unless another note value is named.' },
+      { name: 'Note values in beats', form: 'In 4/4, a whole note = 4 beats, a half note = 2, a quarter note = 1, an eighth note = 0.5. A dot after a note adds half its value: a dotted half note = 2 + 1 = 3 beats; a dotted quarter = 1 + 0.5 = 1.5 beats.', note: 'Note values are relative: in 3/4 the quarter note is still one beat, but the bar holds three of them.' },
+      { name: 'Interval semitones', form: 'Minor 2nd = 1 semitone, major 2nd = 2, minor 3rd = 3, major 3rd = 4, perfect 4th = 5, tritone = 6, perfect 5th = 7, minor 6th = 8, major 6th = 9, minor 7th = 10, major 7th = 11, octave = 12.', note: 'Count semitones on a keyboard: each key, black or white, is one semitone from its neighbor.' }
+    ],
+    gens: [
+      function(){
+        var bank = [
+          { s: 'A song is in 4/4 and the drummer counts four beats before each bar starts over, with the first beat accented.', a: 'Rhythm and meter', w: 'Rhythm and meter: the time signature groups beats into bars; 4/4 is four quarter-note beats per bar.' },
+          { s: 'A piece is built on the notes C-D-E-F-G-A-B-C, rising by whole-whole-half-whole-whole-whole-half steps.', a: 'Scales and keys', w: 'Scales and keys: that step pattern is the major scale; C major has no sharps or flats.' },
+          { s: 'Two notes sound together with 7 semitones between them, from C up to G.', a: 'Intervals', w: 'Intervals: 7 semitones is a perfect fifth.' },
+          { s: 'A guitarist plays C, E-flat, and G together, and the chord sounds darker than C-E-G.', a: 'Chords and triads', w: 'Chords and triads: lowering the third a semitone turns a major triad minor.' },
+          { s: 'The score marks a passage ff and then a long crescendo into the final chorus.', a: 'Dynamics and tempo', w: 'Dynamics and tempo: ff is very loud; a crescendo grows louder gradually.' },
+          { s: 'A singer carries the tune while the piano plays chords underneath that never take over the melody.', a: 'Melody and harmony', w: 'Melody and harmony: a tune plus chordal accompaniment is homophonic texture with a clear melody.' },
+          { s: 'A song runs verse, chorus, verse, chorus, bridge, chorus \\u2014 the same hook returns after each new section.', a: 'Musical form', w: 'Musical form: verse-chorus form repeats the chorus hook between verses, with a contrasting bridge.' },
+          { s: 'A flute and a clarinet play the same pitch, but listeners can tell them apart at once by their sound quality.', a: 'Timbre and texture', w: 'Timbre and texture: timbre is tone color \\u2014 what distinguishes instruments on the same pitch.' },
+          { s: 'A choir sings three independent lines that weave in and out, no single line simply accompanying the others.', a: 'Timbre and texture', w: 'Timbre and texture: several independent melodies at once is polyphonic texture.' },
+          { s: 'A melody jumps from note to note in wide leaps, then settles back down by small steps.', a: 'Melody and harmony', w: 'Melody and harmony: wide leaps are disjunct motion; small steps are conjunct motion.' },
+          { s: 'The key signature shows three sharps, so every F, C, and G is sharp unless marked otherwise.', a: 'Scales and keys', w: 'Scales and keys: the key signature applies its sharps or flats throughout the piece.' },
+          { s: 'A metronome is set to 90 beats per minute for a practice run, then pushed to 120 for the performance tempo.', a: 'Dynamics and tempo', w: 'Dynamics and tempo: tempo is measured in beats per minute; higher BPM is faster.' }
+        ];
+        var it = slPick(bank);
+        var opts = ['Rhythm and meter', 'Scales and keys', 'Intervals', 'Chords and triads', 'Dynamics and tempo', 'Melody and harmony', 'Musical form', 'Timbre and texture'];
+        var keep = [it.a];
+        var others = opts.filter(function(o){ return o !== it.a; });
+        while(keep.length < 4) keep.push(others.splice(slR(0, others.length - 1), 1)[0]);
+        var k = slR(0, 3); keep = keep.slice(k).concat(keep.slice(0, k));
+        return { prompt: 'Which idea is this? \\u2014 ' + it.s, options: keep, answer: it.a, work: it.w };
+      },
+      function(){
+        var bpms = [60, 75, 100, 120, 150, 200];
+        var bpm = bpms[slR(0, bpms.length - 1)];
+        var val = slRound(60 / bpm, 2);
+        return { prompt: 'A metronome is set to ' + bpm + ' beats per minute. How long does one beat last, in seconds?', answer: val, unit: 's', work: 'One beat = 60 / BPM = 60 / ' + bpm + ' = ' + val + ' seconds.' };
+      },
+      function(){
+        var vals = [
+          { n: 'whole note', b: 4 }, { n: 'half note', b: 2 }, { n: 'quarter note', b: 1 },
+          { n: 'eighth note', b: 0.5 }, { n: 'dotted half note', b: 3 }, { n: 'dotted quarter note', b: 1.5 }
+        ];
+        var v = vals[slR(0, vals.length - 1)];
+        var count = 2 + slR(0, 4);
+        var val = slRound(count * v.b, 2);
+        return { prompt: 'In 4/4 time, how many beats do ' + count + ' ' + v.n + 's last in total?', answer: val, unit: 'beats', work: 'One ' + v.n + ' = ' + v.b + ' beats, so ' + count + ' \\u00d7 ' + v.b + ' = ' + val + ' beats.' };
+      }
+    ]
+  },
 };
 
 /* Ask a pack: explanations + analogous examples only. A request carrying
