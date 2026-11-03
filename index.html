@@ -618,6 +618,7 @@ body.lp-plain .pill{font-weight:700}
   #lecLessonBarFill,#quizProgFill{transition:none}
 }
 
+/* v2.43.0 — Astronomy Basics pack */
 /* v2.42.0 — Look it up + phone layout of the update banner */
 .lk-row{display:flex;gap:8px;margin-top:8px}
 .lk-row input{flex:1;min-width:0}
@@ -4692,8 +4693,11 @@ ssRefresh();
    fetched with no-store caching: when a newer build ships, an already-open or
    home-screen copy of an older build sees the newer version number there and
    offers "Update now" (a reload onto the new build). */
-var APP_VERSION = '2.42.0';
+var APP_VERSION = '2.43.0';
 var CHANGELOG = [
+ { v:'2.43.0', date:'Nov 3, 2026', notify:true, notes:[
+   'NEW subject pack: Astronomy Basics \u2014 the solar system, seasons and axial tilt, Moon phases, Kepler\u2019s laws, light-years and light travel, stars and their life cycle, telescopes and the spectrum, and galaxies and the expanding universe, with which-idea, Kepler-period, light-travel-time, and inverse-square-brightness practice, never your assignment.',
+   'Detector V31 was a measurement round, not a new model: ablating the informal-voice markers (actually, just, honestly, my, me) from the shipped V20 model fixed the known human personal-essay false flag but collapsed frozen-probe humanized catch from 13 of 18 to 3 of 18, so those markers carry the humanized signal itself and simple marker removal is not the fix. V20 stays live until a round genuinely beats it.' ]},
  { v:'2.42.0', date:'Nov 2, 2026', notify:true, notes:[
    "NEW Look it up (Study tab): type any word or topic \u2014 or select a word in Your material, or tap a key term after generating a pack \u2014 and get a real dictionary entry (pronunciation you can play, part of speech, definitions, examples, similar words) plus a short Wikipedia summary with a link to the full article. One tap adds the definition to your material so it lands in your next study pack. Only the term you look up is sent (to the Free Dictionary and Wikipedia), never your notes; offline it says so plainly.",
    "Fixed the update box on phones: the Got it / Update buttons sat beside the notes and squeezed them into a narrow column. They now sit underneath at full width, and long notes scroll inside the box."
@@ -8579,6 +8583,67 @@ var SL_PACKS = {
       }
     ]
   },
+  astronomy: {
+    title: 'Astronomy Basics',
+    sources: 'Sources: standard introductory astronomy (OpenStax Astronomy-style; NASA/IAU reference values). Explanations are textbook-level summaries.',
+    concepts: [
+      { term: 'The solar system', explain: 'The solar system is the Sun plus everything bound to it by gravity: eight planets, dwarf planets such as Pluto, moons, asteroids, and comets. The four inner planets (Mercury, Venus, Earth, Mars) are small and rocky; the four outer planets (Jupiter, Saturn, Uranus, Neptune) are much larger and mostly gas and ice. The planets orbit the Sun in the same direction, in nearly the same plane, because they formed from one spinning disk of gas and dust.' },
+      { term: 'Seasons and axial tilt', explain: 'Seasons are caused by Earth\'s axial tilt of about 23.5 degrees, not by Earth being closer to the Sun. As Earth orbits, the tilt points one hemisphere toward the Sun for half the year and away for the other half, so that hemisphere gets more direct sunlight and longer days in its summer. That is why the northern and southern hemispheres have opposite seasons, and why the equator, where sunlight stays nearly overhead all year, has almost no seasons.' },
+      { term: 'Moon phases', explain: 'The Moon does not change shape; phases are the changing fraction of its sunlit half that we see from Earth as it orbits us. A new moon sits between Earth and the Sun, so its dark side faces us; a full moon sits opposite the Sun, so its lit side faces us. One full cycle of phases, the synodic month, takes about 29.5 days, which is why a full moon comes roughly once a month.' },
+      { term: 'Kepler\'s laws', explain: 'Kepler\'s three laws describe planetary orbits. First, planets orbit in ellipses with the Sun at one focus, not in perfect circles. Second, a planet sweeps out equal areas in equal times, so it moves fastest when nearest the Sun and slowest when farthest. Third, the square of a planet\'s orbital period is proportional to the cube of its average distance from the Sun: in Earth units, P squared equals a cubed, where P is in Earth years and a is in astronomical units (AU).' },
+      { term: 'Light-years and light travel', explain: 'A light-year is a distance, not a time: the distance light travels in one year, about 9.46 trillion kilometres. Light is fast but not instant \u2014 sunlight takes about 8 minutes to reach Earth, and light from the nearest star beyond the Sun, Proxima Centauri, takes about 4.24 years. When astronomers look at a distant galaxy, they see it as it was when its light left, so telescopes are also time machines.' },
+      { term: 'Stars and their life cycle', explain: 'Stars shine by nuclear fusion in their cores, fusing hydrogen into helium. A star like the Sun will swell into a red giant when its core hydrogen runs out, shed its outer layers, and end as a white dwarf. Much more massive stars end violently as supernovae, leaving a neutron star or, for the most massive, a black hole. The heavy elements made inside stars and scattered by supernovae are the raw material of planets and of us.' },
+      { term: 'Telescopes and the spectrum', explain: 'A telescope\'s job is mostly to collect light, not just to magnify: a bigger aperture gathers more light and resolves finer detail, which is why professional telescopes are metres across. Astronomers observe far beyond visible light, across the electromagnetic spectrum \u2014 radio, infrared, visible, ultraviolet, X-ray, and gamma-ray \u2014 because different objects shine brightest in different bands. That is why some telescopes sit in space: Earth\'s atmosphere blocks much of the spectrum.' },
+      { term: 'Galaxies and the expanding universe', explain: 'A galaxy is a huge gravitationally bound system of stars, gas, dust, and dark matter. Our Milky Way is a barred spiral galaxy with hundreds of billions of stars; the nearest large neighbor, Andromeda, is about 2.5 million light-years away. Almost all distant galaxies are redshifted \u2014 their light stretched toward the red end of the spectrum \u2014 showing the universe is expanding, with more distant galaxies receding faster.' }
+    ],
+    formulas: [
+      { name: 'Kepler\'s third law (Earth units)', form: 'P\u00b2 = a\u00b3, where P is the orbital period in Earth years and a is the average distance from the Sun in astronomical units (1 AU = Earth\'s average distance). Earth: a = 1, so P = 1 year. A planet at a = 4 AU has P = \u221a(4\u00b3) = \u221a64 = 8 years.', note: 'This form works because the Sun\'s mass dominates; it is the version used for planets orbiting the Sun.' },
+      { name: 'Light travel time', form: 'Time = distance / speed of light. Using about 300,000 km per second for light: sunlight crossing 150 million km takes 150,000,000 / 300,000 = 500 seconds, about 8.3 minutes.', note: '300,000 km/s is the rounded textbook value; the exact value is 299,792 km/s, which changes these answers by under 0.1%.' },
+      { name: 'Inverse-square brightness', form: 'Brightness falls as 1 / distance\u00b2. Double the distance and a light looks 1/4 as bright; triple it and it looks 1/9 as bright. Astronomers use this to compare stars: a star that looks dim may be faint, or simply far away.', note: 'This is why apparent brightness alone never gives a star\'s true luminosity \u2014 distance must be known too.' }
+    ],
+    gens: [
+      function(){
+        var bank = [
+          { s: 'A planet is small, rocky, and orbits close to the Sun, inside the asteroid belt.', a: 'The solar system', w: 'The solar system: the inner planets (Mercury, Venus, Earth, Mars) are small and rocky; the outer planets are gas and ice giants.' },
+          { s: 'In June the northern hemisphere gets longer days and more direct sunlight than in December, while the southern hemisphere gets the opposite.', a: 'Seasons and axial tilt', w: 'Seasons and axial tilt: Earth\'s 23.5-degree tilt, not its distance from the Sun, makes the hemispheres\' seasons opposite.' },
+          { s: 'Tonight the Moon is opposite the Sun in the sky and its whole lit face is visible from Earth.', a: 'Moon phases', w: 'Moon phases: a full moon sits opposite the Sun, so its sunlit half faces Earth.' },
+          { s: 'A planet speeds up as it nears the Sun and slows down as it moves away, sweeping equal areas in equal times.', a: 'Kepler\'s laws', w: 'Kepler\'s laws: the equal-areas law means a planet moves fastest at its closest approach to the Sun.' },
+          { s: 'A star is described as being 4.24 light-years away, so its light takes 4.24 years to reach us.', a: 'Light-years and light travel', w: 'Light-years and light travel: a light-year is a distance \u2014 how far light travels in one year.' },
+          { s: 'A massive star explodes as a supernova and leaves behind a neutron star.', a: 'Stars and their life cycle', w: 'Stars and their life cycle: massive stars end as supernovae, leaving a neutron star or a black hole; Sun-like stars end as white dwarfs.' },
+          { s: 'An observatory builds a telescope with a much wider mirror so it can collect more light from faint galaxies.', a: 'Telescopes and the spectrum', w: 'Telescopes and the spectrum: a telescope\'s main job is light collection, and a bigger aperture gathers more light.' },
+          { s: 'A distant galaxy\'s light is shifted toward the red, and the farthest galaxies show the largest shifts.', a: 'Galaxies and the expanding universe', w: 'Galaxies and the expanding universe: redshift shows the universe is expanding, with more distant galaxies receding faster.' },
+          { s: 'A planet orbits the Sun in an ellipse, with the Sun at one focus rather than at the centre.', a: 'Kepler\'s laws', w: 'Kepler\'s laws: orbits are ellipses with the Sun at one focus.' },
+          { s: 'A new moon is invisible because the side facing Earth is the side away from the Sun.', a: 'Moon phases', w: 'Moon phases: at new moon, the Moon sits between Earth and the Sun, so its dark side faces us.' },
+          { s: 'An X-ray telescope is launched into orbit because Earth\'s atmosphere blocks X-rays from reaching the ground.', a: 'Telescopes and the spectrum', w: 'Telescopes and the spectrum: some telescopes sit in space because the atmosphere blocks much of the spectrum, including X-rays.' },
+          { s: 'A star like the Sun swells into a red giant late in life, then sheds its outer layers and leaves a white dwarf.', a: 'Stars and their life cycle', w: 'Stars and their life cycle: Sun-like stars end as white dwarfs after a red-giant phase.' }
+        ];
+        var it = slPick(bank);
+        var opts = ['The solar system', 'Seasons and axial tilt', 'Moon phases', 'Kepler\'s laws', 'Light-years and light travel', 'Stars and their life cycle', 'Telescopes and the spectrum', 'Galaxies and the expanding universe'];
+        var keep = [it.a];
+        var others = opts.filter(function(o){ return o !== it.a; });
+        while(keep.length < 4) keep.push(others.splice(slR(0, others.length - 1), 1)[0]);
+        var k = slR(0, 3); keep = keep.slice(k).concat(keep.slice(0, k));
+        return { prompt: 'Which idea is this? \u2014 ' + it.s, options: keep, answer: it.a, work: it.w };
+      },
+      function(){
+        var vals = [ { a: 1, p: 1 }, { a: 4, p: 8 }, { a: 9, p: 27 }, { a: 0.25, p: 0.125 }, { a: 16, p: 64 }, { a: 2.25, p: 3.375 } ];
+        var v = vals[slR(0, vals.length - 1)];
+        return { prompt: 'A planet orbits the Sun at an average distance of ' + v.a + ' AU. What is its orbital period in Earth years? (Use P\u00b2 = a\u00b3.)', answer: v.p, unit: 'years', work: 'P = \u221a(a\u00b3) = \u221a(' + v.a + '\u00b3) = ' + v.p + ' years.' };
+      },
+      function(){
+        var dists = [45, 90, 150, 300, 600];
+        var d = dists[slR(0, dists.length - 1)];
+        var val = slRound(d * 1000000 / 300000, 1);
+        return { prompt: 'Light travels at about 300,000 km per second. How many seconds does light take to cross ' + d + ' million km?', answer: val, unit: 's', work: 'Time = distance / speed = ' + d + ',000,000 / 300,000 = ' + val + ' seconds.' };
+      },
+      function(){
+        var mults = [2, 3, 4];
+        var m = mults[slR(0, mults.length - 1)];
+        var val = slRound(1 / (m * m), 4);
+        return { prompt: 'A star moves to ' + m + ' times its original distance from Earth. What fraction of its original brightness does it now appear to have? (Give the fraction as a decimal.)', answer: val, unit: '', work: 'Brightness falls as 1/distance\u00b2, so at ' + m + ' times the distance it is 1/' + m + '\u00b2 = 1/' + (m * m) + ' = ' + val + ' as bright.' };
+      }
+    ]
+  }
 };
 
 /* Ask a pack: explanations + analogous examples only. A request carrying
