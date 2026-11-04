@@ -618,6 +618,7 @@ body.lp-plain .pill{font-weight:700}
   #lecLessonBarFill,#quizProgFill{transition:none}
 }
 
+/* v2.44.0 — Health Basics pack */
 /* v2.43.0 — Astronomy Basics pack */
 /* v2.42.0 — Look it up + phone layout of the update banner */
 .lk-row{display:flex;gap:8px;margin-top:8px}
@@ -4693,8 +4694,11 @@ ssRefresh();
    fetched with no-store caching: when a newer build ships, an already-open or
    home-screen copy of an older build sees the newer version number there and
    offers "Update now" (a reload onto the new build). */
-var APP_VERSION = '2.43.0';
+var APP_VERSION = '2.44.0';
 var CHANGELOG = [
+ { v:'2.44.0', date:'Nov 4, 2026', notify:true, notes:[
+   'NEW subject pack: Health Basics \u2014 balanced nutrition, energy balance, hydration, sleep cycles, aerobic vs strength exercise, heart-rate zones, stress and recovery, and reading a food label, with which-idea, BMI, heart-rate-zone, and sleep-cycle practice, never your assignment.',
+   'Detector V32 was trained and measured this run but HELD, not shipped: on the permanent frozen probe it caught 12 of 18 humanized texts, below the shipped V20\u2019s 13, so V20 stays live until a round genuinely beats it. The round held the second probe at 12 of 12, the false-flag rate at 4.44% (below V20\u2019s 4.71%), GPT-5 detection at 92.2%, and neural-paraphrase detection at 52.2%. A marker-density measurement this run confirmed the confounding: informal-voice markers run 36.5 per 1,000 words in humanized-AI training text vs 12.5 in human-labeled casual text.' ]},
  { v:'2.43.0', date:'Nov 3, 2026', notify:true, notes:[
    'NEW subject pack: Astronomy Basics \u2014 the solar system, seasons and axial tilt, Moon phases, Kepler\u2019s laws, light-years and light travel, stars and their life cycle, telescopes and the spectrum, and galaxies and the expanding universe, with which-idea, Kepler-period, light-travel-time, and inverse-square-brightness practice, never your assignment.',
    'Detector V31 was a measurement round, not a new model: ablating the informal-voice markers (actually, just, honestly, my, me) from the shipped V20 model fixed the known human personal-essay false flag but collapsed frozen-probe humanized catch from 13 of 18 to 3 of 18, so those markers carry the humanized signal itself and simple marker removal is not the fix. V20 stays live until a round genuinely beats it.' ]},
@@ -8643,7 +8647,64 @@ var SL_PACKS = {
         return { prompt: 'A star moves to ' + m + ' times its original distance from Earth. What fraction of its original brightness does it now appear to have? (Give the fraction as a decimal.)', answer: val, unit: '', work: 'Brightness falls as 1/distance\u00b2, so at ' + m + ' times the distance it is 1/' + m + '\u00b2 = 1/' + (m * m) + ' = ' + val + ' as bright.' };
       }
     ]
-  }
+  },
+  health: {
+    title: 'Health Basics',
+    sources: 'Sources: standard introductory health education (CDC/WHO general guidance; OpenStax Anatomy & Physiology-style). General education only — not medical advice, and never a substitute for a clinician.',
+    concepts: [
+      { term: 'Balanced nutrition', explain: 'A balanced diet supplies the three macronutrients — carbohydrates for quick energy, proteins for building and repairing tissue, and fats for stored energy and cell membranes — plus vitamins, minerals, and fibre. No single food covers everything, which is why dietary guidance is built around variety across food groups rather than one “superfood”.' },
+      { term: 'Energy balance', explain: 'Body weight changes with energy balance: energy in from food and drink versus energy out through basal metabolism, daily activity, and exercise. Basal metabolism — the energy used just to stay alive at rest — is the largest share for most people, which is why total intake matters more than any single meal.' },
+      { term: 'Hydration', explain: 'Water carries nutrients, regulates temperature through sweating, and cushions joints. Thirst lags behind actual need, so regular drinking across the day beats waiting until you feel very thirsty, and needs rise with heat and exercise. Pale-yellow urine is a rough everyday guide to adequate hydration.' },
+      { term: 'Sleep cycles', explain: 'Sleep runs in cycles of roughly 90 minutes, moving from light sleep to deep sleep and then to REM (dreaming) sleep. Waking at the end of a cycle usually feels easier than being woken from deep sleep mid-cycle, which is why sleep length in whole cycles — about 7.5 or 9 hours for many adults — is a useful planning rule of thumb.' },
+      { term: 'Aerobic vs strength exercise', explain: 'Aerobic exercise (brisk walking, running, cycling) raises heart rate and breathing for a sustained period and trains the heart and lungs. Strength exercise (resistance training) loads muscles against resistance and builds muscle and bone density. Health guidance recommends both across the week, because they train different systems.' },
+      { term: 'Heart-rate zones', explain: 'Exercise intensity is often described by heart rate as a percentage of maximum heart rate, estimated as 220 minus age. Moderate activity is roughly 50–70% of maximum; vigorous activity is roughly 70–85%. The 220-minus-age formula is a population estimate, so individual maxima vary — it is a guide for pacing, not a precise personal measurement.' },
+      { term: 'Stress and recovery', explain: 'Stress is the body\u2019s response to demands, driven by hormones such as cortisol and adrenaline that raise heart rate and alertness. Short-term stress is normal and can aid performance, but recovery — sleep, rest days, and downtime — is what lets the body adapt. Without recovery, training and study both show diminishing returns.' },
+      { term: 'Reading a food label', explain: 'A food label\u2019s serving size comes first, because every number on the label is per serving, not per package. The key checks are calories per serving, saturated fat, sodium, added sugars, fibre, and protein, plus the ingredient list, where ingredients are listed in descending order by weight.' }
+    ],
+    formulas: [
+      { name: 'Body mass index (BMI)', form: 'BMI = weight in kilograms / (height in metres)\u00b2. Example: 70 kg at 1.75 m gives 70 / (1.75\u00b2) = 70 / 3.0625 = 22.9. Standard adult bands: below 18.5 underweight, 18.5–24.9 healthy, 25–29.9 overweight, 30+ obese.', note: 'BMI is a population screening tool, not a body-composition measure: it does not distinguish muscle from fat, so athletes can score high while being lean.' },
+      { name: 'Maximum heart rate estimate', form: 'Maximum heart rate \u2248 220 \u2212 age. Moderate zone \u2248 50–70% of maximum; vigorous zone \u2248 70–85%. Example: age 20 gives a maximum of 200, so the moderate zone is 100–140 beats per minute and the vigorous zone is 140–170.', note: 'A rough population estimate — individual maxima vary by about \u00b110 beats per minute or more.' },
+      { name: 'Sleep cycles', form: 'Sleep time \u2248 number of cycles \u00d7 90 minutes. Five cycles = 450 minutes = 7.5 hours; six cycles = 540 minutes = 9 hours. Counting back from a fixed wake time in 90-minute steps gives bedtimes that land near a cycle boundary.', note: '90 minutes is an average cycle length; real cycles vary through the night.' }
+    ],
+    gens: [
+      function(){
+        var bank = [
+          { s: 'A meal plan is built around variety across food groups so it supplies carbohydrates, proteins, fats, vitamins, minerals, and fibre.', a: 'Balanced nutrition', w: 'Balanced nutrition: variety across food groups covers all three macronutrients plus vitamins, minerals, and fibre.' },
+          { s: 'A student gains weight over a term because daily energy intake has stayed above energy used by metabolism and activity.', a: 'Energy balance', w: 'Energy balance: weight changes with energy in versus energy out, and basal metabolism is the largest share of energy out.' },
+          { s: 'A runner drinks regularly through a hot training session instead of waiting until very thirsty, because thirst lags behind need.', a: 'Hydration', w: 'Hydration: thirst lags behind actual need, so regular drinking across the day and during exercise matters.' },
+          { s: 'A sleeper sets an alarm for 7.5 hours after falling asleep so they wake at the end of a sleep cycle rather than from deep sleep.', a: 'Sleep cycles', w: 'Sleep cycles: cycles run about 90 minutes, so 7.5 hours is five whole cycles.' },
+          { s: 'A weekly routine pairs brisk cycling for heart and lung fitness with resistance training for muscle and bone.', a: 'Aerobic vs strength exercise', w: 'Aerobic vs strength exercise: aerobic trains heart and lungs; strength builds muscle and bone density.' },
+          { s: 'A 20-year-old paces a workout at 100–140 beats per minute, which is 50–70% of their estimated maximum of 200.', a: 'Heart-rate zones', w: 'Heart-rate zones: moderate activity is roughly 50–70% of maximum heart rate, estimated as 220 minus age.' },
+          { s: 'After a hard training week, performance improves only once rest days and sleep let the body adapt to the stress.', a: 'Stress and recovery', w: 'Stress and recovery: recovery is what lets the body adapt; without it, training shows diminishing returns.' },
+          { s: 'A shopper checks the serving size first, then calories, sodium, added sugars, fibre, and protein per serving, and reads ingredients in descending weight order.', a: 'Reading a food label', w: 'Reading a food label: every number is per serving, and ingredients are listed heaviest first.' }
+        ];
+        var it = slPick(bank);
+        var opts = ['Balanced nutrition', 'Energy balance', 'Hydration', 'Sleep cycles', 'Aerobic vs strength exercise', 'Heart-rate zones', 'Stress and recovery', 'Reading a food label'];
+        var keep = [it.a];
+        var others = opts.filter(function(o){ return o !== it.a; });
+        while(keep.length < 4) keep.push(others.splice(slR(0, others.length - 1), 1)[0]);
+        var k = slR(0, 3); keep = keep.slice(k).concat(keep.slice(0, k));
+        return { prompt: 'Which idea is this? \u2014 ' + it.s, options: keep, answer: it.a, work: it.w };
+      },
+      function(){
+        var vals = [ { w: 70, h: 1.75, b: 22.9 }, { w: 80, h: 1.8, b: 24.7 }, { w: 60, h: 1.6, b: 23.4 }, { w: 90, h: 1.9, b: 24.9 }, { w: 55, h: 1.65, b: 20.2 } ];
+        var v = vals[slR(0, vals.length - 1)];
+        return { prompt: 'A person weighs ' + v.w + ' kg and is ' + v.h + ' m tall. What is their BMI? (Use BMI = weight / height\u00b2, rounded to 1 decimal.)', answer: v.b, unit: '', work: 'BMI = ' + v.w + ' / (' + v.h + '\u00b2) = ' + v.w + ' / ' + slRound(v.h * v.h, 4) + ' = ' + v.b + '.' };
+      },
+      function(){
+        var ages = [18, 20, 25, 30, 40];
+        var a = ages[slR(0, ages.length - 1)];
+        var mx = 220 - a; var lo = slRound(mx * 0.5, 0); var hi = slRound(mx * 0.7, 0);
+        return { prompt: 'A person is ' + a + ' years old. What is the lower end of their moderate heart-rate zone in beats per minute? (Use maximum \u2248 220 \u2212 age, moderate = 50–70% of maximum.)', answer: lo, unit: 'bpm', work: 'Maximum \u2248 220 \u2212 ' + a + ' = ' + mx + ' bpm; 50% of ' + mx + ' = ' + lo + ' bpm (moderate zone ' + lo + '–' + hi + ' bpm).' };
+      },
+      function(){
+        var cyc = [4, 5, 6];
+        var c = cyc[slR(0, cyc.length - 1)];
+        var mins = c * 90; var hrs = slRound(mins / 60, 1);
+        return { prompt: 'Sleep cycles last about 90 minutes. How many hours of sleep is ' + c + ' whole cycles?', answer: hrs, unit: 'hours', work: c + ' cycles \u00d7 90 minutes = ' + mins + ' minutes = ' + hrs + ' hours.' };
+      }
+    ]
+  },
 };
 
 /* Ask a pack: explanations + analogous examples only. A request carrying
