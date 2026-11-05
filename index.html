@@ -618,6 +618,7 @@ body.lp-plain .pill{font-weight:700}
   #lecLessonBarFill,#quizProgFill{transition:none}
 }
 
+/* v2.45.0 — Learning Science Basics pack */
 /* v2.44.0 — Health Basics pack */
 /* v2.43.0 — Astronomy Basics pack */
 /* v2.42.0 — Look it up + phone layout of the update banner */
@@ -4694,8 +4695,11 @@ ssRefresh();
    fetched with no-store caching: when a newer build ships, an already-open or
    home-screen copy of an older build sees the newer version number there and
    offers "Update now" (a reload onto the new build). */
-var APP_VERSION = '2.44.0';
+var APP_VERSION = '2.45.0';
 var CHANGELOG = [
+ { v:'2.45.0', date:'Nov 5, 2026', notify:true, notes:[
+   'NEW subject pack: Learning Science Basics \u2014 retrieval practice, spaced review, interleaving, Feynman explain-back, worked examples, elaborative interrogation, dual coding, and sleep and consolidation, with which-idea, expanding-interval, study-time-split, and forgetting-curve practice, never your assignment.',
+   'Detector V33 was trained and measured this run but HELD, not shipped: on the permanent frozen probe it caught 13 of 18 humanized texts, exactly the shipped V20\u2019s 13 \u2014 the gate needs an improvement, not a tie \u2014 so V20 stays live until a round genuinely beats it. The round\u2019s marker-balance design (400 real human texts selected for high informal-voice marker density, 41.3 per 1,000 words, labelled human) gained two probe texts and lost two, raised mean probe confidence, held the second probe at 12 of 12, the false-flag rate at 4.34% (below V20\u2019s 4.71%), GPT-5 detection at 92.2%, and neural-paraphrase detection at 53.3%.' ]},
  { v:'2.44.0', date:'Nov 4, 2026', notify:true, notes:[
    'NEW subject pack: Health Basics \u2014 balanced nutrition, energy balance, hydration, sleep cycles, aerobic vs strength exercise, heart-rate zones, stress and recovery, and reading a food label, with which-idea, BMI, heart-rate-zone, and sleep-cycle practice, never your assignment.',
    'Detector V32 was trained and measured this run but HELD, not shipped: on the permanent frozen probe it caught 12 of 18 humanized texts, below the shipped V20\u2019s 13, so V20 stays live until a round genuinely beats it. The round held the second probe at 12 of 12, the false-flag rate at 4.44% (below V20\u2019s 4.71%), GPT-5 detection at 92.2%, and neural-paraphrase detection at 52.2%. A marker-density measurement this run confirmed the confounding: informal-voice markers run 36.5 per 1,000 words in humanized-AI training text vs 12.5 in human-labeled casual text.' ]},
@@ -8705,6 +8709,64 @@ var SL_PACKS = {
       }
     ]
   },
+  learn: {
+    title: 'Learning Science Basics',
+    sources: 'Sources: Dunlosky et al. (2013), Strengthening the Student Toolbox; Roediger & Karpicke (2006); Cepeda et al. (2006) on spaced practice; Brown, Roediger & McDaniel, Make It Stick (2014). General education about study methods — not medical advice.',
+    concepts: [
+      { term: 'Retrieval practice', explain: 'Retrieval practice means pulling information out of memory — self-testing, flashcards, or writing down what you remember — instead of re-reading notes. Testing yourself feels harder than re-reading, but it strengthens the memory far more, because the effort of recalling is what makes the memory stick.' },
+      { term: 'Spaced review', explain: 'Spaced review spreads study of one topic over several sessions with gaps in between, instead of cramming it all at once. Memory fades between sessions, and re-learning it after a gap makes it stronger each time. A common expanding pattern is a review after 1 day, then 3 days, then a week, then two weeks.' },
+      { term: 'Interleaving', explain: 'Interleaving mixes different problem types or topics in one study session instead of doing all of one kind and then all of another. It feels messier, but it trains you to choose the right method for each problem — which is exactly what an exam asks you to do — instead of just repeating one procedure on autopilot.' },
+      { term: 'Feynman explain-back', explain: 'The Feynman technique is explaining a topic in plain, simple words, as if teaching a friend who has never heard of it. Wherever you stumble, hedge, or reach for jargon, you have found a gap in your own understanding — go back to your material for that part, then explain it again until it flows.' },
+      { term: 'Worked examples', explain: 'A worked example is a problem solved step by step, with each step explained. Studying worked examples before trying similar problems yourself is one of the most reliable ways to learn a new procedure: you see what each step does and why, instead of guessing your way through a blank page.' },
+      { term: 'Elaborative interrogation', explain: 'Elaborative interrogation is asking “why is this true?” and “how does this work?” as you study, and answering in your own words. Linking a new fact to something you already know — a cause, a mechanism, an example — gives your memory more than one route back to it.' },
+      { term: 'Dual coding', explain: 'Dual coding pairs words with a picture: a sketch, a diagram, a timeline, or a simple map of the idea. The verbal and visual versions are stored separately, so you get two routes to the same memory instead of one — which is why drawing a process often helps more than re-reading a paragraph about it.' },
+      { term: 'Sleep and consolidation', explain: 'Sleep consolidates what you studied: during deep sleep and dreaming sleep the brain replays and stabilises new memories. Studying and then sleeping beats an all-nighter, because the all-nighter skips the very process that locks the learning in. A short review the next morning works with consolidation instead of against it.' }
+    ],
+    formulas: [
+      { name: 'Expanding review intervals', form: 'Review a topic after 1 day, then 3 days later, then 7 days later, then 14 days later. The gaps grow: 1, 3, 7, 14. The third review lands 1 + 3 + 7 = 11 days after first learning, and the fourth lands 25 days after.', note: 'The exact gaps are a guide, not a law — the point is that reviews spread out over time instead of bunching up the night before.' },
+      { name: 'Study-time split', form: 'Spend about 70% of study time testing yourself (practice questions, flashcards, writing from memory) and 30% re-reading notes. Example: 120 minutes of study = 84 minutes testing + 36 minutes re-reading.', note: 'The 70/30 split is a rule of thumb from testing-effect research: most students do the reverse and spend nearly all their time re-reading.' },
+      { name: 'The 24-hour rule', form: 'Roughly half of new material is forgotten within a day if it is never reviewed. Review within 24 hours of first learning to catch it before the steepest drop — that first review is the highest-value minute of studying you will spend.', note: '“Roughly half” is the classic forgetting-curve estimate (Ebbinghaus): real retention varies by topic and learner, but the shape — a steep early drop, flattened by review — holds.' }
+    ],
+    gens: [
+      function(){
+        var bank = [
+          { s: 'A student closes the textbook and writes down everything they can remember about photosynthesis, then checks what they missed.', a: 'Retrieval practice', w: 'Retrieval practice: pulling the material out of memory (writing what you remember) strengthens it far more than re-reading.' },
+          { s: 'A student reviews new vocabulary after 1 day, then 3 days later, then a week later, instead of studying it all the night before the test.', a: 'Spaced review', w: 'Spaced review: spreading reviews over expanding gaps makes each re-learning stronger than cramming.' },
+          { s: 'A maths student mixes addition, subtraction, and word problems in one session so they must choose the right method for each question.', a: 'Interleaving', w: 'Interleaving: mixing problem types trains you to choose the method, which is what an exam actually tests.' },
+          { s: 'A student explains osmosis in plain words to a friend, gets stuck on why water moves, and goes back to the notes for that one part.', a: 'Feynman explain-back', w: 'Feynman explain-back: explaining in simple words exposes the exact gaps in your understanding.' },
+          { s: 'Before trying problems alone, a student studies a fully solved titration step by step, reading why each step is done.', a: 'Worked examples', w: 'Worked examples: studying a solved problem step by step shows what each step does and why.' },
+          { s: 'While reading about the water cycle, a student keeps asking “why does water evaporate faster on a hot day?” and answers in their own words.', a: 'Elaborative interrogation', w: 'Elaborative interrogation: asking “why?” and “how?” links new facts to what you already know.' },
+          { s: 'A student sketches the carbon cycle as a labelled diagram next to their written notes, so they can recall the picture or the words.', a: 'Dual coding', w: 'Dual coding: pairing words with a sketch gives the brain two routes to the same memory.' },
+          { s: 'A student studies in the evening, sleeps a full night, and reviews briefly in the morning instead of staying up all night before the exam.', a: 'Sleep and consolidation', w: 'Sleep and consolidation: sleep stabilises new memories, so studying then sleeping beats an all-nighter.' }
+        ];
+        var it = slPick(bank);
+        var opts = ['Retrieval practice', 'Spaced review', 'Interleaving', 'Feynman explain-back', 'Worked examples', 'Elaborative interrogation', 'Dual coding', 'Sleep and consolidation'];
+        var keep = [it.a];
+        var others = opts.filter(function(o){ return o !== it.a; });
+        while(keep.length < 4) keep.push(others.splice(slR(0, others.length - 1), 1)[0]);
+        var k = slR(0, 3); keep = keep.slice(k).concat(keep.slice(0, k));
+        return { prompt: 'Which idea is this? \u2014 ' + it.s, options: keep, answer: it.a, work: it.w };
+      },
+      function(){
+        var sets = [ { gaps: [1, 3, 7], day: 11 }, { gaps: [2, 4, 8], day: 14 }, { gaps: [1, 2, 4], day: 7 } ];
+        var s = sets[slR(0, sets.length - 1)];
+        return { prompt: 'Reviews are spaced ' + s.gaps[0] + ' day, then ' + s.gaps[1] + ' days, then ' + s.gaps[2] + ' days after the previous review. How many days after first learning is the third review?', answer: s.day, unit: 'days', work: s.gaps[0] + ' + ' + s.gaps[1] + ' + ' + s.gaps[2] + ' = ' + s.day + ' days after first learning.' };
+      },
+      function(){
+        var mins = [60, 90, 120, 150];
+        var m = mins[slR(0, mins.length - 1)];
+        var test = slRound(m * 0.7, 0);
+        return { prompt: 'You have ' + m + ' minutes to study. About 70% of the time should go to testing yourself (practice questions, flashcards). How many minutes is that?', answer: test, unit: 'minutes', work: '70% of ' + m + ' = 0.7 \u00d7 ' + m + ' = ' + test + ' minutes testing yourself, and ' + (m - test) + ' minutes re-reading.' };
+      },
+      function(){
+        var totals = [40, 60, 80, 100];
+        var t = totals[slR(0, totals.length - 1)];
+        var kept = t / 2;
+        return { prompt: 'Roughly half of new material is forgotten within a day without review. You learn ' + t + ' new terms on Monday and do not review. Roughly how many would you still recall on Tuesday?', answer: kept, unit: 'terms', work: 'About half of ' + t + ' = ' + kept + ' terms. That first review within 24 hours is the highest-value minute of studying.' };
+      }
+    ]
+  },
+
 };
 
 /* Ask a pack: explanations + analogous examples only. A request carrying

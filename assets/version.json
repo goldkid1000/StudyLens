@@ -1,9 +1,9 @@
 {
-  "notes": [
-    "NEW subject pack: Health Basics \u2014 balanced nutrition, energy balance, hydration, sleep cycles, aerobic vs strength exercise, heart-rate zones, stress and recovery, and reading a food label, with which-idea, BMI, heart-rate-zone, and sleep-cycle practice, never your assignment.",
-    "Detector V32 was trained and measured this run but HELD, not shipped: on the permanent frozen probe it caught 12 of 18 humanized texts, below the shipped V20's 13, so V20 stays live until a round genuinely beats it. The round held the second probe at 12 of 12, the false-flag rate at 4.44% (below V20's 4.71%), GPT-5 detection at 92.2%, and neural-paraphrase detection at 52.2%."
-  ],
-  "notify": true,
-  "updated": "2026-11-04",
-  "version": "2.44.0"
+ "notes": [
+  "NEW subject pack: Learning Science Basics — retrieval practice, spaced review, interleaving, Feynman explain-back, worked examples, elaborative interrogation, dual coding, and sleep and consolidation, with which-idea, expanding-interval, study-time-split, and forgetting-curve practice, never your assignment.",
+  "Detector V33 was trained and measured this run but HELD, not shipped: on the permanent frozen probe it caught 13 of 18 humanized texts, exactly the shipped V20's 13 — the gate needs an improvement, not a tie — so V20 stays live until a round genuinely beats it. The round's marker-balance design (400 real human texts selected for high informal-voice marker density, 41.3 per 1,000 words, labelled human) gained two probe texts and lost two, raised mean probe confidence, held the second probe at 12 of 12, the false-flag rate at 4.34% (below V20's 4.71%), GPT-5 detection at 92.2%, and neural-paraphrase detection at 53.3%."
+ ],
+ "notify": true,
+ "updated": "2026-11-05",
+ "version": "2.45.0"
 }
