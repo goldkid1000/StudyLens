@@ -618,6 +618,7 @@ body.lp-plain .pill{font-weight:700}
   #lecLessonBarFill,#quizProgFill{transition:none}
 }
 
+/* v2.46.0 — Calculus Basics pack */
 /* v2.45.0 — Learning Science Basics pack */
 /* v2.44.0 — Health Basics pack */
 /* v2.43.0 — Astronomy Basics pack */
@@ -4695,8 +4696,11 @@ ssRefresh();
    fetched with no-store caching: when a newer build ships, an already-open or
    home-screen copy of an older build sees the newer version number there and
    offers "Update now" (a reload onto the new build). */
-var APP_VERSION = '2.45.0';
+var APP_VERSION = '2.46.0';
 var CHANGELOG = [
+ { v:'2.46.0', date:'Nov 6, 2026', notify:true, notes:[
+   'NEW subject pack: Calculus Basics \u2014 limits, the derivative as a rate of change, the power rule, the chain rule, the product rule, integrals as accumulation, the Fundamental Theorem of Calculus, and optimisation, with which-idea, power-rule, average-rate-of-change, and area-under-a-line practice, never your assignment.',
+   'Detector V34 was trained and measured this run but HELD, not shipped: on the permanent frozen probe it caught 12 of 18 humanized texts, below the shipped V20\u2019s 13, so V20 stays live until a round genuinely beats it. The round\u2019s broader marker-balance design (800 real human texts at humanized-like marker density, now spanning informal and formal writing) gained one probe text and lost two; GPT-5 detection reached 95.1%, the best yet, with the false-flag rate at 4.37% (below V20\u2019s 4.71%), but neural-paraphrase detection slipped to 48.9%.' ]},
  { v:'2.45.0', date:'Nov 5, 2026', notify:true, notes:[
    'NEW subject pack: Learning Science Basics \u2014 retrieval practice, spaced review, interleaving, Feynman explain-back, worked examples, elaborative interrogation, dual coding, and sleep and consolidation, with which-idea, expanding-interval, study-time-split, and forgetting-curve practice, never your assignment.',
    'Detector V33 was trained and measured this run but HELD, not shipped: on the permanent frozen probe it caught 13 of 18 humanized texts, exactly the shipped V20\u2019s 13 \u2014 the gate needs an improvement, not a tie \u2014 so V20 stays live until a round genuinely beats it. The round\u2019s marker-balance design (400 real human texts selected for high informal-voice marker density, 41.3 per 1,000 words, labelled human) gained two probe texts and lost two, raised mean probe confidence, held the second probe at 12 of 12, the false-flag rate at 4.34% (below V20\u2019s 4.71%), GPT-5 detection at 92.2%, and neural-paraphrase detection at 53.3%.' ]},
@@ -8767,6 +8771,58 @@ var SL_PACKS = {
     ]
   },
 
+  calc: {
+    title: 'Calculus Basics',
+    sources: 'Sources: OpenStax Calculus Volume 1; Stewart, Calculus (8th ed.). Explanations are textbook-level summaries.',
+    concepts: [
+      { term: 'Limits', explain: 'A limit is the value a function gets closer and closer to as its input gets closer and closer to some number. For example, 1/x gets closer to 0 as x grows without bound, and (x\u00b2 \u2212 1)/(x \u2212 1) gets closer to 2 as x approaches 1, even though the expression itself is undefined exactly at x = 1. Limits are the foundation everything else in calculus is built on.' },
+      { term: 'The derivative as a rate of change', explain: 'The derivative f\u2032(x) measures how fast f is changing at one instant — the slope of the tangent line to the graph at that point. If f(x) is distance travelled, f\u2032(x) is speed at that moment. It is the limit of the average rate of change as the interval shrinks to zero: f\u2032(x) = lim[h\u21920] (f(x + h) \u2212 f(x)) / h.' },
+      { term: 'The power rule', explain: 'The power rule differentiates powers quickly: d/dx[x\u207f] = n\u00b7x\u207f\u207b\u00b9. Bring the exponent down in front as a multiplier and drop the exponent by one. So d/dx[x\u00b3] = 3x\u00b2, and d/dx[5x\u2074] = 20x\u00b3. It works for any constant exponent n, including fractions and negatives.' },
+      { term: 'The chain rule', explain: 'The chain rule differentiates a function inside another function: if y = f(g(x)), then dy/dx = f\u2032(g(x)) \u00b7 g\u2032(x). Differentiate the outside function, leave the inside alone, then multiply by the derivative of the inside. For sin(x\u00b2) the outside is sine, the inside is x\u00b2, so the derivative is cos(x\u00b2) \u00b7 2x.' },
+      { term: 'The product rule', explain: 'The product rule differentiates a product of two functions: (f\u00b7g)\u2032 = f\u2032\u00b7g + f\u00b7g\u2032. Differentiate the first factor times the second, plus the first times the derivative of the second. For x\u00b2\u00b7e\u02e3 the derivative is 2x\u00b7e\u02e3 + x\u00b2\u00b7e\u02e3 — not just the product of the two derivatives.' },
+      { term: 'Integrals as accumulation', explain: 'A definite integral adds up tiny pieces: \u222b\u2090\u1d47 f(x) dx is the total accumulation of the quantity whose rate is f, and it equals the signed area under the graph of f between a and b. If f is a speed, the integral is distance travelled; if f is a flow rate, the integral is the total volume that flowed. Area below the x-axis counts as negative.' },
+      { term: 'The Fundamental Theorem of Calculus', explain: 'The Fundamental Theorem ties the two halves of calculus together: differentiation and integration undo each other. If F is an antiderivative of f, then \u222b\u2090\u1d47 f(x) dx = F(b) \u2212 F(a) — the area under a rate graph is just the change in the accumulated total. It is why you can find an area by evaluating an antiderivative at two points instead of adding up infinitely many slices.' },
+      { term: 'Optimisation', explain: 'Optimisation finds the biggest or smallest value of a function: where a smooth function reaches a peak or a valley, its tangent is flat, so f\u2032(x) = 0 at those critical points. Solve f\u2032(x) = 0, then check each candidate — by the sign change of f\u2032 around it, or by the second derivative — and compare with the endpoints if the domain is restricted. A farmer fencing a pen, a box of fixed volume, a cheapest container: all are the same move.' }
+    ],
+    formulas: [
+      { name: 'Power rule', form: 'd/dx[x\u207f] = n\u00b7x\u207f\u207b\u00b9', note: 'Example: d/dx[x\u00b3] = 3x\u00b2. With a constant in front, d/dx[a\u00b7x\u207f] = a\u00b7n\u00b7x\u207f\u207b\u00b9 — the constant just rides along.' },
+      { name: 'Average rate of change', form: '(f(b) \u2212 f(a)) / (b \u2212 a)', note: 'The slope of the secant line between two points on the graph. The derivative is what this approaches as b gets closer and closer to a. For f(x) = x\u00b2 the average rate of change from a to b is always a + b.' },
+      { name: 'Fundamental Theorem of Calculus', form: '\u222b\u2090\u1d47 f(x) dx = F(b) \u2212 F(a), where F\u2032 = f', note: 'The area under y = x from 0 to b is b\u00b2/2 — a right triangle with base b and height b, and also the antiderivative x\u00b2/2 evaluated at b minus at 0.' }
+    ],
+    gens: [
+      function(){
+        var bank = [
+          { s: 'A student works out what (x\u00b2 \u2212 1)/(x \u2212 1) approaches as x gets closer and closer to 1, even though the expression is undefined exactly at x = 1.', a: 'Limits', w: 'Limits: the value a function approaches as its input approaches some number — here 2, since (x\u00b2 \u2212 1)/(x \u2212 1) simplifies to x + 1.' },
+          { s: 'A cyclist\u2019s distance is tracked every second; the speedometer reading at one instant is how fast the distance is changing right then, not the average over the whole ride.', a: 'The derivative as a rate of change', w: 'The derivative as a rate of change: f\u2032(x) is the instantaneous rate — the slope of the tangent line, the limit of the average rate as the interval shrinks to zero.' },
+          { s: 'A student differentiates f(x) = 5x\u2074 by bringing the 4 down in front and dropping the power by one, getting 20x\u00b3.', a: 'The power rule', w: 'The power rule: d/dx[a\u00b7x\u207f] = a\u00b7n\u00b7x\u207f\u207b\u00b9, so 5x\u2074 becomes 5 \u00d7 4 x\u00b3 = 20x\u00b3.' },
+          { s: 'To differentiate sin(x\u00b2), a student differentiates the outside sine first, leaves the inside alone, then multiplies by the derivative of x\u00b2.', a: 'The chain rule', w: 'The chain rule: dy/dx = f\u2032(g(x)) \u00b7 g\u2032(x), so sin(x\u00b2) becomes cos(x\u00b2) \u00b7 2x.' },
+          { s: 'A student differentiates x\u00b2\u00b7e\u02e3 by differentiating the first factor times the second, plus the first times the derivative of the second.', a: 'The product rule', w: 'The product rule: (f\u00b7g)\u2032 = f\u2032\u00b7g + f\u00b7g\u2032, so x\u00b2\u00b7e\u02e3 becomes 2x\u00b7e\u02e3 + x\u00b2\u00b7e\u02e3.' },
+          { s: 'A water tank fills at a rate that changes through the day; the total water added is the area under the rate graph.', a: 'Integrals as accumulation', w: 'Integrals as accumulation: the definite integral of a rate is the total accumulated — here, the area under the flow-rate graph.' },
+          { s: 'A student finds the area under f\u2032(x) from 1 to 4 by just computing f(4) \u2212 f(1) — no Riemann sums needed, because the antiderivative does the work.', a: 'The Fundamental Theorem of Calculus', w: 'The Fundamental Theorem: \u222b\u2090\u1d47 f\u2032(x) dx = f(b) \u2212 f(a) — differentiation and integration undo each other.' },
+          { s: 'A farmer with 100 m of fencing wants the biggest rectangular pen; she writes the area as a function of one side, sets its derivative to zero, and checks the sign change.', a: 'Optimisation', w: 'Optimisation: maxima and minima of a smooth function sit where f\u2032(x) = 0 (then check the sign change or second derivative).' }
+        ];
+        var it = slPick(bank);
+        var opts = ['Limits', 'The derivative as a rate of change', 'The power rule', 'The chain rule', 'The product rule', 'Integrals as accumulation', 'The Fundamental Theorem of Calculus', 'Optimisation'];
+        var keep = [it.a];
+        var others = opts.filter(function(o){ return o !== it.a; });
+        while(keep.length < 4) keep.push(others.splice(slR(0, others.length - 1), 1)[0]);
+        var k = slR(0, 3); keep = keep.slice(k).concat(keep.slice(0, k));
+        return { prompt: 'Which idea is this? \u2014 ' + it.s, options: keep, answer: it.a, work: it.w };
+      },
+      function(){
+        var a = slR(2, 9), n = slR(2, 6);
+        return { prompt: 'f(x) = ' + a + 'x^' + n + '. What is the coefficient of x^' + (n - 1) + ' in f\u2032(x)?', answer: a * n, unit: '', work: 'f\u2032(x) = ' + a + ' \u00d7 ' + n + ' x^' + (n - 1) + ' = ' + (a * n) + 'x^' + (n - 1) + ' — the power rule brings the exponent down in front and drops it by one.' };
+      },
+      function(){
+        var a = slR(1, 9), b = a + slR(1, 5);
+        return { prompt: 'For f(x) = x\u00b2, what is the average rate of change from x = ' + a + ' to x = ' + b + '?', answer: a + b, unit: '', work: '(f(' + b + ') \u2212 f(' + a + ')) / (' + b + ' \u2212 ' + a + ') = (' + (b * b) + ' \u2212 ' + (a * a) + ') / ' + (b - a) + ' = ' + (a + b) + '. For x\u00b2 the average rate of change from a to b is always a + b.' };
+      },
+      function(){
+        var b = slPick([4, 6, 8, 10, 12]);
+        return { prompt: 'What is the area under the line y = x from x = 0 to x = ' + b + '?', answer: b * b / 2, unit: '', work: 'The region is a right triangle with base ' + b + ' and height ' + b + ', so area = \u00bd \u00d7 ' + b + ' \u00d7 ' + b + ' = ' + (b * b / 2) + '. (By the Fundamental Theorem, \u222b\u2080^' + b + ' x dx = ' + b + '\u00b2/2 = ' + (b * b / 2) + '.)' };
+      }
+    ]
+  }
 };
 
 /* Ask a pack: explanations + analogous examples only. A request carrying

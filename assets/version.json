@@ -1,9 +1,9 @@
 {
  "notes": [
-  "NEW subject pack: Learning Science Basics — retrieval practice, spaced review, interleaving, Feynman explain-back, worked examples, elaborative interrogation, dual coding, and sleep and consolidation, with which-idea, expanding-interval, study-time-split, and forgetting-curve practice, never your assignment.",
-  "Detector V33 was trained and measured this run but HELD, not shipped: on the permanent frozen probe it caught 13 of 18 humanized texts, exactly the shipped V20's 13 — the gate needs an improvement, not a tie — so V20 stays live until a round genuinely beats it. The round's marker-balance design (400 real human texts selected for high informal-voice marker density, 41.3 per 1,000 words, labelled human) gained two probe texts and lost two, raised mean probe confidence, held the second probe at 12 of 12, the false-flag rate at 4.34% (below V20's 4.71%), GPT-5 detection at 92.2%, and neural-paraphrase detection at 53.3%."
+  "NEW subject pack: Calculus Basics — limits, the derivative as a rate of change, the power rule, the chain rule, the product rule, integrals as accumulation, the Fundamental Theorem of Calculus, and optimisation, with which-idea, power-rule, average-rate-of-change, and area-under-a-line practice, never your assignment.",
+  "Detector V34 was trained and measured this run but HELD, not shipped: on the permanent frozen probe it caught 12 of 18 humanized texts, below the shipped V20's 13 — so V20 stays live until a round genuinely beats it. The round's broader marker-balance design (800 real human texts at humanized-like marker density, now spanning informal and formal writing) gained one probe text and lost two; GPT-5 detection reached 95.1%, the best yet, with the false-flag rate at 4.37% (below V20's 4.71%), but neural-paraphrase detection slipped to 48.9%."
  ],
  "notify": true,
- "updated": "2026-11-05",
- "version": "2.45.0"
+ "updated": "2026-11-06",
+ "version": "2.46.0"
 }
