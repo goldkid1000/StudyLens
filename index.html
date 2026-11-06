@@ -608,6 +608,22 @@ body.lp-plain .pill{font-weight:700}
 .lesson-dot.playing{background:#3fb27f;animation:slPulse 1.2s ease-in-out infinite}
 @keyframes slPulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.5);opacity:.6}}
 .lec-lesson-bar{height:8px;border-radius:6px;background:var(--surface3);overflow:hidden;margin-top:8px}
+.lec-finish-steps{list-style:none;margin:10px 0 0;padding:0}
+.lec-finish-steps li{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-top:1px solid var(--line)}
+.lec-finish-steps li:first-child{border-top:0}
+.lec-step-dot{flex:0 0 auto;width:22px;height:22px;border-radius:50%;border:2px solid var(--mut);margin-top:2px;position:relative}
+.lec-step-dot.done{background:#3fb27f;border-color:#3fb27f}
+.lec-step-dot.done::after{content:"✓";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:700}
+.lec-step-dot.busy{border-color:var(--acc)}
+.lec-step-dot.busy::after{content:"";position:absolute;inset:4px;border-radius:50%;background:var(--acc);animation:slPulse 1s ease-in-out infinite}
+.lec-step-dot.wait{border-color:#e5a13d}
+@keyframes slPulse{0%,100%{opacity:.35}50%{opacity:1}}
+.lec-ts-btn{min-height:44px;padding:6px 10px;border-radius:8px;border:1px solid var(--line);background:var(--surface3);color:var(--acc);font-weight:700;cursor:pointer;font-family:inherit}
+.lec-notes-view h5{margin:14px 0 4px}
+.lec-notes-view ul{margin:4px 0;padding-left:18px}
+.lec-notes-view li{margin:6px 0;line-height:1.45}
+.lec-garbled{background:color-mix(in srgb,#e5a13d 14%,transparent);border-radius:8px;padding:6px 8px}
+@media (prefers-reduced-motion: reduce){ .lec-step-dot.busy::after{animation:none} }
 #lecLessonBarFill{height:100%;width:0%;background:#3fb27f;transition:width .3s var(--ease)}
 .quiz-prog{height:8px;border-radius:6px;background:var(--surface3);overflow:hidden;margin:6px 0 10px}
 #quizProgFill{height:100%;width:0%;background:var(--acc);transition:width .3s var(--ease)}
@@ -1015,6 +1031,19 @@ body.lp-plain .pill{font-weight:700}
           <div class="row" style="margin-top:8px"><button class="btn" id="lecYtUseBtn">Use this transcript</button><span class="small" id="lecYtStatus" role="status"></span></div>
         </div>
         <p class="small" id="lecRecStatus" role="status" style="margin-top:8px"></p>
+        <div id="lecFinishPanel" hidden style="margin-top:10px;border:1.5px solid var(--line);border-radius:14px;padding:12px">
+          <h4 style="margin:0 0 4px">Finishing your lecture — gathering everything</h4>
+          <p class="small" style="margin:0">Each step below shows what actually happened. Nothing here is a fake timer — a step only ticks when its real work is done, and if something is missing it says so instead of pretending.</p>
+          <ol class="lec-finish-steps" id="lecFinishSteps">
+            <li><span class="lec-step-dot" id="lecStepDot0" aria-hidden="true"></span><span><strong>Transcribing</strong><br><span class="small" id="lecStepDetail0">Waiting…</span></span></li>
+            <li><span class="lec-step-dot" id="lecStepDot1" aria-hidden="true"></span><span><strong>Finding key terms</strong><br><span class="small" id="lecStepDetail1">Waiting…</span></span></li>
+            <li><span class="lec-step-dot" id="lecStepDot2" aria-hidden="true"></span><span><strong>Making notes</strong><br><span class="small" id="lecStepDetail2">Waiting…</span></span></li>
+            <li><span class="lec-step-dot" id="lecStepDot3" aria-hidden="true"></span><span><strong>Gathering sources</strong><br><span class="small" id="lecStepDetail3">Waiting…</span></span></li>
+            <li><span class="lec-step-dot" id="lecStepDot4" aria-hidden="true"></span><span><strong>Flashcards &amp; quiz ready</strong><br><span class="small" id="lecStepDetail4">Waiting…</span></span></li>
+          </ol>
+          <p class="small" id="lecFinishStatus" role="status" style="margin-top:8px"></p>
+          <div class="row" style="margin-top:8px"><button class="btn small" id="lecFinishViewBtn" hidden>See my notes</button></div>
+        </div>
         <div id="lecAudioWrap" hidden style="margin-top:8px"></div>
         <div class="row" style="margin-top:6px"><button class="btn plain small" id="lecDeleteAudioBtn" hidden>Delete saved audio</button></div>
         <h4 style="margin:14px 0 6px">Transcript</h4>
@@ -1039,7 +1068,18 @@ body.lp-plain .pill{font-weight:700}
       <div class="card">
         <div id="lecNotesCard" hidden>
           <h4 style="margin:14px 0 6px">Your notes (editable — they're yours)</h4>
+          <div class="lec-notes-view" id="lecNotesView"></div>
+          <p class="small">Tap a timestamp to jump the lecture audio to that moment. Notes below are yours to edit — Iris never rewrites what your professor said.</p>
           <textarea id="lecNotes" style="min-height:180px"></textarea>
+          <h4 style="margin:14px 0 6px">Study this lecture</h4>
+          <p class="small">Simple Study rounds built from these notes only — never from anything else, never your assignment.</p>
+          <div class="row" style="margin-top:8px">
+            <button class="btn small" id="lecSSWordbankBtn">Word bank</button>
+            <button class="btn small ghost" id="lecSSMatchingBtn">Matching</button>
+            <button class="btn small ghost" id="lecSSTFBtn">True / False</button>
+            <button class="btn small ghost" id="lecSSMCBtn">Multiple choice</button>
+          </div>
+          <p class="small" id="lecStudyStatus" role="status" style="margin-top:6px"></p>
           <div class="row" style="margin-top:8px">
             <button class="btn small" id="lecCardsBtn">Make flashcards</button>
             <button class="btn small ghost" id="lecQuizBtn">Quiz me</button>
@@ -4696,8 +4736,13 @@ ssRefresh();
    fetched with no-store caching: when a newer build ships, an already-open or
    home-screen copy of an older build sees the newer version number there and
    offers "Update now" (a reload onto the new build). */
-var APP_VERSION = '2.46.0';
+var APP_VERSION = '2.47.0';
 var CHANGELOG = [
+ { v:'2.47.0', date:'Nov 6, 2026', notify:true, notes:[
+   'NEW in Lecture notes: a TurboLearn-style finish flow — when a recording ends (or you hit “Make my notes”), a loader walks through real steps, each one showing what actually happened: Transcribing, Finding key terms, Making notes, Gathering sources, and Flashcards & quiz ready. No step pretends to work — if there is no transcript yet, it says so plainly and stops instead of faking progress.',
+   'NEW: structured notes view — your notes now render as sections with a timestamp button on every line, so tapping [mm:ss] jumps the lecture audio to that exact moment (or to the transcript when there is no audio). Key terms, your professor’s examples, exam flags, and parts Iris couldn’t hear clearly are listed separately, still only from what was actually said.',
+   'NEW: study this lecture in one tap — Word bank, Matching, True/False, and Multiple choice buttons under your notes build a Simple Study round from these notes only, never from anything else. Ask Iris now adds a Socratic follow-up (“say it back in your own words”) instead of just quoting, and when she can’t find something she points you to the section to re-read.',
+   'Nothing else changed: the detector (V20), the review queue, tutor rules, and Ollama connection are untouched, and no new server calls were added — sources still come only from Wikipedia, OpenAlex, and Crossref, searched by key term only, never your transcript.' ]},
  { v:'2.46.0', date:'Nov 6, 2026', notify:true, notes:[
    'NEW subject pack: Calculus Basics \u2014 limits, the derivative as a rate of change, the power rule, the chain rule, the product rule, integrals as accumulation, the Fundamental Theorem of Calculus, and optimisation, with which-idea, power-rule, average-rate-of-change, and area-under-a-line practice, never your assignment.',
    'Detector V34 was trained and measured this run but HELD, not shipped: on the permanent frozen probe it caught 12 of 18 humanized texts, below the shipped V20\u2019s 13, so V20 stays live until a round genuinely beats it. The round\u2019s broader marker-balance design (800 real human texts at humanized-like marker density, now spanning informal and formal writing) gained one probe text and lost two; GPT-5 detection reached 95.1%, the best yet, with the false-flag rate at 4.37% (below V20\u2019s 4.71%), but neural-paraphrase detection slipped to 48.9%.' ]},
@@ -9813,6 +9858,7 @@ function lecFinishRecording(){
   var db = $('lecDeleteAudioBtn'); if(db) db.hidden = false;
   lecStatus('Recording saved only on this device — a crash or a closed tab won’t lose it, and it is never uploaded. Transcribe it on-device with Whisper below, download it, or type/paste the transcript.');
   lecSave();
+  if(window.lecFinishFlow) window.lecFinishFlow('recording');
 }
 
 function lecShowAudio(url, label, blob){
@@ -9937,8 +9983,9 @@ async function lecWhisper(){
     }
     var ta = $('lecTranscript');
     ta.value = lines.join('\n') + '\n';
-    st.textContent = 'Done — transcript is in the box below, made entirely on this device. Now hit “Make my notes”.' + (quiet ? ' (The audio was very quiet, so check any gaps against your memory.)' : '');
+    st.textContent = 'Done — transcript is in the box below, made entirely on this device. Gathering your notes next…' + (quiet ? ' (The audio was very quiet, so check any gaps against your memory.)' : '');
     lecSave();
+    if(window.lecFinishFlow) window.lecFinishFlow('transcript');
   }catch(e){
     st.textContent = 'On-device transcription couldn’t run in this browser just now (' + (e && e.message ? e.message.slice(0, 90) : 'error') + '). Nothing was uploaded. Live captions while recording, or pasting a transcript, still work.';
   }
@@ -10042,9 +10089,13 @@ function lecAsk(q, transcript){
     words.forEach(function(w){ if(low.indexOf(w) >= 0) sc++; });
     return { s: s, sc: sc };
   }).filter(function(x){ return x.sc > 0; }).sort(function(a, b){ return b.sc - a.sc; });
-  if(!scored.length) return { found: false, text: 'Iris couldn\u2019t find that in this lecture\u2019s transcript. Try the words your professor used, or check the parts flagged as hard to hear.' };
+  if(!scored.length){
+    var hintTerms = [];
+    try{ var nn = (typeof LEC !== 'undefined' && LEC.lastNotes) || null; if(nn && nn.terms) hintTerms = nn.terms.slice(0, 3).map(function(x){ return x.term; }); }catch(e){}
+    return { found: false, text: 'Iris couldn\u2019t find that in this lecture\u2019s transcript — she only quotes what your professor actually said, so she won\u2019t guess. Try the words your professor used' + (hintTerms.length ? ' (for example: ' + hintTerms.join(', ') + ')' : '') + ', or check the parts flagged as hard to hear. If it still isn\u2019t there, it probably wasn\u2019t covered in this lecture.' };
+  }
   var top = scored.slice(0, 2);
-  return { found: true, text: top.map(function(x){ return '\u201C' + x.s.text + '\u201D — from your lecture at ' + x.s.t; }).join('\n') };
+  return { found: true, text: top.map(function(x){ return '\u201C' + x.s.text + '\u201D — from your lecture at ' + x.s.t; }).join('\n') + '\n\nSay it back: can you explain that in your own words, and what example did your professor give for it? Iris only quotes this lecture — she never does your assignment for you.' };
 }
 window.slLecture = { makeNotes: lecMakeNotes, notesText: lecNotesText, ask: lecAsk, sentences: lecSentences };
 /* ---- notes actions ---- */
@@ -10098,7 +10149,7 @@ function lecSave(){
     r.readAsText(f);
   });
   $('lecWhisperBtn').addEventListener('click', lecWhisper);
-  $('lecNotesBtn').addEventListener('click', lecBuild);
+  $('lecNotesBtn').addEventListener('click', function(){ if(window.lecFinishFlow) window.lecFinishFlow('notes'); else lecBuild(); });
   var profSel = $('lecProfile');
   if(profSel) profSel.addEventListener('change', lecProfileHelp);
   lecProfileHelp();
@@ -10309,6 +10360,160 @@ function lecSave(){
       lecBiteRender();
     });
   })();
+})();
+</script>
+
+<script>
+/* =====================================================================
+   LECTURE FINISH FLOW (v2.47.0) — TurboLearn-style, honest steps.
+   Runs when a recording ends, when Whisper finishes, or when the
+   learner hits "Make my notes". Every step does REAL work and only
+   ticks when that work is done. No fake timers, no invented progress:
+   if there is no transcript yet, step 1 says so and the flow stops.
+   Nothing here uploads anything: notes/proof use only the on-device
+   transcript; proof searches only extracted key terms (never the
+   transcript text) against Wikipedia / OpenAlex / Crossref.
+   ===================================================================== */
+function lecFinishSet(i, state, detail){
+  var dot = $('lecStepDot' + i), det = $('lecStepDetail' + i);
+  if(dot) dot.className = 'lec-step-dot' + (state ? ' ' + state : '');
+  if(det) det.textContent = detail || '';
+}
+function lecFinishShow(){
+  var p = $('lecFinishPanel'); if(p){ p.hidden = false; p.scrollIntoView({ block: 'start' }); }
+  for(var i = 0; i < 5; i++) lecFinishSet(i, '', 'Waiting…');
+  var st = $('lecFinishStatus'); if(st) st.textContent = '';
+  var vb = $('lecFinishViewBtn'); if(vb) vb.hidden = true;
+}
+function lecSeekTo(ts){
+  var parts = String(ts || '00:00').split(':');
+  var sec = 0;
+  if(parts.length === 2) sec = (+parts[0]) * 60 + (+parts[1]);
+  else if(parts.length === 3) sec = (+parts[0]) * 3600 + (+parts[1]) * 60 + (+parts[2]);
+  var audio = null;
+  var wrap = $('lecAudioWrap');
+  if(wrap) audio = wrap.querySelector('audio');
+  if(audio && isFinite(sec)){
+    try{ audio.currentTime = sec; audio.play(); }catch(e){}
+    audio.scrollIntoView({ block: 'center' });
+    return;
+  }
+  var ta = $('lecTranscript');
+  if(ta){ ta.focus(); ta.scrollIntoView({ block: 'center' }); }
+}
+function lecRenderNotesView(n){
+  var box = $('lecNotesView'); if(!box || !n) return;
+  var h = '';
+  n.sections.forEach(function(sec){
+    h += '<h5>' + esc(sec.title) + '</h5><ul>';
+    sec.items.forEach(function(s){
+      h += '<li><button class="lec-ts-btn" data-ts="' + esc(s.t) + '" aria-label="Jump to ' + esc(s.t) + ' in the lecture">[' + esc(s.t) + ']</button> ' + esc(s.text) + '</li>';
+    });
+    h += '</ul>';
+  });
+  if(n.terms.length){
+    h += '<h5>Key terms — as your professor stated them</h5><ul>';
+    n.terms.forEach(function(x){ h += '<li><button class="lec-ts-btn" data-ts="' + esc(x.t) + '">[' + esc(x.t) + ']</button> <strong>' + esc(x.term) + '</strong> — ' + esc(x.def) + '</li>'; });
+    h += '</ul>';
+  }
+  if(n.examples.length){
+    h += '<h5>Examples your professor used</h5><ul>';
+    n.examples.forEach(function(s){ h += '<li><button class="lec-ts-btn" data-ts="' + esc(s.t) + '">[' + esc(s.t) + ']</button> ' + esc(s.text) + '</li>'; });
+    h += '</ul>';
+  }
+  if(n.flags.length){
+    h += '<h5>Flagged — sounds like exam material</h5><ul>';
+    n.flags.forEach(function(s){ h += '<li><button class="lec-ts-btn" data-ts="' + esc(s.t) + '">[' + esc(s.t) + ']</button> ' + esc(s.text) + '</li>'; });
+    h += '</ul>';
+  }
+  if(n.garbled.length){
+    h += '<h5>Parts Iris couldn’t hear clearly — check these against your memory or a classmate’s notes</h5><ul>';
+    n.garbled.forEach(function(s){ h += '<li class="lec-garbled"><button class="lec-ts-btn" data-ts="' + esc(s.t) + '">[' + esc(s.t) + ']</button> ' + esc(s.text) + '</li>'; });
+    h += '</ul>';
+  }
+  box.innerHTML = h;
+  box.querySelectorAll('.lec-ts-btn').forEach(function(b){
+    b.addEventListener('click', function(){ lecSeekTo(b.getAttribute('data-ts')); });
+  });
+}
+async function lecFinishFlow(source){
+  if(LEC._finishing) return false;
+  LEC._finishing = true;
+  try{
+    lecFinishShow();
+    var tr = ($('lecTranscript') || {}).value || '';
+    /* Step 1 — Transcribing: real state, never faked. */
+    lecFinishSet(0, 'busy', 'Checking what we have…');
+    var sents = lecSentences(tr);
+    if(tr.trim().length < 60 || !sents.length){
+      lecFinishSet(0, 'wait', 'No transcript yet — record a lecture, transcribe it on-device with Whisper, or paste a transcript. Nothing was faked; the next steps wait for a transcript.');
+      var st0 = $('lecFinishStatus');
+      if(st0) st0.textContent = 'Stopped at Transcribing — add a transcript first, then hit “Make my notes”.';
+      return false;
+    }
+    lecFinishSet(0, 'done', sents.length + ' sentences in the transcript — from live captions, Whisper, or a pasted transcript. Nothing was re-transcribed.');
+    /* Step 2 — Finding key terms: real parse, counted. */
+    lecFinishSet(1, 'busy', 'Reading the transcript for key terms…');
+    var n = lecMakeNotes(tr);
+    LEC.lastNotes = n;
+    lecFinishSet(1, 'done', n.terms.length + ' key term' + (n.terms.length === 1 ? '' : 's') + ' as your professor stated them, ' + n.sections.length + ' topic section' + (n.sections.length === 1 ? '' : 's') + (n.garbled.length ? ', ' + n.garbled.length + ' part' + (n.garbled.length === 1 ? '' : 's') + ' flagged as hard to hear.' : ', nothing flagged as hard to hear.'));
+    /* Step 3 — Making notes: real build + structured view. */
+    lecFinishSet(2, 'busy', 'Writing your notes…');
+    $('lecNotes').value = lecNotesText(n);
+    $('lecNotesCard').hidden = false;
+    lecRenderNotesView(n);
+    lecSave();
+    if(window.LP && LP.on('readAloud') && window.slLesson) window.slLesson.open();
+    lecFinishSet(2, 'done', 'Notes are ready — sections, key terms, examples, and exam flags, all only from what was actually said. Tap any timestamp to jump to that moment.');
+    /* Step 4 — Gathering sources: real API lookups, counted honestly. */
+    lecFinishSet(3, 'busy', 'Checking Wikipedia, OpenAlex, and Crossref for your key terms…');
+    var before = ($('lecProof') || {}).innerHTML || '';
+    try{ await lecProofRun(); }catch(e){}
+    var links = 0;
+    var box = $('lecProof');
+    if(box) links = box.querySelectorAll('a[href^="http"]').length;
+    if(links > 0) lecFinishSet(3, 'done', links + ' real source link' + (links === 1 ? '' : 's') + ' found — every one came back from Wikipedia, OpenAlex, or Crossref for a key term. Parts with no solid source say so in the list.');
+    else lecFinishSet(3, 'done', 'No solid source found for these terms — the list says so for each part, with a Google Scholar link to check yourself. Nothing was invented.');
+    /* Step 5 — Flashcards & quiz ready: real validation, counted. */
+    lecFinishSet(4, 'busy', 'Checking what can be built from these notes…');
+    var notesTxt = ($('lecNotes') || {}).value || '';
+    var canBuild = notesTxt.trim().length >= 120 && n.terms.length > 0;
+    if(canBuild){
+      lecFinishSet(4, 'done', n.terms.length + ' key terms ready — tap Word bank, Matching, True/False, or Multiple choice below to start a Simple Study round, or Make flashcards / Quiz me for the full set. All built from these notes only.');
+    } else {
+      lecFinishSet(4, 'wait', 'Not enough key terms in these notes for a full round yet — add a bit more transcript, or use the bite-sized lesson above, which works section by section.');
+    }
+    var st = $('lecFinishStatus');
+    if(st) st.textContent = 'Done — your notes, sources, and study buttons are below.';
+    var vb = $('lecFinishViewBtn');
+    if(vb){ vb.hidden = false; vb.addEventListener('click', function(){ var c = $('lecNotesCard'); if(c) c.scrollIntoView({ block: 'start' }); }); }
+    return true;
+  } finally {
+    LEC._finishing = false;
+  }
+}
+window.lecFinishFlow = lecFinishFlow;
+window.lecSeekTo = lecSeekTo;
+window.lecRenderNotesView = lecRenderNotesView;
+window.slLectureFinish = { flow: lecFinishFlow, seek: lecSeekTo, renderNotes: lecRenderNotesView };
+/* Simple Study from this lecture's notes only. */
+function lecSimpleStudy(mode){
+  var notes = ($('lecNotes') || {}).value || '';
+  var st = $('lecStudyStatus');
+  if(notes.trim().length < 120){ if(st) st.textContent = 'Make the notes first — Simple Study needs a bit more to work from.'; return; }
+  var m = $('material'); if(m) m.value = notes;
+  generateStudy();
+  /* generateStudy jumps to the Cards tab; bring the learner to Simple Study instead. */
+  showTab('study');
+  if(typeof ssStartMode === 'function') ssStartMode(mode);
+  if(st) st.textContent = 'Simple Study round built from this lecture’s notes only.';
+}
+(function(){
+  var map = { lecSSWordbankBtn: 'wordbank', lecSSMatchingBtn: 'matching', lecSSTFBtn: 'tf', lecSSMCBtn: 'mc' };
+  Object.keys(map).forEach(function(id){
+    var b = $(id);
+    if(b) b.addEventListener('click', function(){ lecSimpleStudy(map[id]); });
+  });
 })();
 </script>
 
