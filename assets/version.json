@@ -1,11 +1,9 @@
 {
  "notes": [
-  "NEW in Lecture notes: a TurboLearn-style finish flow \u2014 when a recording ends (or you hit \u201cMake my notes\u201d), a loader walks through real steps, each one showing what actually happened: Transcribing, Finding key terms, Making notes, Gathering sources, and Flashcards & quiz ready. No step pretends to work \u2014 if there is no transcript yet, it says so plainly and stops instead of faking progress.",
-  "NEW: structured notes view \u2014 your notes now render as sections with a timestamp button on every line, so tapping [mm:ss] jumps the lecture audio to that exact moment (or to the transcript when there is no audio). Key terms, your professor\u2019s examples, exam flags, and parts Iris couldn\u2019t hear clearly are listed separately, still only from what was actually said.",
-  "NEW: study this lecture in one tap \u2014 Word bank, Matching, True/False, and Multiple choice buttons under your notes build a Simple Study round from these notes only, never from anything else. Ask Iris now adds a Socratic follow-up (\u201csay it back in your own words\u201d) instead of just quoting, and when she can\u2019t find something she points you to the section to re-read.",
-  "Nothing else changed: the detector (V20), the review queue, tutor rules, and Ollama connection are untouched, and no new server calls were added \u2014 sources still come only from Wikipedia, OpenAlex, and Crossref, searched by key term only, never your transcript."
+  "NEW subject pack: Literature Basics — close reading, theme, plot and structure, character, imagery and figurative language, symbolism, point of view and narrator, and tone and mood, with which-idea, figurative-device, rhyme-scheme, and stanza line-count practice, never your assignment.",
+  "Detector V35 was trained and measured this run but HELD, not shipped: on the permanent frozen probe it caught 11 of 18 humanized texts, below the shipped V20’s 13, so V20 stays live until a round genuinely beats it. The round’s new 23 stylometric features (sentence rhythm, word length, lexical diversity, pronoun and punctuation rates) separate train-style humanized text well but push the held-out blogger style toward human; main accuracy reached 86.8% (best yet), neural-paraphrase detection improved to 56.5%, and the false-flag rate stayed below V20’s at 4.63%."
  ],
  "notify": true,
- "updated": "2026-11-06",
- "version": "2.47.0"
+ "updated": "2026-11-07",
+ "version": "2.48.0"
 }

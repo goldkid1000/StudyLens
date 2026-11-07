@@ -634,6 +634,7 @@ body.lp-plain .pill{font-weight:700}
   #lecLessonBarFill,#quizProgFill{transition:none}
 }
 
+/* v2.48.0 — Literature Basics pack */
 /* v2.46.0 — Calculus Basics pack */
 /* v2.45.0 — Learning Science Basics pack */
 /* v2.44.0 — Health Basics pack */
@@ -4736,8 +4737,11 @@ ssRefresh();
    fetched with no-store caching: when a newer build ships, an already-open or
    home-screen copy of an older build sees the newer version number there and
    offers "Update now" (a reload onto the new build). */
-var APP_VERSION = '2.47.0';
+var APP_VERSION = '2.48.0';
 var CHANGELOG = [
+ { v:'2.48.0', date:'Nov 7, 2026', notify:true, notes:[
+   'NEW subject pack: Literature Basics \u2014 close reading, theme, plot and structure, character, imagery and figurative language, symbolism, point of view and narrator, and tone and mood, with which-idea, figurative-device, rhyme-scheme, and stanza line-count practice, never your assignment.',
+   'Detector V35 was trained and measured this run but HELD, not shipped: on the permanent frozen probe it caught 11 of 18 humanized texts, below the shipped V20\u2019s 13, so V20 stays live until a round genuinely beats it. The round\u2019s new 23 stylometric features (sentence rhythm, word length, lexical diversity, pronoun and punctuation rates) separate train-style humanized text well but push the held-out blogger style toward human; main accuracy reached 86.8% (best yet), neural-paraphrase detection improved to 56.5%, and the false-flag rate stayed below V20\u2019s at 4.63%.' ]},
  { v:'2.47.0', date:'Nov 6, 2026', notify:true, notes:[
    'NEW in Lecture notes: a TurboLearn-style finish flow — when a recording ends (or you hit “Make my notes”), a loader walks through real steps, each one showing what actually happened: Transcribing, Finding key terms, Making notes, Gathering sources, and Flashcards & quiz ready. No step pretends to work — if there is no transcript yet, it says so plainly and stops instead of faking progress.',
    'NEW: structured notes view — your notes now render as sections with a timestamp button on every line, so tapping [mm:ss] jumps the lecture audio to that exact moment (or to the transcript when there is no audio). Key terms, your professor’s examples, exam flags, and parts Iris couldn’t hear clearly are listed separately, still only from what was actually said.',
@@ -8865,6 +8869,82 @@ var SL_PACKS = {
       function(){
         var b = slPick([4, 6, 8, 10, 12]);
         return { prompt: 'What is the area under the line y = x from x = 0 to x = ' + b + '?', answer: b * b / 2, unit: '', work: 'The region is a right triangle with base ' + b + ' and height ' + b + ', so area = \u00bd \u00d7 ' + b + ' \u00d7 ' + b + ' = ' + (b * b / 2) + '. (By the Fundamental Theorem, \u222b\u2080^' + b + ' x dx = ' + b + '\u00b2/2 = ' + (b * b / 2) + '.)' };
+      }
+    ]
+  },
+  lit: {
+    title: 'Literature Basics',
+    sources: 'Sources: Perrine\u2019s Literature: Structure, Sound, and Sense; The Norton Introduction to Literature. Explanations are textbook-level summaries.',
+    concepts: [
+      { term: 'Close reading', explain: 'Close reading means slowing down and paying attention to exactly what the words on the page do — not what you remember the story being about. Read a passage twice: first for what happens, then for how it is said — the word choices, the order of events, what is repeated, what is left out. A claim about a text is only as strong as the exact words you can point to for it.' },
+      { term: 'Theme', explain: 'A theme is the big idea a work keeps coming back to — love, power, identity, freedom — stated as a complete thought, not a single word. "Love" is a topic; "love asks people to give up control" is a theme. One work usually has several themes, and the same theme can look different in different characters. Find themes by watching what repeats and what changes by the end.' },
+      { term: 'Plot and structure', explain: 'Plot is not just "what happens" — it is the order the writer chose to tell it in, and structure is the shape that order makes. Most stories move through exposition, rising tension, a climax where things turn, falling action, and a resolution — but writers also start in the middle, flash back, or tell the end first. When the order feels odd, ask what the writer gains by telling it that way.' },
+      { term: 'Character', explain: 'Characters are revealed by what they do, what they say, what they think, how others react to them, and how the narrator describes them. A flat character has one or two traits and stays the same; a round character is complex enough to surprise you. A dynamic character changes by the end — and the change, or the refusal to change, is usually the point.' },
+      { term: 'Imagery and figurative language', explain: 'Imagery is language that appeals to the senses — what you can see, hear, smell, taste, or touch in the words. Figurative language says one thing in terms of another: a metaphor says something IS something else ("the city is a furnace"), a simile says it is LIKE something else ("as quiet as snowfall"), and personification gives human qualities to something non-human. Ask what the comparison makes you feel that a plain description would not.' },
+      { term: 'Symbolism', explain: 'A symbol is an object, place, or action that carries a meaning beyond itself — a river can stand for a journey, a locked door for a choice refused. Symbols earn their meaning by repeating and gathering weight through the work; a single mention is usually just a detail. If you think something is symbolic, check whether the story keeps returning to it and whether its meaning deepens each time.' },
+      { term: 'Point of view and narrator', explain: 'Point of view is who is telling the story and how much they can know. A first-person narrator ("I") is inside the story and can be wrong or biased; a third-person limited narrator follows one character\u2019s thoughts; a third-person omniscient narrator knows everyone\u2019s. A narrator who misunderstands what is happening — an unreliable narrator — is a deliberate choice, and noticing it changes everything the story seems to say.' },
+      { term: 'Tone and mood', explain: 'Tone is the writer\u2019s attitude toward the subject — ironic, tender, angry, playful — and mood is the feeling the reader is left with. Tone lives in word choice: calling a house "a cottage" and calling it "a shack" describe the same building with opposite attitudes. When the tone shifts, something in the story has shifted too, and the shift is worth naming.' }
+    ],
+    formulas: [
+      { name: 'Reading a passage closely', form: 'Notice \u2192 pattern \u2192 meaning: what repeats, what changes, what does it mean?', note: 'First list the concrete details you actually see, then look for a pattern among them, then ask what the pattern suggests. Skipping the pattern step is how readings turn into guesses.' },
+      { name: 'STEAL for character', form: 'Speech, Thoughts, Effect on others, Actions, Looks.', note: 'STEAL is a checklist for how writers build a character: what they say, what they think, how others react to them, what they do, and how they look. A claim about a character should rest on at least two of the five.' },
+      { name: 'PEEL paragraph', form: 'Point, Evidence, Explanation, Link.', note: 'One paragraph, one point: state it, quote the evidence, explain how the evidence supports the point, then link back to the question. Evidence without explanation is just a quotation sitting there.' }
+    ],
+    gens: [
+      function(){
+        var bank = [
+          { s: 'A student reads the same paragraph three times, underlining the exact words the writer chose, circling what repeats, and noting what is left unsaid — before deciding what the passage means.', a: 'Close reading', w: 'Close reading: slow down to the words themselves — what is said, how it is said, what repeats, what is left out — and only then build a claim on the exact wording.' },
+          { s: 'After finishing a novel, a student notices that three different characters all give something up for someone else, and writes: "this book argues that love means giving up control."', a: 'Theme', w: 'Theme: a big idea stated as a complete thought, found by watching what repeats and what changes. "Love" is the topic; "love means giving up control" is the theme.' },
+          { s: 'A story opens with the ending — a trial verdict — then jumps back twenty years and works its way forward again, so the reader keeps wondering how it all went wrong.', a: 'Plot and structure', w: 'Plot and structure: the order the writer chose, and the shape it makes. Starting at the end is a structural choice — it changes what the reader watches for.' },
+          { s: 'A character who begins the novel refusing to apologise to anyone slowly learns to say sorry — first to a stranger, then to her sister — and the novel ends with her knocking on her mother\u2019s door.', a: 'Character', w: 'Character: a dynamic character changes, and the change is usually the point. Watch what characters do, say, think, and how others react to them.' },
+          { s: 'A poet describes grief as "a house with the lights left on and nobody home", and the image of the empty lit house keeps returning through the poem.', a: 'Imagery and figurative language', w: 'Imagery and figurative language: a metaphor says grief IS an empty lit house — the comparison carries a feeling a plain description would not.' },
+          { s: 'A river appears every time the hero makes a choice: she crosses it to leave home, wades it to return, and finally stands on its bank and decides not to cross at all.', a: 'Symbolism', w: 'Symbolism: an object that carries meaning beyond itself. The river earns its meaning by repeating and deepening each time it appears.' },
+          { s: 'The story is told by a twelve-year-old who believes his older brother is a hero — but everything the brother actually does in the scenes suggests the opposite.', a: 'Point of view and narrator', w: 'Point of view and narrator: a first-person narrator can be wrong. An unreliable narrator is a deliberate choice, and noticing it changes the story.' },
+          { s: 'The first half of a story describes a village in warm, generous words — "golden fields", "laughter at every table" — then after the fire the same village is "ash", "silence", "empty chairs".', a: 'Tone and mood', w: 'Tone and mood: tone is the writer\u2019s attitude, carried by word choice. When the words turn cold, the tone has shifted — and the shift is worth naming.' }
+        ];
+        var it = slPick(bank);
+        var opts = ['Close reading', 'Theme', 'Plot and structure', 'Character', 'Imagery and figurative language', 'Symbolism', 'Point of view and narrator', 'Tone and mood'];
+        var keep = [it.a];
+        var others = opts.filter(function(o){ return o !== it.a; });
+        while(keep.length < 4) keep.push(others.splice(slR(0, others.length - 1), 1)[0]);
+        var k = slR(0, 3); keep = keep.slice(k).concat(keep.slice(0, k));
+        return { prompt: 'Which idea is this? \u2014 ' + it.s, options: keep, answer: it.a, work: it.w };
+      },
+      function(){
+        var bank = [
+          { line: 'The classroom was a furnace by noon.', a: 'Metaphor', w: 'Metaphor: the classroom IS a furnace — no "like" or "as". The comparison carries the heat and the stuck feeling.' },
+          { line: 'Her voice was as steady as a metronome.', a: 'Simile', w: 'Simile: "as steady as a metronome" — the word "as" marks the comparison. It says her voice is LIKE a metronome.' },
+          { line: 'The old house groaned every time the wind rose.', a: 'Personification', w: 'Personification: a house cannot groan — the writer gives a non-human thing a human action to make it feel alive.' },
+          { line: 'The sea sang softly to the shore all night.', a: 'Personification', w: 'Personification: the sea "sang" — a human action given to something non-human.' },
+          { line: 'The silence was a thick blanket over the whole town.', a: 'Metaphor', w: 'Metaphor: silence IS a thick blanket — no "like" or "as". The image makes the quiet feel heavy and covering.' },
+          { line: 'He ran like a deer startled from the tall grass.', a: 'Simile', w: 'Simile: "like a deer" — the comparison is marked with "like", so it is a simile, not a metaphor.' },
+          { line: 'The stars danced and the moon winked at the travellers.', a: 'Personification', w: 'Personification: stars cannot dance and the moon cannot wink — human actions given to the sky.' },
+          { line: 'Her laughter was music drifting down the hallway.', a: 'Metaphor', w: 'Metaphor: laughter IS music — stated directly, without "like" or "as".' }
+        ];
+        var it = slPick(bank);
+        var opts = ['Metaphor', 'Simile', 'Personification'];
+        var keep = opts.slice();
+        var k = slR(0, 2); keep = keep.slice(k).concat(keep.slice(0, k));
+        return { prompt: 'Which device is at work here? \u2014 "' + it.line + '"', options: keep, answer: it.a, work: it.w };
+      },
+      function(){
+        var schemes = [
+          { lines: ['day', 'light', 'day', 'light'], a: 'ABAB', w: 'ABAB: lines 1 and 3 rhyme with each other (day/day) and lines 2 and 4 rhyme with each other (light/light).' },
+          { lines: ['stone', 'stone', 'rain', 'rain'], a: 'AABB', w: 'AABB: the first two lines rhyme with each other (stone/stone) and the last two rhyme with each other (rain/rain).' },
+          { lines: ['fire', 'gold', 'gold', 'fire'], a: 'ABBA', w: 'ABBA: lines 1 and 4 rhyme (fire/fire) and the middle two rhyme (gold/gold) — an envelope rhyme.' },
+          { lines: ['sea', 'sea', 'sea', 'sea'], a: 'AAAA', w: 'AAAA: all four lines end on the same rhyme (sea/sea/sea/sea).' },
+          { lines: ['night', 'deep', 'night', 'deep'], a: 'ABAB', w: 'ABAB: lines 1 and 3 rhyme (night/night) and lines 2 and 4 rhyme (deep/deep).' },
+          { lines: ['road', 'road', 'home', 'home'], a: 'AABB', w: 'AABB: the first pair rhymes (road/road) and the second pair rhymes (home/home).' }
+        ];
+        var it = slPick(schemes);
+        var opts = ['ABAB', 'AABB', 'ABBA', 'AAAA'];
+        var keep = opts.slice();
+        var k = slR(0, 3); keep = keep.slice(k).concat(keep.slice(0, k));
+        return { prompt: 'Four lines end with these words: ' + it.lines.join(', ') + '. What is the rhyme scheme?', options: keep, answer: it.a, work: it.w };
+      },
+      function(){
+        var n = slR(2, 6);
+        return { prompt: 'A poem is made of ' + n + ' stanzas of 4 lines each. How many lines does the poem have in total?', answer: n * 4, unit: '', work: n + ' stanzas \u00d7 4 lines each = ' + (n * 4) + ' lines. (A stanza is a grouped set of lines — like a paragraph in a poem — and a 4-line stanza is called a quatrain.)' };
       }
     ]
   }
