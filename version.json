@@ -1,9 +1,9 @@
 {
  "notes": [
-  "NEW subject pack: Literature Basics — close reading, theme, plot and structure, character, imagery and figurative language, symbolism, point of view and narrator, and tone and mood, with which-idea, figurative-device, rhyme-scheme, and stanza line-count practice, never your assignment.",
-  "Detector V35 was trained and measured this run but HELD, not shipped: on the permanent frozen probe it caught 11 of 18 humanized texts, below the shipped V20’s 13, so V20 stays live until a round genuinely beats it. The round’s new 23 stylometric features (sentence rhythm, word length, lexical diversity, pronoun and punctuation rates) separate train-style humanized text well but push the held-out blogger style toward human; main accuracy reached 86.8% (best yet), neural-paraphrase detection improved to 56.5%, and the false-flag rate stayed below V20’s at 4.63%."
+  "NEW subject pack: Business Basics — supply and demand, market structures, the marketing mix (4 Ps), forms of business ownership, accounting basics, cash flow vs profit, management functions, and business ethics & social responsibility, with which-idea, break-even, profit, and marketing-mix practice, never your assignment.",
+  "Detector upgraded to V36 — the first detector to pass the ship gate since V20, after 16 straight holds: a stacked stylometric specialist (sentence rhythm, word length, lexical diversity, pronoun and punctuation rates) lifts humanized-AI catch from 13 of 18 to 16 of 18 on the permanent frozen probe, with the false-flag rate at 4.66% (below V20’s 4.71%), GPT-5 detection at 94.1%, and neural-paraphrase detection at 55.4%. The second probe is now 12 of 12. Honest limits: the known human personal-essay false flag is still there (and more confident), and formal-human writing still false-flags more often (17.3% on the HuGPT set) — a score is a signal, never proof."
  ],
  "notify": true,
- "updated": "2026-11-07",
- "version": "2.48.0"
+ "updated": "2026-11-08",
+ "version": "2.49.0"
 }

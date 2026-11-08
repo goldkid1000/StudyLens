@@ -634,6 +634,7 @@ body.lp-plain .pill{font-weight:700}
   #lecLessonBarFill,#quizProgFill{transition:none}
 }
 
+/* v2.49.0 — Business Basics pack */
 /* v2.48.0 — Literature Basics pack */
 /* v2.46.0 — Calculus Basics pack */
 /* v2.45.0 — Learning Science Basics pack */
@@ -1209,7 +1210,7 @@ body.lp-plain .pill{font-weight:700}
           <button class="btn ghost" id="hfBtn">Run Hugging Face scan</button>
           <button class="btn plain small" id="detSampleBtn">Try sample writing</button>
         </div>
-        <p class="small" style="margin-top:8px">Three ways to check: the <strong>on-device check</strong> runs the trained V20 classifier right here in the tab — word + character-pattern TF-IDF models with learned weights, trained on real human-vs-AI writing (HC3 plus modern GPT-4/ChatGPT samples). It's instant, free, needs no key, and nothing is uploaded; its measured accuracy and honest limits are printed next to every score. The <strong>GPTZero scan</strong> and <strong>Hugging Face scan</strong> run other trained models using your own free keys (below). No score from any of them proves authorship — use them to strengthen your own voice.</p>
+        <p class="small" style="margin-top:8px">Three ways to check: the <strong>on-device check</strong> runs the trained V36 classifier right here in the tab — word + character-pattern TF-IDF models with learned weights, trained on real human-vs-AI writing (HC3 plus modern GPT-4/ChatGPT samples). It's instant, free, needs no key, and nothing is uploaded; its measured accuracy and honest limits are printed next to every score. The <strong>GPTZero scan</strong> and <strong>Hugging Face scan</strong> run other trained models using your own free keys (below). No score from any of them proves authorship — use them to strengthen your own voice.</p>
         <details>
           <summary>Free API keys (optional) — which ones work here</summary>
           <div class="inner">
@@ -1255,7 +1256,7 @@ body.lp-plain .pill{font-weight:700}
 
       <div class="card">
         <h3>Batch file scan</h3>
-        <p class="mut">Scan several files at once with the same on-device V20 detector. PDF, DOCX, TXT/MD, and images (read with on-device OCR) are supported — PDFs are also scored page by page where a page has enough text. Files are read right here in this tab; nothing is uploaded. The PDF/DOCX/image readers load from a CDN on first use, like the Screen tab's text reader.</p>
+        <p class="mut">Scan several files at once with the same on-device V36 detector. PDF, DOCX, TXT/MD, and images (read with on-device OCR) are supported — PDFs are also scored page by page where a page has enough text. Files are read right here in this tab; nothing is uploaded. The PDF/DOCX/image readers load from a CDN on first use, like the Screen tab's text reader.</p>
         <div class="row">
           <label class="btn ghost filelabel" for="batchInput">Choose files…</label>
           <input type="file" id="batchInput" accept=".pdf,.docx,.txt,.md,.png,.jpg,.jpeg,.webp,.gif" multiple hidden>
@@ -2609,21 +2610,26 @@ function runHeuristicDetector(){
 }
 /* ---- Trained on-device classifier (two-block TF-IDF + logistic regression) ----
    A real trained model, not scoring rules: learned weights shipped in
-   assets/classifier.json (format studylens-classifier-v20, fetched from this
+   assets/classifier.json (format studylens-classifier-v36, fetched from this
    app's own files on first use). A sentence model scores every sentence from
    two TF-IDF blocks — word uni+bigrams and char_wb 3–5 grams — each
    L2-normalized separately, then concatenated. A document model combines
    whole-document word TF-IDF with 17 aggregates of the sentence scores (the
    11 score aggregates plus 6 distribution features: sentence-length spread,
    mean sentence length, short-sentence share, score spread, lowest score,
-   lowest-3 mean) into
+   lowest-3 mean) plus S_PROB, a stacked stylometric-specialist probability
+   (23 rhythm/style features — sentence-length and word-length shape, lexical
+   diversity, pronoun and punctuation rates — scored by a small logistic
+   regression trained on humanized-AI vs human only; it is one feature among
+   6,018, not a standalone detector) into
    human / ai / mixed probabilities: the doc logits first pass through the
    model file's calibration transform (per-class affine, applied BEFORE
    softmax), and the verdict is MIXED iff calibrated P(mixed) >= t_mixed
    (0.25, read from the model file), else the larger of P(human) / P(ai).
-   Held-out metrics (V18): 86.2% accuracy overall, 4.8% false-flag rate on
-   human writing; 61% catch on a held-out humanized-AI adversarial set
-   (V17 caught 0% there).
+   Held-out metrics (V36): 86.2% accuracy overall, 4.66% false-flag rate on
+   human writing; 89% catch on a held-out humanized-AI adversarial set
+   (V20 caught 72%) — the first detector to pass the ship gate since V20,
+   after 16 straight holds. GPT-5 detection 94.1%.
    This JS inference was verified
    against the Python reference before shipping: 300/300 prediction
    agreement on the held-out verification sample. */
@@ -2635,7 +2641,7 @@ function loadClassifier(){
     if(!r.ok) throw new Error('HTTP ' + r.status);
     return r.json();
   }).then(function(o){
-    if(!o || o.format !== 'studylens-classifier-v20') throw new Error('unexpected model format');
+    if(!o || o.format !== 'studylens-classifier-v36') throw new Error('unexpected model format');
     CLF = o;
     function idxOf(vocab){ var m = new Map(); vocab.forEach(function(v, i){ m.set(v, i); }); return m; }
     CLF_IDX = { sw: idxOf(o.sentence_model.word.vocabulary), sc: idxOf(o.sentence_model.char_wb.vocabulary), doc: idxOf(o.doc_model.vocabulary) };
@@ -2730,6 +2736,118 @@ function v7Aggregates(ps, wordCount, lens){
   return [f50, mean, mx, sd, Math.log1p(n) / 5, Math.log(w) / 10, f80, f20, f80 * f20, fmid, topMean,
     lcv, lmean / 50, shortN / n, qat(0.75) - qat(0.25), sorted[0], botMean];
 }
+/* ---- V36 stylometric features (S23) + stacked specialist probability ----
+   Port of studylens-training/sfeats.js (parity-verified against the Python
+   sfeats.py: max abs diff 1.4e-14 over 47 texts). Renamed v7SFeats* to avoid
+   the app's existing splitSents(), which is a different splitter. The
+   specialist weights live in the model file (doc_model.s_prob): standardize
+   each feature with its mean/std, then the logistic regression. */
+// V35 stylometric features (S23) — JS mirror of sfeats.py.
+// Must produce EXACTLY the same numbers as the Python version on English text.
+// Tokenization is ASCII [a-z] words with an optional apostrophe part, so both
+// sides agree. Sentence splitting mirrors feats18.split_sents.
+const ABBR2 = ['dr', 'mr', 'mrs', 'ms', 'st', 'vs', 'etc', 'e.g', 'i.e', 'u.s', 'u.k'];
+const TOKEN_RE = /[a-z]+(?:'[a-z]+)?/g;
+const VOWEL_RE = /[aeiouy]+/g;
+const CONTRACTION_RE = /'(?:t|re|ve|ll|d|m|s)\b/g;
+const FIRST_PERSON = new Set(['i', 'me', 'my', 'mine', 'we', 'us', 'our', 'ours']);
+const SECOND_PERSON = new Set(['you', 'your', 'yours', 'yourself', 'yourselves']);
+const FUNCTION_WORDS = new Set(('the a an of to in and or but is are was were be been being it its ' +
+  'that this these those with for on as at by from not no he she they we ' +
+  'his her their have has had do does did will would can could should').split(' '));
+
+function v7SFeatsSplitSents(text) {
+  let t = text.replace(/\s+/g, ' ');
+  for (const a of ABBR2) t = t.split(a + '.').join(a + '\x01');
+  const parts = t.split(/(?<=[.!?])\s+/).map(p => p.trim().replace(/\x01/g, '.'));
+  return parts.filter(p => p.split(/\s+/).filter(Boolean).length >= 4);
+}
+
+function v7Syllables(word) {
+  const base = word.split("'")[0];
+  const m = base.match(VOWEL_RE);
+  let n = m ? m.length : 0;
+  if (base.endsWith('e') && n > 1) n -= 1;
+  return Math.max(1, n);
+}
+
+function v7SFeats(text) {
+  const low = text.toLowerCase();
+  const toks = low.match(TOKEN_RE) || [];
+  const n = toks.length;
+  if (n === 0) return new Array(23).fill(0);
+  const w = n;
+
+  const wl = toks.map(t => t.length);
+  const wlMean = wl.reduce((a, b) => a + b, 0) / w;
+  const wlVar = wl.reduce((a, x) => a + (x - wlMean) * (x - wlMean), 0) / w;
+  const wlStd = Math.sqrt(wlVar);
+
+  const counts = new Map();
+  for (const t of toks) counts.set(t, (counts.get(t) || 0) + 1);
+  const ttr = counts.size / w;
+  let hapax = 0;
+  for (const c of counts.values()) if (c === 1) hapax += 1;
+  hapax = hapax / w;
+
+  const sylMean = toks.reduce((a, t) => a + v7Syllables(t), 0) / w;
+
+  const perK = 1000.0 / w;
+  const contr = ((low.match(CONTRACTION_RE) || []).length) * perK;
+  let fp = 0, sp = 0, func = 0;
+  for (const t of toks) {
+    if (FIRST_PERSON.has(t)) fp += 1;
+    if (SECOND_PERSON.has(t)) sp += 1;
+    if (FUNCTION_WORDS.has(t)) func += 1;
+  }
+  fp *= perK; sp *= perK; func /= w;
+  const countChar = (ch) => (low.split(ch).length - 1) * perK;
+  const comma = countChar(',');
+  const semi = countChar(';');
+  const colon = countChar(':');
+  const emdash = ((low.split('\u2014').length - 1) + (low.split('--').length - 1)) * perK;
+  const excl = countChar('!');
+  const quest = countChar('?');
+  const paren = countChar('(');
+  const digit = ((low.match(/\d/g) || []).length) * perK;
+  let caps = 0;
+  for (const t of text.split(/\s+/)) {
+    if (t.length >= 2 && t === t.toUpperCase() && /[A-Z]/.test(t)) caps += 1;
+  }
+  caps *= perK;
+
+  const sents = v7SFeatsSplitSents(text);
+  let med = 0, iqr = 0, gt30 = 0, lt5 = 0;
+  if (sents.length) {
+    const lens = sents.map(s => (s.toLowerCase().match(TOKEN_RE) || []).length).sort((a, b) => a - b);
+    const m = lens.length;
+    med = (m % 2 === 1) ? lens[Math.floor(m / 2)] : (lens[m / 2 - 1] + lens[m / 2]) / 2;
+    const q1 = lens[Math.floor(m / 4)];
+    const q3 = lens[Math.floor((3 * m) / 4)];
+    iqr = q3 - q1;
+    gt30 = lens.filter(x => x > 30).length / m;
+    lt5 = lens.filter(x => x < 5).length / m;
+  }
+
+  const paras = text.split(/\n+/).filter(p => p.trim());
+  let paraLen = w;
+  if (paras.length) {
+    paraLen = paras.reduce((a, p) => a + ((p.toLowerCase().match(TOKEN_RE) || []).length), 0) / paras.length;
+  }
+
+  return [wlMean, wlStd, ttr, hapax, sylMean, contr, fp, sp, func,
+    comma, semi, colon, emdash, excl, quest, paren,
+    med / 50, iqr / 50, gt30, lt5, paraLen / 50,
+    digit, caps];
+}
+function v7SProb(text){
+  var sm = CLF.doc_model.s_prob;
+  if(!sm) return 0;
+  var f = v7SFeats(text);
+  var z = sm.intercept;
+  for(var j = 0; j < f.length; j++) z += sm.coef[j] * (f[j] - sm.mean[j]) / sm.std[j];
+  return 1 / (1 + Math.exp(-z));
+}
 function v7Analyze(text){
   var dm = CLF.doc_model;
   var sents = v7SplitSents(text);
@@ -2740,10 +2858,15 @@ function v7Analyze(text){
   var agg = v7Aggregates(scoring, wc, scoringLens);
   var df = v7WordCounts(text, CLF_IDX.doc), dn = v7Norm(df, dm.idf);
   var V = dm.vocabulary.length;
+  /* V36 stacked feature: the stylometric-specialist probability, the doc
+     model's last coefficient column (index V + 17). Only added when the
+     loaded model file carries s_prob (v36+); older files have no such column. */
+  var sprob = dm.s_prob ? v7SProb(text) : 0;
   var logits = dm.classes.map(function(_, k){
     var row = dm.coef[k], s = dm.intercept[k];
     df.forEach(function(v, c){ s += row[c] * v * dm.idf[c] / dn; });
     for(var j = 0; j < agg.length; j++) s += row[V + j] * agg[j];
+    if(dm.s_prob) s += row[V + agg.length] * sprob;
     return s;
   });
   /* Calibration (from the model file's "calibration" object): per-class
@@ -2789,7 +2912,7 @@ function v7Reasons(sent){
   if(pos.length) out.push('words pushing toward AI: ' + pos.join(', '));
   if(neg.length) out.push('words pushing toward human: ' + neg.join(', '));
   if(!out.length) out.push('few of this sentence\'s words are in the model\'s vocabulary — it leans on character patterns and the document score');
-  out.push('the V20 sentence model also weighs character patterns — word shapes, spacing, and punctuation habits');
+  out.push('the V36 sentence model also weighs character patterns — word shapes, spacing, and punctuation habits');
   return out;
 }
 function clfTips(text, sents){
@@ -2818,7 +2941,7 @@ async function runClassifierDetector(){
   var res = v7Analyze(text);
   var sents = res.sents;
   if(!sents.length){
-    out.innerHTML = '<div class="flagbox">No full sentences found — the V20 model reads complete sentences (4+ words each). Paste a paragraph or two of connected writing.</div>';
+    out.innerHTML = '<div class="flagbox">No full sentences found — the V36 model reads complete sentences (4+ words each). Paste a paragraph or two of connected writing.</div>';
     return;
   }
   var scores = sents.map(function(s, i){
@@ -2830,8 +2953,8 @@ async function runClassifierDetector(){
   var verdict = res.verdict.toUpperCase();
   var confP = res.verdict === 'mixed' ? res.proba.mixed : Math.max(res.proba.human, res.proba.ai);
   var confLabel = confP >= 0.9 ? 'High confidence' : confP >= 0.6 ? 'Medium confidence' : 'Low confidence';
-  renderDetectorResults('Trained on-device model (V20) — ' + pA + '% AI probability · ' + confLabel, pct, verdict, sents, scores.map(function(s){ return s.score; }),
-    'V20, with probabilities calibrated on held-out data: on held-out writing it never trained on, overall accuracy is <strong>86.2%</strong>, GPT-5 detection is <strong>91.7%</strong>, and the false-flag rate on human writing is <strong>4.71%</strong>. V20 was retrained on AI writing rewritten to sound human and catches <strong>72%</strong> of it on a held-out set (V18 caught 61%) — still the hardest call after Mixed, so a Mixed or borderline result means uncertain, not proof. <strong>A score is a signal to review — never proof of who wrote something.</strong>');
+  renderDetectorResults('Trained on-device model (V36) — ' + pA + '% AI probability · ' + confLabel, pct, verdict, sents, scores.map(function(s){ return s.score; }),
+    'V36, with probabilities calibrated on held-out data: on held-out writing it never trained on, overall accuracy is <strong>86.2%</strong>, GPT-5 detection is <strong>94.1%</strong>, and the false-flag rate on human writing is <strong>4.66%</strong>. V36 adds a stacked stylometric specialist and catches <strong>89%</strong> of humanized AI writing on a held-out set (V20 caught 72%) — still the hardest call after Mixed, so a Mixed or borderline result means uncertain, not proof. <strong>A score is a signal to review — never proof of who wrote something.</strong>');
   if(res.verdict === 'uncertain'){
     $('detectOut').insertAdjacentHTML('afterbegin',
       '<div class="flagbox"><strong>Too close to call — no verdict given.</strong> The model is essentially tied between human and AI on this text, so instead of guessing it abstains: on held-out data these coin-flip calls are wrong about half the time. Read the writing yourself and decide; this screen is not evidence either way.</div>');
@@ -4737,8 +4860,11 @@ ssRefresh();
    fetched with no-store caching: when a newer build ships, an already-open or
    home-screen copy of an older build sees the newer version number there and
    offers "Update now" (a reload onto the new build). */
-var APP_VERSION = '2.48.0';
+var APP_VERSION = '2.49.0';
 var CHANGELOG = [
+ { v:'2.49.0', date:'Nov 8, 2026', notify:true, notes:[
+   'NEW subject pack: Business Basics \u2014 supply and demand, market structures, the marketing mix (4 Ps), forms of business ownership, accounting basics, cash flow vs profit, management functions, and business ethics & social responsibility, with which-idea, break-even, profit, and marketing-mix practice, never your assignment.',
+   'Detector upgraded to V36 \u2014 the first detector to pass the ship gate since V20, after 16 straight holds: a stacked stylometric specialist (sentence rhythm, word length, lexical diversity, pronoun and punctuation rates) lifts humanized-AI catch from 13 of 18 to 16 of 18 on the permanent frozen probe, with the false-flag rate at 4.66% (below V20\u2019s 4.71%), GPT-5 detection at 94.1%, and neural-paraphrase detection at 55.4%. The second probe is now 12 of 12. Honest limits: the known human personal-essay false flag is still there (and more confident), and formal-human writing still false-flags more often (17.3% on the HuGPT set) \u2014 a score is a signal, never proof.' ]},
  { v:'2.48.0', date:'Nov 7, 2026', notify:true, notes:[
    'NEW subject pack: Literature Basics \u2014 close reading, theme, plot and structure, character, imagery and figurative language, symbolism, point of view and narrator, and tone and mood, with which-idea, figurative-device, rhyme-scheme, and stanza line-count practice, never your assignment.',
    'Detector V35 was trained and measured this run but HELD, not shipped: on the permanent frozen probe it caught 11 of 18 humanized texts, below the shipped V20\u2019s 13, so V20 stays live until a round genuinely beats it. The round\u2019s new 23 stylometric features (sentence rhythm, word length, lexical diversity, pronoun and punctuation rates) separate train-style humanized text well but push the held-out blogger style toward human; main accuracy reached 86.8% (best yet), neural-paraphrase detection improved to 56.5%, and the false-flag rate stayed below V20\u2019s at 4.63%.' ]},
@@ -5527,7 +5653,7 @@ $('exportCsvBtn').addEventListener('click', exportAnki);
    StudyLens. Essay feedback = pattern checks on the user's OWN writing
    (structure / clarity / mechanical grammar patterns) framed by the chosen
    reviewer's rubric — suggestions only, it never rewrites the draft. Batch
-   scan reuses the trained V20 classifier (v7Analyze) per file and per PDF
+   scan reuses the trained V36 classifier (v7Analyze) per file and per PDF
    page — no new scores are invented. The writing timeline keeps timestamped
    snapshots of the detector box in memory only: never uploaded, gone when
    the tab closes. */
@@ -8945,6 +9071,83 @@ var SL_PACKS = {
       function(){
         var n = slR(2, 6);
         return { prompt: 'A poem is made of ' + n + ' stanzas of 4 lines each. How many lines does the poem have in total?', answer: n * 4, unit: '', work: n + ' stanzas \u00d7 4 lines each = ' + (n * 4) + ' lines. (A stanza is a grouped set of lines — like a paragraph in a poem — and a 4-line stanza is called a quatrain.)' };
+      }
+    ]
+  },
+  biz: {
+    title: 'Business Basics',
+    sources: 'Sources: OpenStax, Introduction to Business (CC BY); OpenStax, Principles of Marketing (CC BY). Explanations are textbook-level summaries.',
+    concepts: [
+      { term: 'Supply and demand', explain: 'Supply and demand is the tug-of-war that sets prices. Demand is how much buyers want at each price; supply is how much sellers will offer at each price. When demand rises and supply stays put, the price tends to rise; when supply floods in, the price tends to fall. The market price is where the two meet — the equilibrium — and anything that shifts either side (a new trend, a shortage, a tax) moves that meeting point.' },
+      { term: 'Market structures', explain: 'A market structure is the shape of competition in an industry. Perfect competition has many small sellers of identical products, so no one sets the price. A monopoly has one seller with no close substitute. An oligopoly has a few big sellers who watch each other closely — airlines, phone carriers. Monopolistic competition has many sellers with slightly different products, like restaurants or clothing brands. The structure decides how much power a firm has over its price.' },
+      { term: 'The marketing mix (4 Ps)', explain: 'The marketing mix is the four levers a firm controls: Product (what you sell and what makes it different), Price (what you charge and what that signals), Place (where and how customers get it), and Promotion (how you tell them about it). A good plan lines all four up — a premium product with a bargain price and no advertising sends a mixed message. Every marketing decision is really a decision about one of the four Ps.' },
+      { term: 'Forms of business ownership', explain: 'A sole proprietorship is one owner, simple to start, but the owner is personally liable for the debts. A partnership splits ownership — and liability — between two or more people. A corporation is a separate legal person: owners (shareholders) have limited liability, but it costs more to set up and faces more rules. An LLC blends the two — limited liability with simpler taxes and paperwork. The right form depends on how much risk, control, and outside money the business needs.' },
+      { term: 'Accounting basics', explain: 'Accounting is the language of business: it records what a business owns, owes, and earns. The balance sheet is a snapshot — assets (what you own), liabilities (what you owe), and owner\u2019s equity (what is left) — tied together by the accounting equation. The income statement covers a period: revenue minus expenses equals profit or loss. The cash-flow statement tracks actual money moving in and out. Together they answer three questions: what do we have, did we make money, and can we pay our bills?' },
+      { term: 'Cash flow vs profit', explain: 'Profit and cash are not the same thing, and confusing them kills businesses. Profit is revenue minus expenses on paper — it counts sales made on credit even before the money arrives, and it subtracts non-cash costs like depreciation. Cash flow is the actual money in the bank. A shop can be profitable on paper and still run out of cash if customers pay late and the rent is due now. That is why lenders and owners watch the cash-flow statement, not just the profit line.' },
+      { term: 'Management functions', explain: 'Management is four jobs that repeat in a loop: planning (setting goals and a path to them), organizing (arranging people, money, and materials), leading (motivating and guiding the team), and controlling (measuring results against the plan and fixing what is off). A manager who plans brilliantly but never checks results is flying blind; one who controls everything but never plans is just reacting. The four functions apply whether the team is three people or three thousand.' },
+      { term: 'Business ethics & social responsibility', explain: 'Business ethics is the line between what is legal and what is right — honest advertising, fair treatment of workers, not cutting corners that hurt customers. Social responsibility goes a step further: a business considering its impact on the community and the environment, not just its shareholders. It is not only about being good — scandals destroy trust and value fast, while a reputation for fairness attracts customers, employees, and investors. The test is simple: would you be comfortable if the decision were on the front page?' }
+    ],
+    formulas: [
+      { name: 'Break-even point', form: 'Break-even units = Fixed costs \u00f7 (Price \u2212 Variable cost per unit)', note: 'Fixed costs (rent, salaries) stay the same no matter how much you sell; variable costs (materials, packaging) grow with each unit. Each sale contributes Price \u2212 Variable cost toward covering the fixed costs. Divide the fixed costs by that contribution and you get the number of units you must sell before the first dollar of profit.' },
+      { name: 'The accounting equation', form: 'Assets = Liabilities + Owner\u2019s equity', note: 'Everything a business owns was paid for either by borrowing (liabilities) or by the owners (equity). The two sides must always balance — every transaction touches at least two accounts, which is why it is called double-entry bookkeeping. If the sides do not balance, a record is wrong somewhere.' },
+      { name: 'SWOT analysis', form: 'Strengths / Weaknesses (inside the firm) \u00d7 Opportunities / Threats (outside it)', note: 'SWOT is a planning grid, not a formula: list what the firm does well and badly (internal), then what the market offers and what endangers it (external). The strategy comes from the combinations — use a strength to seize an opportunity, fix a weakness before a threat hits it. A SWOT with no action attached is just a list.' }
+    ],
+    gens: [
+      function(){
+        var bank = [
+          { s: 'A coffee shop notices that when it raises its latte price by 50 cents, fewer people buy — but when a competitor closes, its line gets longer even at the higher price.', a: 'Supply and demand', w: 'Supply and demand: the price moved buyers, and the competitor closing shifted demand toward this shop. Price is where supply and demand meet.' },
+          { s: 'Three phone carriers dominate a country\u2019s mobile market, and when one cuts its monthly price, the other two match it within days.', a: 'Market structures', w: 'Market structures: a few big sellers watching each other is an oligopoly. In an oligopoly, one firm\u2019s price move forces a response from the rest.' },
+          { s: 'A bakery launches a new sourdough loaf and has to decide its recipe, its price, which shops will stock it, and how to announce it on social media.', a: 'The marketing mix (4 Ps)', w: 'The marketing mix (4 Ps): recipe is Product, the price is Price, the shops are Place, and the announcement is Promotion — all four levers in one launch.' },
+          { s: 'Two friends open a bike-repair shop together and agree in writing how they will split the profits — and that both of them are personally on the hook if the shop owes money.', a: 'Forms of business ownership', w: 'Forms of business ownership: two owners sharing profits and personal liability is a partnership. A corporation or LLC would limit that personal liability.' },
+          { s: 'At the end of the month a shop owner lists everything the shop owns (bikes, tools, cash), everything it owes (a supplier bill, a small loan), and what is left for the owner — and the two sides of the list add up to the same total.', a: 'Accounting basics', w: 'Accounting basics: that list is a balance sheet, and the two sides match because Assets = Liabilities + Owner\u2019s equity. The equation always balances.' },
+          { s: 'A tutoring business shows a $4,000 profit for the month, but its bank balance fell — most students pay by invoice at the end of the term, while rent and wages were due on the 1st.', a: 'Cash flow vs profit', w: 'Cash flow vs profit: the profit is on paper (invoices counted as revenue), but the cash had not arrived when the bills were due. Profitable and short of cash can happen at once.' },
+          { s: 'A restaurant manager sets a goal to cut food waste by 15%, rearranges the kitchen rota, coaches the cooks on portioning, then weighs the waste each week and changes the plan when the numbers stall.', a: 'Management functions', w: 'Management functions: goal (planning), rota (organizing), coaching (leading), weekly weighing and adjusting (controlling) — all four, in a loop.' },
+          { s: 'A clothing brand discovers its supplier uses underpaid labour. Fixing it will cost money, but the owner decides to switch suppliers anyway, saying the brand could not survive the story getting out.', a: 'Business ethics & social responsibility', w: 'Business ethics & social responsibility: the decision weighs what is right against cost, and reputation is part of the math — a scandal destroys trust and value fast.' }
+        ];
+        var it = slPick(bank);
+        var opts = ['Supply and demand', 'Market structures', 'The marketing mix (4 Ps)', 'Forms of business ownership', 'Accounting basics', 'Cash flow vs profit', 'Management functions', 'Business ethics & social responsibility'];
+        var keep = [it.a];
+        var others = opts.filter(function(o){ return o !== it.a; });
+        while(keep.length < 4) keep.push(others.splice(slR(0, others.length - 1), 1)[0]);
+        var k = slR(0, 3); keep = keep.slice(k).concat(keep.slice(0, k));
+        return { prompt: 'Which idea is this? \u2014 ' + it.s, options: keep, answer: it.a, work: it.w };
+      },
+      function(){
+        var units = slPick([50, 60, 80, 100, 120, 150, 200, 250, 300, 400, 500]);
+        var price = slPick([12, 15, 18, 20, 24, 25, 30, 36, 40, 48, 50, 60]);
+        var margin = slPick([4, 5, 6, 8, 10, 12, 15, 20]);
+        if (margin >= price) margin = Math.floor(price / 2);
+        var variable = price - margin;
+        var fixed = units * margin;
+        return { prompt: 'A small business has fixed costs of $' + fixed + ' a month. It sells each unit for $' + price + ' and each unit costs $' + variable + ' to make. How many units must it sell to break even?', answer: units, unit: '', work: 'Each sale contributes $' + price + ' \u2212 $' + variable + ' = $' + margin + ' toward the fixed costs. Break-even units = $' + fixed + ' \u00f7 $' + margin + ' = ' + units + ' units. Sell one more and the business starts making a profit.' };
+      },
+      function(){
+        var units = slPick([40, 60, 80, 100, 120, 150, 200, 250, 300]);
+        var price = slPick([10, 12, 15, 18, 20, 25, 30, 40]);
+        var variable = slPick([3, 4, 5, 6, 8, 10, 12]);
+        if (variable >= price) variable = Math.floor(price / 3);
+        var fixed = slPick([200, 300, 400, 500, 600, 800, 1000, 1200]);
+        var revenue = units * price;
+        var costs = fixed + units * variable;
+        var profit = revenue - costs;
+        return { prompt: 'A stall sells ' + units + ' items at $' + price + ' each. Its fixed costs are $' + fixed + ' and each item costs $' + variable + ' to make. What is its profit in dollars? (Give a negative number if it makes a loss.)', answer: profit, unit: '', work: 'Revenue = ' + units + ' \u00d7 $' + price + ' = $' + revenue + '. Costs = $' + fixed + ' fixed + ' + units + ' \u00d7 $' + variable + ' = $' + costs + '. Profit = $' + revenue + ' \u2212 $' + costs + ' = $' + profit + '.' };
+      },
+      function(){
+        var bank = [
+          { s: 'A jam maker switches from plain glass jars to a wide-mouth jar with a wooden lid, because customers said the old jar was hard to open and looked cheap on the shelf.', a: 'Product', w: 'Product: the jar itself — what the product is and how it is designed and packaged — changed. Price, stockists, and advertising did not.' },
+          { s: 'A gym drops its monthly fee from $60 to $45 for students, hoping the lower price brings in enough new members to make up for the smaller fee.', a: 'Price', w: 'Price: the lever pulled is what customers pay. The service, the location, and the advertising stayed the same.' },
+          { s: 'A local honey brand that only sold at the weekend market signs up three grocery stores, so shoppers can pick it up with their weekly shop instead of waiting for Saturday.', a: 'Place', w: 'Place: where and how customers get the product changed — new stockists, same honey, same price, same advertising.' },
+          { s: 'A bookshop runs a two-week Instagram series showing staff reading their favourite first pages, with a discount code in each post, to pull people into the shop.', a: 'Promotion', w: 'Promotion: the lever is telling people about it — the Instagram series and the discount code. The books, the prices, and the shop itself did not change.' },
+          { s: 'A coffee roaster adds a decaf bean to its range after regulars keep asking for one, keeping the same bags, prices, and shops.', a: 'Product', w: 'Product: the range itself grew — a new bean for a new need. The price, the stockists, and the promotion stayed put.' },
+          { s: 'A cinema offers half-price tickets on Tuesday nights to fill seats that would otherwise sit empty, while weekend prices stay the same.', a: 'Price', w: 'Price: the lever is a time-based price cut to fill empty seats. The films, the cinema, and the advertising did not change.' },
+          { s: 'A plant shop starts selling through a delivery app so customers across town can order without driving over, instead of relying only on walk-in trade.', a: 'Place', w: 'Place: the channel changed — a new way for customers to get the plants. The plants, prices, and social media stayed the same.' },
+          { s: 'A bakery sponsors the local school fair and hands out free mini-muffins with a flyer for its new breakfast box, to get the neighbourhood talking about it.', a: 'Promotion', w: 'Promotion: the lever is getting noticed — sponsorship, samples, and a flyer. The muffins, the prices, and the shop location did not change.' }
+        ];
+        var it = slPick(bank);
+        var opts = ['Product', 'Price', 'Place', 'Promotion'];
+        var keep = opts.slice();
+        var k = slR(0, 3); keep = keep.slice(k).concat(keep.slice(0, k));
+        return { prompt: 'Which P of the marketing mix is this? \u2014 ' + it.s, options: keep, answer: it.a, work: it.w };
       }
     ]
   }
