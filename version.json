@@ -1,9 +1,9 @@
 {
  "notes": [
-  "NEW subject pack: Business Basics — supply and demand, market structures, the marketing mix (4 Ps), forms of business ownership, accounting basics, cash flow vs profit, management functions, and business ethics & social responsibility, with which-idea, break-even, profit, and marketing-mix practice, never your assignment.",
-  "Detector upgraded to V36 — the first detector to pass the ship gate since V20, after 16 straight holds: a stacked stylometric specialist (sentence rhythm, word length, lexical diversity, pronoun and punctuation rates) lifts humanized-AI catch from 13 of 18 to 16 of 18 on the permanent frozen probe, with the false-flag rate at 4.66% (below V20’s 4.71%), GPT-5 detection at 94.1%, and neural-paraphrase detection at 55.4%. The second probe is now 12 of 12. Honest limits: the known human personal-essay false flag is still there (and more confident), and formal-human writing still false-flags more often (17.3% on the HuGPT set) — a score is a signal, never proof."
+  "NEW subject pack: Research Methods Basics — the scientific method, variables (independent, dependent, control), experimental vs observational studies, random sampling vs random assignment, correlation vs causation, validity and reliability, statistical significance and p-values, and ethics in research, with which-idea, variable-ID, correlation-or-causation, and margin-of-error practice, never your assignment.",
+  "Detector V37 was trained and measured this run but HELD, not shipped: on the permanent frozen probe it caught 16 of 18 humanized texts, exactly the shipped V36’s 16 — the gate needs an improvement, not a tie — so V36 stays live until a round genuinely beats it. The round’s new formal-human dense set (200 real arXiv abstracts, human-written scholarly prose) did move the thing it targeted: formal-human false flags on the HuGPT set fell from 17.3% to 15.4%, modern-slice accuracy rose to 98.0%, and the false-flag rate stayed below V36’s at 4.64%. But GPT-5 detection slipped to 91.7% (from 94.1%), and the two probe misses (noise pollution, microplastics in the ocean) only moved closer without flipping."
  ],
  "notify": true,
- "updated": "2026-11-08",
- "version": "2.49.0"
+ "updated": "2026-11-09",
+ "version": "2.50.0"
 }
