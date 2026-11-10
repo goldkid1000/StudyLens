@@ -1,9 +1,9 @@
 {
  "notes": [
-  "NEW subject pack: Research Methods Basics — the scientific method, variables (independent, dependent, control), experimental vs observational studies, random sampling vs random assignment, correlation vs causation, validity and reliability, statistical significance and p-values, and ethics in research, with which-idea, variable-ID, correlation-or-causation, and margin-of-error practice, never your assignment.",
-  "Detector V37 was trained and measured this run but HELD, not shipped: on the permanent frozen probe it caught 16 of 18 humanized texts, exactly the shipped V36’s 16 — the gate needs an improvement, not a tie — so V36 stays live until a round genuinely beats it. The round’s new formal-human dense set (200 real arXiv abstracts, human-written scholarly prose) did move the thing it targeted: formal-human false flags on the HuGPT set fell from 17.3% to 15.4%, modern-slice accuracy rose to 98.0%, and the false-flag rate stayed below V36’s at 4.64%. But GPT-5 detection slipped to 91.7% (from 94.1%), and the two probe misses (noise pollution, microplastics in the ocean) only moved closer without flipping."
+  "NEW subject pack: Engineering Basics — forces and Newton’s laws, stress and strain, Ohm’s law and circuits, energy and power, materials (strength, stiffness, toughness), thermodynamics basics, fluid pressure and flow, and statics and equilibrium, with which-idea, Ohm’s-law, force/pressure, and efficiency practice, never your assignment.",
+  "Detector V38 was trained and measured this run but HELD, not shipped: on the permanent frozen probe it caught 16 of 18 humanized texts, exactly the shipped V36’s 16 — the gate needs an improvement, not a tie — and its human false-flag rate ticked up slightly to 4.74% (from 4.66%), so V36 stays live until a round genuinely beats it. The round did move other things: paraphrase detection rose to 57.6%, modern-slice accuracy to 98.1%, and formal-human false flags fell to 15.9%, but the two probe misses (noise pollution, microplastics in the ocean) barely moved. Next try: giving the specialist that already catches 18 of 18 more weight in the combined model."
  ],
  "notify": true,
- "updated": "2026-11-09",
- "version": "2.50.0"
+ "updated": "2026-11-10",
+ "version": "2.51.0"
 }

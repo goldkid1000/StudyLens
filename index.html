@@ -634,6 +634,7 @@ body.lp-plain .pill{font-weight:700}
   #lecLessonBarFill,#quizProgFill{transition:none}
 }
 
+/* v2.51.0 — Engineering Basics pack */
 /* v2.50.0 — Research Methods Basics pack */
 /* v2.49.0 — Business Basics pack */
 /* v2.48.0 — Literature Basics pack */
@@ -4861,8 +4862,11 @@ ssRefresh();
    fetched with no-store caching: when a newer build ships, an already-open or
    home-screen copy of an older build sees the newer version number there and
    offers "Update now" (a reload onto the new build). */
-var APP_VERSION = '2.50.0';
+var APP_VERSION = '2.51.0';
 var CHANGELOG = [
+ { v:'2.51.0', date:'Nov 10, 2026', notify:true, notes:[
+   'NEW subject pack: Engineering Basics \u2014 forces and Newton\u2019s laws, stress and strain, Ohm\u2019s law and circuits, energy and power, materials (strength, stiffness, toughness), thermodynamics basics, fluid pressure and flow, and statics and equilibrium, with which-idea, Ohm\u2019s-law, force/pressure, and efficiency practice, never your assignment.',
+   'Detector V38 was trained and measured this run but HELD, not shipped: on the permanent frozen probe it caught 16 of 18 humanized texts, exactly the shipped V36\u2019s 16 \u2014 the gate needs an improvement, not a tie \u2014 and its human false-flag rate ticked up slightly to 4.74% (from 4.66%), so V36 stays live until a round genuinely beats it. The round did move other things: paraphrase detection rose to 57.6%, modern-slice accuracy to 98.1%, and formal-human false flags fell to 15.9%, but the two probe misses (noise pollution, microplastics in the ocean) barely moved. Next try: giving the specialist that already catches 18 of 18 more weight in the combined model.' ]},
  { v:'2.50.0', date:'Nov 9, 2026', notify:true, notes:[
    'NEW subject pack: Research Methods Basics \u2014 the scientific method, variables (independent, dependent, control), experimental vs observational studies, random sampling vs random assignment, correlation vs causation, validity and reliability, statistical significance and p-values, and ethics in research, with which-idea, variable-ID, correlation-or-causation, and margin-of-error practice, never your assignment.',
    'Detector V37 was trained and measured this run but HELD, not shipped: on the permanent frozen probe it caught 16 of 18 humanized texts, exactly the shipped V36\u2019s 16 \u2014 the gate needs an improvement, not a tie \u2014 so V36 stays live until a round genuinely beats it. The round\u2019s new formal-human dense set (200 real arXiv abstracts, human-written scholarly prose) did move the thing it targeted: formal-human false flags on the HuGPT set fell from 17.3% to 15.4%, modern-slice accuracy rose to 98.0%, and the false-flag rate stayed below V36\u2019s at 4.64%. But GPT-5 detection slipped to 91.7% (from 94.1%), and the two probe misses (noise pollution, microplastics in the ocean) only moved closer without flipping.' ]},
@@ -9225,6 +9229,81 @@ var SL_PACKS = {
         var n = slPick([100, 400, 625, 1600, 2500]);
         var margin = slRound(100 / Math.sqrt(n), 1);
         return { prompt: 'A poll surveys ' + n + ' randomly chosen people. Roughly what is the margin of error, in percent? (Use margin \u2248 1 \u00f7 \u221an.)', answer: margin, unit: '%', work: 'Margin \u2248 1 \u00f7 \u221a' + n + ' = 1 \u00f7 ' + Math.sqrt(n) + ' = ' + (1 / Math.sqrt(n)).toFixed(3) + ', which is about ' + margin + '%. Note the square root: quadrupling the sample only halves the margin, so shrinking it further gets expensive fast.' };
+      }
+    ]
+  },
+  eng: {
+    title: 'Engineering Basics',
+    sources: 'Sources: OpenStax, University Physics Volume 1 (CC BY); OpenStax, College Physics (CC BY). Explanations are textbook-level summaries.',
+    concepts: [
+      { term: 'Forces and Newton\u2019s laws', explain: 'Everything engineers build has to survive forces, and Newton\u2019s three laws are the rules forces play by. First law: an object keeps doing what it is doing — sitting still or moving steadily — unless a net force acts on it. Second law: force equals mass times acceleration (F = ma), so the same push moves a light object much more than a heavy one. Third law: every push has an equal and opposite push back — the bridge pushes up on the truck exactly as hard as the truck pushes down on the bridge. If you can list every force on a part, you can predict what it will do.' },
+      { term: 'Stress and strain', explain: 'Stress is how hard a material is being pulled or squeezed — force divided by the area it acts on. Strain is how much the material stretches or squashes in response — the change in length divided by the original length. Pull a steel rod gently and it stretches a tiny, predictable amount, then springs back; pull harder past its yield point and it stays stretched; pull harder still and it snaps. Engineers pick materials and sizes so the working stress stays well below the yield stress, with a safety factor to spare.' },
+      { term: 'Ohm\u2019s law and electric circuits', explain: 'Ohm\u2019s law ties the three quantities of a circuit together: voltage equals current times resistance (V = IR). Voltage is the push, current is the flow of charge, and resistance is how hard the circuit is to push through. Double the voltage across the same resistor and the current doubles; double the resistance at the same voltage and the current halves. Every circuit an engineer designs — from a phone charger to a power grid — is an exercise in choosing voltages, currents, and resistances so nothing overheats or starves.' },
+      { term: 'Energy and power', explain: 'Energy is the capacity to do work; power is how fast that work gets done. Lift a weight and you store gravitational potential energy in it; let it fall and that energy becomes motion. A 60-watt bulb uses 60 joules every second — that is what the watt means. Engineers care about both: a battery holds a certain amount of energy (how long it lasts), and a motor delivers a certain power (how hard it can push right now). Confusing the two is how you end up with a device that is strong for ten seconds and dead after that.' },
+      { term: 'Materials: strength, stiffness, toughness', explain: 'Three words engineers never mix up. Strength is how much stress a material can take before it yields or breaks. Stiffness is how much it resists bending or stretching — steel is stiff, rubber is not, even though rubber can be strong in its own way. Toughness is how much energy it can absorb before breaking — a tough material dents and bends, a brittle one shatters. That is why bridges use steel (strong and stiff), car bumpers use plastics that crumple (tough), and windows use glass (stiff, but brittle — handle with care).' },
+      { term: 'Thermodynamics basics: heat, work, efficiency', explain: 'Thermodynamics is the bookkeeping of energy. The first law says energy is never created or destroyed, only moved around or changed form: the fuel energy going into an engine comes out as useful work plus waste heat, never more. The second law says some of that energy always ends up as waste heat — no engine is 100% efficient, ever. Efficiency is simply useful output divided by input, and the gap between 100% and reality is what engineers spend their careers shrinking.' },
+      { term: 'Fluid pressure and flow', explain: 'Pressure in a fluid is force spread over area, and it grows with depth: the deeper you go, the more fluid sits above you pressing down. That is why a dam is thickest at the bottom and why your ears pop underwater. Flow is about volume moving per second, and a narrow pipe makes the same flow move faster — which is why putting your thumb over a hose makes the water jet further. Pumps, pipes, dams, and airplane wings are all pressure-and-flow problems wearing different clothes.' },
+      { term: 'Statics and equilibrium', explain: 'Statics is the study of things that do not move — and making sure they stay that way. A structure in equilibrium has all its forces and all its turning effects (moments) balanced: push up equals push down, clockwise equals counter-clockwise. Engineers draw a free-body diagram — the object alone, with every force on it as an arrow — and check the balance. If the arrows do not balance, something will move, tip, or fall, and the design is wrong. Every bridge, shelf, and chair is a statics problem that passed.' }
+    ],
+    formulas: [
+      { name: 'Ohm\u2019s law', form: 'V = I \u00d7 R', note: 'Voltage equals current times resistance. If you know any two of the three, the third follows: I = V \u00f7 R, R = V \u00f7 I. Units: volts (V), amps (A), ohms (\u03a9). A 12-volt battery across a 4-ohm resistor pushes 3 amps. Engineers use it constantly to check that a circuit draws the current it should — too much current means heat, and heat means failure.' },
+      { name: 'Stress and strain', form: '\u03c3 = F \u00f7 A,  \u03b5 = \u0394L \u00f7 L', note: 'Stress (\u03c3, sigma) is force divided by cross-sectional area; strain (\u03b5, epsilon) is the change in length divided by the original length. Units: stress in pascals (newtons per square metre), strain has no units — it is a ratio. A 1,000-newton pull on a rod with a 10 mm\u00b2 cross-section is 100 MPa of stress. The ratio of stress to strain in the elastic region is Young\u2019s modulus, the material\u2019s stiffness.' },
+      { name: 'Power and efficiency', form: 'P = W \u00f7 t,  efficiency = useful output \u00f7 input \u00d7 100%', note: 'Power is work divided by time — one watt is one joule per second. For electricity, P = V \u00d7 I. Efficiency compares what you got out with what you put in: a motor that takes in 500 W of electricity and delivers 400 W of motion is 80% efficient, and the missing 100 W left as heat. No real machine reaches 100%, and the second law of thermodynamics says none ever will.' }
+    ],
+    gens: [
+      function(){
+        var bank = [
+          { s: 'A crane lifts a 2,000 kg steel beam. The cable pulls up on the beam exactly as hard as gravity pulls down, so the beam hangs steady in the air.', a: 'Forces and Newton\u2019s laws', w: 'Forces and Newton\u2019s laws: the upward pull and the downward weight are equal and opposite (third law), and with no net force the beam stays put (first law). F = ma says any imbalance would accelerate it.' },
+          { s: 'A steel cable holding a sign stretches by 2 mm over its 4 m length. The engineer checks the pull per square millimetre of cable and compares it with the steel\u2019s yield point.', a: 'Stress and strain', w: 'Stress and strain: the pull per area is the stress, the 2 mm stretch over 4 m is the strain. Both must stay below the material\u2019s limits, with a safety factor.' },
+          { s: 'A phone charger takes 5 volts and the cable has a resistance of 2 ohms. The designer works out the current that will flow, because too much current would melt the cable.', a: 'Ohm\u2019s law and electric circuits', w: 'Ohm\u2019s law and electric circuits: current follows V = IR, so 5 V across 2 \u03a9 gives 2.5 A. The designer sizes the cable for that current.' },
+          { s: 'A wind turbine catches the wind for an hour and feeds 3,000 kWh into the grid. The operator reports both how much energy it made and how fast it delivered it at peak wind.', a: 'Energy and power', w: 'Energy and power: the 3,000 kWh is energy (how much), the peak output in kilowatts is power (how fast). Both matter — one for the bill, one for the grid.' },
+          { s: 'A car bumper is made from a plastic that crumples in a crash, soaking up the impact, while the passenger cabin is made from stiff steel that barely bends at all.', a: 'Materials: strength, stiffness, toughness', w: 'Materials: the bumper is tough — it absorbs energy by deforming. The cabin is stiff and strong — it holds its shape. Different jobs, different material properties.' },
+          { s: 'A power plant burns fuel to make electricity. For every 100 units of fuel energy, 35 become electricity and 65 leave as heat up the cooling towers. No redesign has ever made the heat disappear.', a: 'Thermodynamics basics: heat, work, efficiency', w: 'Thermodynamics basics: energy is conserved (first law) — 35 + 65 = 100 — and some waste heat is unavoidable (second law). Efficiency here is 35%.' },
+          { s: 'A dam holds back a reservoir. The wall is thin at the top and much thicker at the base, and the spillway narrows so the same flow of water speeds up as it leaves.', a: 'Fluid pressure and flow', w: 'Fluid pressure and flow: pressure grows with depth, so the base carries the most load and is built thickest. Narrowing the spillway speeds the flow up for the same volume per second.' },
+          { s: 'Before a bookshelf is sold, the designer sketches the shelf alone, draws every force on it as an arrow — the books pushing down, the brackets pushing up — and checks that the ups match the downs and nothing would tip.', a: 'Statics and equilibrium', w: 'Statics and equilibrium: that sketch is a free-body diagram, and the check is equilibrium — forces and moments balanced, so nothing moves. If the arrows did not balance, the shelf would fail.' }
+        ];
+        var it = slPick(bank);
+        var opts = ['Forces and Newton\u2019s laws', 'Stress and strain', 'Ohm\u2019s law and electric circuits', 'Energy and power', 'Materials: strength, stiffness, toughness', 'Thermodynamics basics: heat, work, efficiency', 'Fluid pressure and flow', 'Statics and equilibrium'];
+        var keep = [it.a];
+        var others = opts.filter(function(o){ return o !== it.a; });
+        while(keep.length < 4) keep.push(others.splice(slR(0, others.length - 1), 1)[0]);
+        var k = slR(0, 3); keep = keep.slice(k).concat(keep.slice(0, k));
+        return { prompt: 'Which idea is this? \u2014 ' + it.s, options: keep, answer: it.a, work: it.w };
+      },
+      function(){
+        var kind = slPick(['V', 'I', 'R']);
+        var R = slPick([2, 3, 4, 5, 6, 8, 10, 12, 20]);
+        var I = slPick([2, 3, 4, 5, 6, 10]);
+        var V = I * R;
+        if(kind === 'V') return { prompt: 'A circuit carries ' + I + ' A through a ' + R + ' \u03a9 resistor. What is the voltage across it? (V = I \u00d7 R)', answer: V, unit: 'V', work: 'V = I \u00d7 R = ' + I + ' A \u00d7 ' + R + ' \u03a9 = ' + V + ' V.' };
+        if(kind === 'I') return { prompt: 'A ' + V + ' V battery is connected across a ' + R + ' \u03a9 resistor. What current flows? (I = V \u00f7 R)', answer: I, unit: 'A', work: 'I = V \u00f7 R = ' + V + ' V \u00f7 ' + R + ' \u03a9 = ' + I + ' A.' };
+        return { prompt: 'A ' + V + ' V supply drives ' + I + ' A through a resistor. What is its resistance? (R = V \u00f7 I)', answer: R, unit: '\u03a9', work: 'R = V \u00f7 I = ' + V + ' V \u00f7 ' + I + ' A = ' + R + ' \u03a9.' };
+      },
+      function(){
+        var kind = slPick(['F', 'P']);
+        if(kind === 'F'){
+          var m = slPick([2, 3, 4, 5, 6, 8, 10, 12, 15, 20]);
+          var a = slPick([2, 3, 4, 5, 6, 10]);
+          return { prompt: 'A ' + m + ' kg cart accelerates at ' + a + ' m/s\u00b2. What net force is pushing it? (F = m \u00d7 a)', answer: m * a, unit: 'N', work: 'F = m \u00d7 a = ' + m + ' kg \u00d7 ' + a + ' m/s\u00b2 = ' + (m * a) + ' N. The same push on a heavier cart would accelerate it less — that is Newton\u2019s second law.' };
+        }
+        var F = slPick([120, 200, 240, 360, 480, 600]);
+        var A = slPick([2, 3, 4, 6, 8, 12]);
+        if(F % A !== 0){ F = A * slPick([20, 30, 40, 50, 60, 80, 100]); }
+        return { prompt: 'A force of ' + F + ' N presses on an area of ' + A + ' m\u00b2. What is the pressure? (P = F \u00f7 A)', answer: F / A, unit: 'Pa', work: 'P = F \u00f7 A = ' + F + ' N \u00f7 ' + A + ' m\u00b2 = ' + (F / A) + ' Pa. Spread the same force over a bigger area and the pressure drops — that is why snowshoes work.' };
+      },
+      function(){
+        var kind = slPick(['eff', 'kwh']);
+        if(kind === 'eff'){
+          var out = slPick([200, 300, 400, 500, 600, 700, 800]);
+          var inp = slPick([500, 800, 1000]);
+          if(out >= inp){ out = Math.round(inp * slPick([0.4, 0.5, 0.6, 0.7, 0.8])); }
+          var eff = slRound(out / inp * 100, 1);
+          return { prompt: 'A motor takes in ' + inp + ' W of electricity and delivers ' + out + ' W of motion. What is its efficiency, in percent?', answer: eff, unit: '%', work: 'Efficiency = useful output \u00f7 input \u00d7 100% = ' + out + ' \u00f7 ' + inp + ' \u00d7 100% = ' + eff + '%. The missing ' + (inp - out) + ' W left as waste heat — no real machine reaches 100%.' };
+        }
+        var P = slPick([40, 60, 100, 150, 200, 500, 1000, 2000]);
+        var h = slPick([2, 3, 4, 5, 6, 8, 10]);
+        var kwh = slRound(P * h / 1000, 2);
+        return { prompt: 'A ' + P + ' W appliance runs for ' + h + ' hours. How much energy does it use, in kilowatt-hours?', answer: kwh, unit: 'kWh', work: 'Energy = power \u00d7 time = ' + P + ' W \u00d7 ' + h + ' h = ' + (P * h) + ' Wh = ' + kwh + ' kWh. That is the number your electricity bill charges for.' };
       }
     ]
   }
