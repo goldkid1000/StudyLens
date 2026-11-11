@@ -634,6 +634,7 @@ body.lp-plain .pill{font-weight:700}
   #lecLessonBarFill,#quizProgFill{transition:none}
 }
 
+/* v2.52.0 — Linguistics Basics pack */
 /* v2.51.0 — Engineering Basics pack */
 /* v2.50.0 — Research Methods Basics pack */
 /* v2.49.0 — Business Basics pack */
@@ -4862,8 +4863,11 @@ ssRefresh();
    fetched with no-store caching: when a newer build ships, an already-open or
    home-screen copy of an older build sees the newer version number there and
    offers "Update now" (a reload onto the new build). */
-var APP_VERSION = '2.51.0';
+var APP_VERSION = '2.52.0';
 var CHANGELOG = [
+ { v:'2.52.0', date:'Nov 11, 2026', notify:true, notes:[
+   'NEW subject pack: Linguistics Basics \u2014 phonetics, phonology, morphology, syntax, semantics, pragmatics, language acquisition, and sociolinguistics & language change, with which-idea, morpheme-count, minimal-pair, and syllable-count practice, never your assignment.',
+   'Detector V39 was trained and measured this run but HELD, not shipped: on the permanent frozen probe it caught 16 of 18 humanized texts, exactly the shipped V36\u2019s 16 \u2014 the gate needs an improvement, not a tie \u2014 and its human false-flag rate ticked up slightly to 4.74% (from 4.66%), so V36 stays live until a round genuinely beats it. This round tested the leading idea from last time \u2014 giving the specialist that already catches 18 of 18 more weight \u2014 across 12 variants, and the answer is no: scaling its weight up only trades mixed-class recall for humanized catch, and the unscaled variant won. The two probe misses (noise pollution, microplastics in the ocean) barely moved for the fourth straight round. Next try: a second generator family for the humanized class.' ]},
  { v:'2.51.0', date:'Nov 10, 2026', notify:true, notes:[
    'NEW subject pack: Engineering Basics \u2014 forces and Newton\u2019s laws, stress and strain, Ohm\u2019s law and circuits, energy and power, materials (strength, stiffness, toughness), thermodynamics basics, fluid pressure and flow, and statics and equilibrium, with which-idea, Ohm\u2019s-law, force/pressure, and efficiency practice, never your assignment.',
    'Detector V38 was trained and measured this run but HELD, not shipped: on the permanent frozen probe it caught 16 of 18 humanized texts, exactly the shipped V36\u2019s 16 \u2014 the gate needs an improvement, not a tie \u2014 and its human false-flag rate ticked up slightly to 4.74% (from 4.66%), so V36 stays live until a round genuinely beats it. The round did move other things: paraphrase detection rose to 57.6%, modern-slice accuracy to 98.1%, and formal-human false flags fell to 15.9%, but the two probe misses (noise pollution, microplastics in the ocean) barely moved. Next try: giving the specialist that already catches 18 of 18 more weight in the combined model.' ]},
@@ -9304,6 +9308,117 @@ var SL_PACKS = {
         var h = slPick([2, 3, 4, 5, 6, 8, 10]);
         var kwh = slRound(P * h / 1000, 2);
         return { prompt: 'A ' + P + ' W appliance runs for ' + h + ' hours. How much energy does it use, in kilowatt-hours?', answer: kwh, unit: 'kWh', work: 'Energy = power \u00d7 time = ' + P + ' W \u00d7 ' + h + ' h = ' + (P * h) + ' Wh = ' + kwh + ' kWh. That is the number your electricity bill charges for.' };
+      }
+    ]
+  },
+  ling: {
+    title: 'Linguistics Basics',
+    sources: 'Sources: Language Files, 12th ed. (Ohio State University Press); Fromkin, Rodman & Hyams, An Introduction to Language (Cengage). Explanations are textbook-level summaries.',
+    concepts: [
+      { term: 'Phonetics: the sounds of speech', explain: 'Phonetics is the study of the actual sounds people make when they speak. Every speech sound is produced by shaping the air coming from your lungs: your vocal folds can vibrate (voiced sounds like b, d, z) or stay open (voiceless sounds like p, t, s), and your tongue, lips, and teeth shape the sound further — that is why p and b feel almost the same in your mouth but sound different. Linguists write sounds with the International Phonetic Alphabet (IPA), one symbol per sound, so the same sound is written the same way no matter the language or spelling. English spelling hides this: the letter a stands for different sounds in cat, father, and about, but the IPA gives each its own symbol.' },
+      { term: 'Phonology: sound patterns', explain: 'Phonology is about the patterns sounds follow inside a language — which sounds count as different to its speakers, and where each sound is allowed to appear. English treats p and b as different sounds because pat and bat mean different things; that pair is called a minimal pair, and it proves the two sounds are separate phonemes in English. But the p in pin (with a puff of air) and the p in spin (no puff) are the same phoneme to an English speaker, even though a phonetician can hear the difference — your brain has learned to ignore it. Every language draws these lines differently, which is why sounds that are easy in one language feel impossible in another.' },
+      { term: 'Morphology: word structure', explain: 'Morphology is the study of how words are built from smaller meaningful pieces called morphemes. A morpheme is the smallest unit that carries meaning: cat is one morpheme, cats is two (cat + the plural -s), and unhappiness is three (un- + happy + -ness). Some morphemes stand alone as words (free morphemes like book), others only attach to other pieces (bound morphemes like -ed, -ing, un-, re-). Once you can spot morphemes, unfamiliar words get easier: if you know re- means again and play means play, replay is no mystery, and that same trick works when you meet a new technical word in a textbook.' },
+      { term: 'Syntax: sentence structure', explain: 'Syntax is the set of rules for arranging words into sentences — and every speaker knows far more of it than they can explain. You can tell at once that Dog the bit man the is wrong, even though it uses the same words as The dog bit the man; word order carries meaning. Sentences are built from phrases, not just word strings: in The cat on the mat slept, the cat on the mat is one noun phrase acting as a unit, which is why you can replace the whole thing with it and the sentence still works. Languages differ in their basic order — English is usually subject-verb-object, Japanese is subject-object-verb — but all of them group words into phrases this way.' },
+      { term: 'Semantics: meaning', explain: 'Semantics is the study of meaning itself: what words and sentences mean, and how meanings combine. Some words point at things in the world (dog means a kind of animal); others relate words to each other — a puppy is a kind of dog (hyponymy), hot is the opposite of cold (antonymy), and bank is ambiguous between a river edge and a place that holds money. Sentences carry meaning too: The cat chased the mouse and The mouse was chased by the cat describe the same event, and a sentence like Every student read a book can mean one book shared or a different book each — that is scope ambiguity, and it is a normal part of language, not a mistake.' },
+      { term: 'Pragmatics: meaning in context', explain: 'Pragmatics is about what speakers mean beyond the literal words — meaning in context. When someone says It is cold in here, they usually are not giving a weather report; they are asking you to close the window. That is an indirect speech act: the words ask nothing, but the message is a request. Paul Grice captured the unspoken rules with the cooperative principle: speakers are expected to be truthful, informative, relevant, and clear, and when someone seems to break a rule on purpose — answering Are you coming? with My car is in the shop — the listener works out the implied meaning instead of taking the words literally. Context, not just the dictionary, decides what is meant.' },
+      { term: 'Language acquisition: how children learn language', explain: 'Children learn their first language without lessons, textbooks, or grammar drills — and they do it on a schedule that is strikingly similar across the world. Babies babble, then produce single words around their first birthday, then two-word combinations (more juice), then full sentences with grammar their parents never taught them, like goed instead of went — an overgeneralization that proves they have worked out the rule for -ed and are applying it. By about age five most children command the core grammar of their language. The leading explanation is that children are born with a capacity for language and learn from the speech around them; what varies is which language they hear, not whether they can learn one.' },
+      { term: 'Sociolinguistics and language change', explain: 'Sociolinguistics studies how language varies between people, places, and situations — and how it changes over time. No dialect is broken English: a dialect is simply a variety of a language with its own consistent rules, whether it is spoken in a region, a social group, or a community. Speakers also switch style by situation, speaking more formally in an interview than with friends — that is register. And all living languages change: English once had thee and thou, Shakespeare pronounced night closer to nicht, and new words arrive constantly (selfie, ghost as a verb). Change is normal, not decay; a language that never changed would be a dead one.' }
+    ],
+    formulas: [
+      { name: 'The minimal-pair test', form: 'Two words differ by exactly ONE sound \\u2192 different phonemes', note: 'If changing one sound changes the meaning, the two sounds are separate phonemes in that language. Pat vs bat proves p and b are different phonemes in English; pin vs spin does not prove two p sounds, because the meaning does not change. The test works in any language: find two words that are identical except for one sound, and you have found two phonemes. It is the basic tool phonologists use to map out a language\\u2019s sound system.' },
+      { name: 'Morpheme breakdown', form: 'word = root + affixes  (e.g. un-happi-ness = 3 morphemes)', note: 'Break a word into its smallest meaningful pieces. Free morphemes stand alone (book, happy); bound morphemes attach (un-, -ness, -ed, -s). Count the pieces: unhappiness is three morphemes, cats is two, cat is one. Watch out for spelling changes: happy loses its y when -ness attaches, but the pieces are still there. Breaking words down this way is how you decode unfamiliar vocabulary in any subject.' },
+      { name: 'Grice\\u2019s maxims (the cooperative principle)', form: 'Be truthful \\u00b7 informative \\u00b7 relevant \\u00b7 clear', note: 'Grice\\u2019s four maxims describe what listeners expect from speakers: say what you believe is true (quality), say enough but not too much (quantity), stay on topic (relation), and be orderly and clear (manner). When a speaker openly breaks one — answering Did you like the talk? with Well, the room was nice — the listener does not assume confusion; they infer the speaker means no, politely. That inference is called an implicature, and it is how most of what we really mean gets across.' }
+    ],
+    gens: [
+      function(){
+        var bank = [
+          { s: 'A student notices that the p in pin comes with a little puff of air, but the p in spin does not — yet nobody hears them as different sounds. Her teacher says her brain has filed both under the same unit of her language.', a: 'Phonology: sound patterns', w: 'Phonology: sound patterns: the two p sounds are allophones of one phoneme — the difference is real but never changes meaning in English, so speakers ignore it. Phonetics describes the puff; phonology explains why it does not matter.' },
+          { s: 'A child says I goed to the park yesterday. Her father smiles because the mistake shows she has figured out how past tense works — she just applied the regular rule to an irregular verb.', a: 'Language acquisition: how children learn language', w: 'Language acquisition: goed is an overgeneralization — the child has learned the -ed rule and applies it everywhere, including where adults use the irregular went. It proves she is building grammar from patterns, not just copying words.' },
+          { s: 'Two friends are studying. One says It is freezing in here and looks at the open window. The other gets up and closes it, though nobody asked a question or gave an order.', a: 'Pragmatics: meaning in context', w: 'Pragmatics: meaning in context: the literal words state a fact, but in context they are an indirect request — close the window. Meaning comes from the situation and what speakers expect of each other, not from the dictionary alone.' },
+          { s: 'A reader meets the word unbreakable in a novel and works it out without a dictionary: un- means not, break means break, -able means can be. Three pieces, one meaning.', a: 'Morphology: word structure', w: 'Morphology: word structure: unbreakable is three morphemes — un- + break + -able. Knowing the pieces lets you decode a word you have never seen, which is exactly how morphology helps with textbook vocabulary.' },
+          { s: 'A teacher writes Dog the bit man the on the board and asks the class why it feels wrong, even though it has all the right words. One student says the words are in the wrong order — the doer has to come before the action, and the whole thing has to hang together as phrases.', a: 'Syntax: sentence structure', w: 'Syntax: sentence structure: the words are all there, but their order is wrong — English expects subject-verb-object, and the words have to group into phrases. Word order and phrase structure are what syntax is about, not the sounds or the meanings of the individual words.' },
+          { s: 'A tourist in Tokyo hears a word that sounds like it ends in a vowel every time, even when the spelling suggests otherwise. Her guide explains that in Japanese, syllables follow a strict pattern, so borrowed words get reshaped to fit.', a: 'Phonetics: the sounds of speech', w: 'Phonetics: the sounds of speech: this is about how sounds are actually produced and which sound shapes a language allows. Japanese syllable structure forces extra vowels into borrowed words — a fact about the sounds themselves, before any question of meaning.' },
+          { s: 'A speaker says The dog chased the cat and then The cat was chased by the dog, and points out that both sentences describe the same event — the second one just presents it differently.', a: 'Semantics: meaning', w: 'Semantics: meaning: this is about what sentences mean and how meanings combine. Active and passive versions of the same event share their core meaning; semantics studies those meaning relationships, not the social context.' },
+          { s: 'Two students compare how they talk to their professors versus their friends: longer sentences, no slang, and please and thank you with professors; short sentences and jokes with friends. The words change because the situation changes.', a: 'Sociolinguistics and language change', w: 'Sociolinguistics and language change: switching between formal and casual styles by situation is register — language varying with social context. The same person uses different varieties of the language, and both are rule-governed.' }
+        ];
+        var it = slPick(bank);
+        var opts = ['Phonetics: the sounds of speech', 'Phonology: sound patterns', 'Morphology: word structure', 'Syntax: sentence structure', 'Semantics: meaning', 'Pragmatics: meaning in context', 'Language acquisition: how children learn language', 'Sociolinguistics and language change'];
+        var keep = [it.a];
+        var others = opts.filter(function(o){ return o !== it.a; });
+        while(keep.length < 4) keep.push(others.splice(slR(0, others.length - 1), 1)[0]);
+        var k = slR(0, 3); keep = keep.slice(k).concat(keep.slice(0, k));
+        return { prompt: 'Which idea is this? \u2014 ' + it.s, options: keep, answer: it.a, work: it.w };
+      },
+      function(){
+        var bank = [
+          { w: 'unhappiness', n: 3, parts: 'un- + happy + -ness' },
+          { w: 'replay', n: 2, parts: 're- + play' },
+          { w: 'cats', n: 2, parts: 'cat + -s (plural)' },
+          { w: 'teacher', n: 2, parts: 'teach + -er' },
+          { w: 'walked', n: 2, parts: 'walk + -ed (past tense)' },
+          { w: 'unbreakable', n: 3, parts: 'un- + break + -able' },
+          { w: 'books', n: 2, parts: 'book + -s (plural)' },
+          { w: 'quickly', n: 2, parts: 'quick + -ly' },
+          { w: 'preview', n: 2, parts: 'pre- + view' },
+          { w: 'disagreement', n: 3, parts: 'dis- + agree + -ment' },
+          { w: 'reusable', n: 3, parts: 're- + use + -able' },
+          { w: 'childhood', n: 2, parts: 'child + -hood' },
+          { w: 'darkness', n: 2, parts: 'dark + -ness' },
+          { w: 'impossible', n: 3, parts: 'im- + poss- + -ible' },
+          { w: 'friendship', n: 2, parts: 'friend + -ship' },
+          { w: 'cat', n: 1, parts: 'cat — a single free morpheme' }
+        ];
+        var it = slPick(bank);
+        return { prompt: 'How many morphemes (smallest meaningful pieces) does the word \u2018' + it.w + '\u2019 have?', answer: it.n, unit: '', work: '\u2018' + it.w + '\u2019 breaks down as ' + it.parts + ' — that is ' + it.n + ' morpheme' + (it.n === 1 ? '' : 's') + '. Count the meaningful pieces, not the letters: a long word can have few morphemes, and a short word can have several.' };
+      },
+      function(){
+        var pairs = [
+          { a: 'pat', b: 'bat', min: true },
+          { a: 'cat', b: 'cut', min: true },
+          { a: 'sip', b: 'zip', min: true },
+          { a: 'fan', b: 'van', min: true },
+          { a: 'dog', b: 'dig', min: true },
+          { a: 'pin', b: 'pen', min: true },
+          { a: 'sun', b: 'moon', min: false },
+          { a: 'dog', b: 'cat', min: false },
+          { a: 'red', b: 'blue', min: false },
+          { a: 'book', b: 'pen', min: false },
+          { a: 'tree', b: 'rock', min: false },
+          { a: 'fish', b: 'bird', min: false }
+        ];
+        var good = pairs.filter(function(p){ return p.min; });
+        var bad = pairs.filter(function(p){ return !p.min; });
+        var it = slPick(good);
+        var keep = [it];
+        while(keep.length < 4){
+          var d = slPick(bad);
+          if(keep.indexOf(d) === -1) keep.push(d);
+        }
+        var k = slR(0, 3); keep = keep.slice(k).concat(keep.slice(0, k));
+        var opts = keep.map(function(p){ return p.a + ' / ' + p.b; });
+        return { prompt: 'Which pair is a minimal pair — two words that differ by exactly ONE sound?', options: opts, answer: it.a + ' / ' + it.b, work: '\u2018' + it.a + '\u2019 and \u2018' + it.b + '\u2019 differ by exactly one sound, so they prove the two sounds are separate phonemes. The other pairs differ in two or more sounds, so they cannot be minimal pairs — changing several sounds at once tells you nothing about any single one.' };
+      },
+      function(){
+        var bank = [
+          { w: 'banana', n: 3, parts: 'ba-na-na' },
+          { w: 'computer', n: 3, parts: 'com-pu-ter' },
+          { w: 'linguistics', n: 3, parts: 'lin-guis-tics' },
+          { w: 'cat', n: 1, parts: 'cat' },
+          { w: 'elephant', n: 3, parts: 'el-e-phant' },
+          { w: 'photography', n: 4, parts: 'pho-tog-ra-phy' },
+          { w: 'water', n: 2, parts: 'wa-ter' },
+          { w: 'university', n: 5, parts: 'u-ni-ver-si-ty' },
+          { w: 'dog', n: 1, parts: 'dog' },
+          { w: 'syllable', n: 3, parts: 'syl-la-ble' },
+          { w: 'dictionary', n: 4, parts: 'dic-tion-a-ry' },
+          { w: 'happy', n: 2, parts: 'hap-py' },
+          { w: 'international', n: 5, parts: 'in-ter-na-tion-al' },
+          { w: 'table', n: 2, parts: 'ta-ble' },
+          { w: 'butterfly', n: 3, parts: 'but-ter-fly' },
+          { w: 'pronunciation', n: 5, parts: 'pro-nun-ci-a-tion' }
+        ];
+        var it = slPick(bank);
+        return { prompt: 'How many syllables does the word \u2018' + it.w + '\u2019 have? (Count the beats — one vowel sound per syllable.)', answer: it.n, unit: '', work: '\u2018' + it.w + '\u2019 breaks into ' + it.parts + ' — that is ' + it.n + ' syllable' + (it.n === 1 ? '' : 's') + '. Say it slowly and clap once per beat: each beat has one vowel sound at its centre, which is why syllables matter for phonology and for poetry.' };
       }
     ]
   }

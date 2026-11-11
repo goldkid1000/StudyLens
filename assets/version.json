@@ -1,9 +1,9 @@
 {
  "notes": [
-  "NEW subject pack: Engineering Basics — forces and Newton’s laws, stress and strain, Ohm’s law and circuits, energy and power, materials (strength, stiffness, toughness), thermodynamics basics, fluid pressure and flow, and statics and equilibrium, with which-idea, Ohm’s-law, force/pressure, and efficiency practice, never your assignment.",
-  "Detector V38 was trained and measured this run but HELD, not shipped: on the permanent frozen probe it caught 16 of 18 humanized texts, exactly the shipped V36’s 16 — the gate needs an improvement, not a tie — and its human false-flag rate ticked up slightly to 4.74% (from 4.66%), so V36 stays live until a round genuinely beats it. The round did move other things: paraphrase detection rose to 57.6%, modern-slice accuracy to 98.1%, and formal-human false flags fell to 15.9%, but the two probe misses (noise pollution, microplastics in the ocean) barely moved. Next try: giving the specialist that already catches 18 of 18 more weight in the combined model."
+  "NEW subject pack: Linguistics Basics — phonetics, phonology, morphology, syntax, semantics, pragmatics, language acquisition, and sociolinguistics & language change, with which-idea, morpheme-count, minimal-pair, and syllable-count practice, never your assignment.",
+  "Detector V39 was trained and measured this run but HELD, not shipped: on the permanent frozen probe it caught 16 of 18 humanized texts, exactly the shipped V36’s 16 — the gate needs an improvement, not a tie — and its human false-flag rate ticked up slightly to 4.74% (from 4.66%), so V36 stays live until a round genuinely beats it. This round tested the leading idea from last time — giving the specialist that already catches 18 of 18 more weight — across 12 variants, and the answer is no: scaling its weight up only trades mixed-class recall for humanized catch, and the unscaled variant won. The two probe misses (noise pollution, microplastics in the ocean) barely moved for the fourth straight round. Next try: a second generator family for the humanized class."
  ],
  "notify": true,
- "updated": "2026-11-10",
- "version": "2.51.0"
+ "updated": "2026-11-11",
+ "version": "2.52.0"
 }
