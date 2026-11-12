@@ -634,6 +634,7 @@ body.lp-plain .pill{font-weight:700}
   #lecLessonBarFill,#quizProgFill{transition:none}
 }
 
+/* v2.53.0 — Sports Science Basics pack */
 /* v2.52.0 — Linguistics Basics pack */
 /* v2.51.0 — Engineering Basics pack */
 /* v2.50.0 — Research Methods Basics pack */
@@ -4863,8 +4864,11 @@ ssRefresh();
    fetched with no-store caching: when a newer build ships, an already-open or
    home-screen copy of an older build sees the newer version number there and
    offers "Update now" (a reload onto the new build). */
-var APP_VERSION = '2.52.0';
+var APP_VERSION = '2.53.0';
 var CHANGELOG = [
+ { v:'2.53.0', date:'Nov 12, 2026', notify:true, notes:[
+   'NEW subject pack: Sports Science Basics \u2014 energy systems, muscle fiber types, VO2max, training principles, periodization, heart-rate zones, biomechanics, and recovery & supercompensation, with which-idea, running-pace, Karvonen target-heart-rate, and energy-system practice, never your assignment.',
+   'Detector V40 was trained and measured this run but HELD, not shipped: on the permanent frozen probe it caught 16 of 18 humanized texts, exactly the shipped V36\u2019s 16 \u2014 the gate needs an improvement, not a tie \u2014 and its human false-flag rate ticked up slightly to 4.71% (from 4.66%), so V36 stays live until a round genuinely beats it. This round tested the leading idea from last time \u2014 fresh real human personal and narrative writing from public-domain memoirs, plus humanizer rewrites kept labeled HUMAN \u2014 and the answer is no: the narrative false flag barely moved (the fixed-probe human essay still scores 98.9% AI) and the two probe misses (noise pollution, microplastics in the ocean) barely moved for the fifth straight round. Next try: a second generator family for the humanized class.' ]},
  { v:'2.52.0', date:'Nov 11, 2026', notify:true, notes:[
    'NEW subject pack: Linguistics Basics \u2014 phonetics, phonology, morphology, syntax, semantics, pragmatics, language acquisition, and sociolinguistics & language change, with which-idea, morpheme-count, minimal-pair, and syllable-count practice, never your assignment.',
    'Detector V39 was trained and measured this run but HELD, not shipped: on the permanent frozen probe it caught 16 of 18 humanized texts, exactly the shipped V36\u2019s 16 \u2014 the gate needs an improvement, not a tie \u2014 and its human false-flag rate ticked up slightly to 4.74% (from 4.66%), so V36 stays live until a round genuinely beats it. This round tested the leading idea from last time \u2014 giving the specialist that already catches 18 of 18 more weight \u2014 across 12 variants, and the answer is no: scaling its weight up only trades mixed-class recall for humanized catch, and the unscaled variant won. The two probe misses (noise pollution, microplastics in the ocean) barely moved for the fourth straight round. Next try: a second generator family for the humanized class.' ]},
@@ -9419,6 +9423,78 @@ var SL_PACKS = {
         ];
         var it = slPick(bank);
         return { prompt: 'How many syllables does the word \u2018' + it.w + '\u2019 have? (Count the beats — one vowel sound per syllable.)', answer: it.n, unit: '', work: '\u2018' + it.w + '\u2019 breaks into ' + it.parts + ' — that is ' + it.n + ' syllable' + (it.n === 1 ? '' : 's') + '. Say it slowly and clap once per beat: each beat has one vowel sound at its centre, which is why syllables matter for phonology and for poetry.' };
+      }
+    ]
+  },
+  sport: {
+    title: 'Sports Science Basics',
+    sources: 'Sources: McArdle, Katch & Katch, Exercise Physiology (Wolters Kluwer); Haff & Triplett (eds.), NSCA Essentials of Strength Training and Conditioning; Kenney, Wilmore & Costill, Physiology of Sport and Exercise. Explanations are textbook-level summaries.',
+    concepts: [
+      { term: 'Energy systems: three ways to make ATP', explain: 'Muscles run on ATP, and the body has three ways to make it. The ATP-PC (phosphagen) system covers the first ~10 seconds of all-out effort — a 100 m sprint, a single heavy lift — using stored ATP and phosphocreatine. The glycolytic system takes over from ~10 seconds to ~2 minutes, breaking down glucose without oxygen; it is powerful but produces lactate and hydrogen ions, which is why a 400 m sprint burns. The oxidative (aerobic) system uses oxygen to burn glucose and fat and can run for hours, so it dominates everything longer than ~2 minutes. All three systems are always on; what changes with effort and duration is which one does most of the work.' },
+      { term: 'Muscle fiber types: slow vs fast twitch', explain: 'Muscle fibers come in types, and the mix you are born with shapes what you are good at. Type I (slow-twitch) fibers are fatigue-resistant and built for endurance: they use oxygen well and keep going for hours. Type IIx (fast-twitch) fibers contract hard and fast for power and sprinting but tire in seconds. Type IIa sits in between — fast, but with decent endurance. Sprinters tend to have more fast-twitch fibers, distance runners more slow-twitch. Training can shift Type IIx fibers toward Type IIa, and it can make any fiber stronger, but it does not turn a slow-twitch fiber into a fast-twitch one.' },
+      { term: 'VO2max: the aerobic ceiling', explain: 'VO2max is the maximum rate at which your body can take in and use oxygen during hard exercise, measured in milliliters of oxygen per kilogram of body weight per minute (mL/kg/min). It is the gold-standard measure of aerobic fitness. An untrained young adult is usually around 35–45, a trained college runner around 50–60, and an elite male distance runner 70–85. Training raises VO2max by improving the heart, blood, and muscles — a stronger heart pumps more blood per beat, and trained muscles extract more oxygen from it — but part of the ceiling is genetic, which is why two athletes on the same program can still differ.' },
+      { term: 'Training principles: overload, specificity, reversibility', explain: 'Four principles decide whether training works. Overload: the stress must exceed what the body is used to, or nothing adapts — running the same easy pace forever stops improving fitness. Specificity: the body adapts to exactly what you train, so sprinters sprint and distance runners run long; lifting heavy does not by itself make you faster over 200 m. Progression: overload must rise gradually, a little at a time, or the athlete breaks down instead of adapting. Reversibility: use it or lose it — fitness fades within weeks of stopping, faster for endurance than for strength. Individuality sits underneath all four: the same workout is a different dose for different athletes.' },
+      { term: 'Periodization: planning the training year', explain: 'Periodization is planning training in blocks so an athlete peaks for the meets that matter instead of being tired all year. A macrocycle is the big picture — a season or a year. It is built from mesocycles, blocks of 3–6 weeks with one focus (base endurance, strength, speed, taper), and each mesocycle is built from microcycles, usually one week each. Volume and intensity trade off across the blocks: high volume and lower intensity early, lower volume and higher intensity as the key meet approaches, then a taper — a planned drop in volume — so the athlete arrives fresh. Without a plan, athletes either train hard all the time and burn out, or never train hard enough to improve.' },
+      { term: 'Heart-rate zones: training by intensity', explain: 'Heart-rate zones turn effort into numbers, using a percentage of maximum heart rate. Zone 1 (under ~60%) is recovery — easy walking or a light jog. Zone 2 (60–70%) is the aerobic base: conversational pace where the body burns mostly fat and builds endurance; most of a distance runner\u2019s easy mileage lives here. Zone 3 (70–80%) is tempo pace — comfortably hard. Zone 4 (80–90%) is threshold pace, about the hardest effort you can hold for an hour. Zone 5 (over 90%) is maximal — intervals and the end of a race. The common beginner mistake is doing everything in Zone 3: too hard to recover, too easy to build top-end fitness.' },
+      { term: 'Biomechanics: force and leverage', explain: 'Biomechanics is the physics of movement. Sprint speed comes from two things multiplied together: stride length times stride frequency. Pushing against the ground produces a ground reaction force that drives the runner forward, so stronger, faster ground contact means faster sprinting. Joints work as levers: the elbow is a third-class lever, with the biceps pulling between the elbow joint (fulcrum) and the hand (load) — that arrangement trades force for range and speed, which is why the arm can move fast but cannot lift as much as the legs. Coaches use this to spot wasted motion: a sprinter who bounces up and down is spending force vertically instead of horizontally.' },
+      { term: 'Recovery and supercompensation', explain: 'Training does not make you stronger — recovering from training does. A hard session breaks the body down: muscles are damaged, energy stores are drained, and the nervous system is tired. During recovery the body rebuilds a little stronger than before, a rise called supercompensation. That is why rest days, sleep, and food are part of training, not time off from it: train again too soon and you interrupt the rebuild; wait too long and the gain fades back to baseline. The art of coaching is timing the next hard session to land on the supercompensation peak — hard enough to keep improving, spaced enough to actually recover.' }
+    ],
+    formulas: [
+      { name: 'Estimated maximum heart rate (Tanaka)', form: 'HRmax = 208 \u2212 0.7 \u00D7 age', note: 'The Tanaka formula is the current best simple estimate: a 20-year-old is about 208 \u2212 14 = 194 beats per minute. The older 220 \u2212 age rule gives 200 for the same athlete — close, but Tanaka fits measured data better, especially for older adults. Either way it is an estimate: real maximum heart rates vary by about \u00B110 beats per minute between people of the same age, so zones built from it are starting points, not exact lines.' },
+      { name: 'Karvonen target heart rate', form: 'Target HR = (HRmax \u2212 HRrest) \u00D7 intensity + HRrest', note: 'Karvonen uses heart-rate reserve — the gap between resting and maximum heart rate — so the target fits the individual, not just the age. Example: HRmax 194, resting HR 54, training at 70% intensity gives (194 \u2212 54) \u00D7 0.70 + 54 = 152 beats per minute. Two athletes with the same age but different resting heart rates get different targets, which is the point: a fitter heart rests lower and has more reserve to work with.' },
+      { name: 'Running pace', form: 'pace = total time \u00F7 distance', note: 'Pace is time per unit of distance — seconds per 400 m on a track, or minutes per kilometer on the road. A 1600 m run in 6 minutes 40 seconds (400 s) is 400 \u00F7 4 laps = 100 seconds per 400 m, or 1:40 per lap. Coaches use even splits — the same pace every lap — because a race run evenly is almost always faster than one that starts too fast and fades.' }
+    ],
+    gens: [
+      function(){
+        var bank = [
+          { s: 'A sprinter runs the 100 m in 10.5 seconds. Her coach says almost all of that effort came from stored ATP and phosphocreatine, because the race is over before the other systems can take over.', a: 'Energy systems: three ways to make ATP', w: 'Energy systems: the 100 m is over in ~10 seconds, which is the ATP-PC system\u2019s window. The glycolytic system needs longer to ramp up, and the oxidative system dominates efforts longer than ~2 minutes — neither gets a chance in a 10-second race.' },
+          { s: 'A distance runner notices her easy runs feel comfortable for hours, while her sprinter friend is exhausted after one 400 m repeat. A muscle test shows she has mostly slow-twitch fibers and he has mostly fast-twitch.', a: 'Muscle fiber types: slow vs fast twitch', w: 'Muscle fiber types: Type I slow-twitch fibers resist fatigue and suit endurance; Type IIx fast-twitch fibers are powerful but tire fast. Fiber mix is largely inherited, which is why the same workout feels easy to one athlete and brutal to another.' },
+          { s: 'A coach tests two athletes on a treadmill, measuring the most oxygen each can use per minute. One scores 62 mL/kg/min, the other 41 — and the coach says the first has a much higher aerobic ceiling.', a: 'VO2max: the aerobic ceiling', w: 'VO2max: the maximum oxygen uptake in mL/kg/min is the standard measure of aerobic fitness. 62 is a trained endurance level; 41 is near untrained. Training raises it, but part of the ceiling is genetic.' },
+          { s: 'A swimmer has done the same 30-minute easy swim, three times a week, for two months, and her times have stopped improving. Her coach says the body has adapted to that dose and needs a bigger stress to keep changing.', a: 'Training principles: overload, specificity, reversibility', w: 'Training principles: overload — the stress must exceed what the body is used to. The same workout stops working once the body has adapted to it, so the dose has to rise gradually (progression) to keep improving.' },
+          { s: 'A track coach maps out the season in blocks: six weeks of base mileage, then four weeks of strength, then three weeks of speed work, then a two-week taper before the championship meet.', a: 'Periodization: planning the training year', w: 'Periodization: training is organized into mesocycles (3–6 week blocks with one focus) inside a macrocycle (the season), ending in a taper so the athlete peaks for the championship instead of being tired all year.' },
+          { s: 'A runner checks her watch mid-run: 148 beats per minute. Her estimated max is 194, so she is at about 76% — a tempo effort, not the easy conversational pace her coach wanted for today.', a: 'Heart-rate zones: training by intensity', w: 'Heart-rate zones: 148 \u00F7 194 is about 76% of max — Zone 3 tempo pace. Her easy days should be Zone 2 (60–70%, about 116–136 bpm), where she can still talk in full sentences.' },
+          { s: 'A sprint coach films an athlete and points out that she bounces up and down with every stride. He says the force going into the ground should drive her forward, not up — she is spending energy vertically.', a: 'Biomechanics: force and leverage', w: 'Biomechanics: sprint speed is stride length times stride frequency, and the ground reaction force should push the runner forward. Bouncing wastes that force vertically instead of turning it into horizontal speed.' },
+          { s: 'A lifter trains legs hard on Monday, then sleeps nine hours, eats well, and takes Tuesday easy. By Wednesday he is stronger than he was on Monday — his coach says the gain happened during the rest, not during the workout.', a: 'Recovery and supercompensation', w: 'Recovery and supercompensation: training breaks the body down; recovery rebuilds it slightly stronger than before. Sleep, food, and rest days are when adaptation happens — train again too soon and you interrupt the rebuild.' }
+        ];
+        var it = slPick(bank);
+        var opts = ['Energy systems: three ways to make ATP', 'Muscle fiber types: slow vs fast twitch', 'VO2max: the aerobic ceiling', 'Training principles: overload, specificity, reversibility', 'Periodization: planning the training year', 'Heart-rate zones: training by intensity', 'Biomechanics: force and leverage', 'Recovery and supercompensation'];
+        var keep = [it.a];
+        var others = opts.filter(function(o){ return o !== it.a; });
+        while(keep.length < 4) keep.push(others.splice(slR(0, others.length - 1), 1)[0]);
+        var k = slR(0, 3); keep = keep.slice(k).concat(keep.slice(0, k));
+        return { prompt: 'Which idea is this? \u2014 ' + it.s, options: keep, answer: it.a, work: it.w };
+      },
+      function(){
+        var dist = slPick([400, 800, 1600]);
+        var laps = dist / 400;
+        var pace = slR(70, 130);
+        var total = pace * laps;
+        var mm = Math.floor(total / 60), ss = total % 60;
+        var tstr = mm + ':' + (ss < 10 ? '0' : '') + ss;
+        return { prompt: 'A runner covers ' + dist + ' m in ' + tstr + ' (' + total + ' seconds). What is the pace per 400 m, in seconds?', answer: pace, unit: 's / 400 m', work: dist + ' m is ' + laps + (laps === 1 ? ' lap' : ' laps') + ' of 400 m. ' + total + ' s \u00F7 ' + laps + ' = ' + pace + ' seconds per 400 m. Even splits mean holding that pace every lap.' };
+      },
+      function(){
+        var age = slR(16, 24);
+        var rest = slR(48, 68);
+        var inten = slPick([0.6, 0.65, 0.7, 0.75, 0.8, 0.85]);
+        var hrmax = 208 - 0.7 * age;
+        var target = Math.round((hrmax - rest) * inten + rest);
+        return { prompt: 'An athlete is ' + age + ' years old with a resting heart rate of ' + rest + ' bpm. Using the Tanaka estimate for max heart rate and the Karvonen formula, what is the target heart rate at ' + Math.round(inten * 100) + '% intensity, in bpm?', answer: target, unit: 'bpm', work: 'Tanaka max: 208 \u2212 0.7 \u00D7 ' + age + ' = ' + slRound(hrmax, 1) + ' bpm. Karvonen: (' + slRound(hrmax, 1) + ' \u2212 ' + rest + ') \u00D7 ' + inten + ' + ' + rest + ' = ' + target + ' bpm.' };
+      },
+      function(){
+        var bank = [
+          { e: 'the 100 m dash (about 10 seconds, all out)', a: 'ATP-PC (phosphagen)', w: 'ATP-PC (phosphagen): a ~10-second all-out effort runs almost entirely on stored ATP and phosphocreatine — the other systems cannot ramp up in time.' },
+          { e: 'a one-rep-max bench press (a single 3-second lift)', a: 'ATP-PC (phosphagen)', w: 'ATP-PC (phosphagen): a single maximal lift lasting a few seconds uses stored ATP and phosphocreatine, with no time for glycolysis or oxygen delivery to matter.' },
+          { e: 'the 200 m dash (about 22 seconds, all out)', a: 'Glycolytic (anaerobic)', w: 'Glycolytic (anaerobic): a ~22-second sprint is too long for ATP-PC alone, so fast glucose breakdown without oxygen does most of the work — which is why the last 50 m burns.' },
+          { e: 'the 400 m dash (about 50 seconds, all out)', a: 'Glycolytic (anaerobic)', w: 'Glycolytic (anaerobic): a ~50-second all-out effort is the classic glycolytic event — powerful, but lactate and hydrogen ions build up fast, which is why the 400 m hurts so much.' },
+          { e: 'the 800 m run (about 2 minutes, hard)', a: 'Mixed glycolytic + oxidative', w: 'Mixed glycolytic + oxidative: at ~2 minutes the effort sits on the boundary — glycolysis still powers much of it, but the oxidative system is already contributing heavily.' },
+          { e: 'the 1500 m run (about 4 minutes, hard)', a: 'Oxidative (aerobic)', w: 'Oxidative (aerobic): a ~4-minute race is mostly aerobic — the oxidative system supplies the majority of the energy, with glycolysis covering surges and the finish.' },
+          { e: 'the 5000 m run (about 15 minutes, hard)', a: 'Oxidative (aerobic)', w: 'Oxidative (aerobic): a 15-minute race is dominated by the oxidative system, which is the only one that can sustain that duration — this is where VO2max decides the result.' },
+          { e: 'a marathon (about 2\u20134 hours, steady)', a: 'Oxidative (aerobic)', w: 'Oxidative (aerobic): a marathon runs on the oxidative system burning glucose and fat with oxygen — the only system that can last for hours.' }
+        ];
+        var it = slPick(bank);
+        var opts = ['ATP-PC (phosphagen)', 'Glycolytic (anaerobic)', 'Mixed glycolytic + oxidative', 'Oxidative (aerobic)'];
+        return { prompt: 'Which energy system dominates during ' + it.e + '?', options: opts, answer: it.a, work: it.w };
       }
     ]
   }
