@@ -1,9 +1,10 @@
 {
  "notes": [
-  "NEW subject pack: Sports Science Basics — energy systems, muscle fiber types, VO2max, training principles, periodization, heart-rate zones, biomechanics, and recovery & supercompensation, with which-idea, running-pace, Karvonen target-heart-rate, and energy-system practice, never your assignment.",
-  "Detector V40 was trained and measured this run but HELD, not shipped: on the permanent frozen probe it caught 16 of 18 humanized texts, exactly the shipped V36’s 16 — the gate needs an improvement, not a tie — and its human false-flag rate ticked up slightly to 4.71% (from 4.66%), so V36 stays live until a round genuinely beats it. This round tested the leading idea from last time — fresh real human personal and narrative writing from public-domain memoirs, plus humanizer rewrites kept labeled HUMAN — and the answer is no: the narrative false flag barely moved (the fixed-probe human essay still scores 98.9% AI) and the two probe misses (noise pollution, microplastics in the ocean) barely moved for the fifth straight round. Next try: a second generator family for the humanized class."
+  "NEW subject pack: Finance Basics \u2014 compound interest, simple interest, the 50/30/20 budget rule, credit and APR, inflation and real returns, diversification and risk, emergency fund, and avalanche vs snowball debt payoff, with which-idea, compound-interest, simple-interest, and rule-of-72 practice, never your assignment.",
+  "NEW in the detector results: when the overall verdict and the sentence view disagree \u2014 for example the overall score reads AI but the sentences mostly read human, or the other way round \u2014 the results now say so plainly in a flagbox and call the result a weak signal to check by reading the writing yourself, not proof. A score is a signal to review, never proof of authorship.",
+  "Detector V42 was trained and measured this run but HELD, not shipped: on the permanent frozen probe it caught 14 of 18 humanized texts, below the shipped V36's 16 \u2014 and its human false-flag rate ticked up slightly to 4.87% (from 4.66%), so V36 stays live until a round genuinely beats it. This round tested the leading idea from last time \u2014 a bigger set of Qwen-written humanized texts (80 fresh docs, 140 in the pool) \u2014 and the answer is mixed: the new Qwen probe went to 12 of 12 and neural-paraphrase detection rose to 60.9%, but the frozen probe lost two texts (beekeeping, vertical farming) and the human personal-essay false flag deepened to 99.5%. Next try: quality over quantity \u2014 a stronger generator for the humanized class \u2014 and revisiting how the stylometric specialist is combined."
  ],
  "notify": true,
- "updated": "2026-11-12",
- "version": "2.53.0"
+ "updated": "2026-11-15",
+ "version": "2.54.0"
 }

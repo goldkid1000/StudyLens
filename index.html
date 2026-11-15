@@ -634,6 +634,7 @@ body.lp-plain .pill{font-weight:700}
   #lecLessonBarFill,#quizProgFill{transition:none}
 }
 
+/* v2.54.0 — Finance Basics pack */
 /* v2.53.0 — Sports Science Basics pack */
 /* v2.52.0 — Linguistics Basics pack */
 /* v2.51.0 — Engineering Basics pack */
@@ -2510,7 +2511,21 @@ function gaugeHTML(pct, verdict){
     '<div class="gauge-center"><div class="gauge-verdict">' + verdict + '</div><div class="gauge-sub">overall verdict</div></div>';
 }
 function renderDetectorResults(title, pct, verdict, sents, scores, explain){
-  var html = '<h3 style="margin-bottom:10px">' + esc(title) + '</h3>' +
+  /* Disagreement note (v2.54.0): the overall verdict comes from the
+     document model while the sentence colours come from the sentence model,
+     and the two can disagree — e.g. a real human personal essay the
+     document model flags 99% AI while every sentence reads human. When
+     they disagree the result is less trustworthy, so say so plainly
+     instead of showing two contradictory views with no explanation. The
+     verdict itself is unchanged; this only adds the warning. */
+  var meanSent = scores.length ? scores.reduce(function(x, y){ return x + y; }, 0) / scores.length : 50;
+  var disagree = '';
+  if(verdict === 'AI' && meanSent < 40){
+    disagree = '<div class="flagbox"><strong>The overall score and the sentence view disagree on this text.</strong> The overall score reads AI (' + pct.ai + '% AI probability), but the sentences mostly read human (average sentence AI-score ' + Math.round(meanSent) + '/100). The two views come from different parts of the model, and when they disagree the result is less trustworthy — read the writing yourself and treat this as a weak signal, not proof.</div>';
+  } else if(verdict === 'HUMAN' && meanSent > 60){
+    disagree = '<div class="flagbox"><strong>The overall score and the sentence view disagree on this text.</strong> The overall score reads human, but the sentences mostly read AI (average sentence AI-score ' + Math.round(meanSent) + '/100). The two views come from different parts of the model, and when they disagree the result is less trustworthy — read the writing yourself and treat this as a weak signal, not proof.</div>';
+  }
+  var html = '<h3 style="margin-bottom:10px">' + esc(title) + '</h3>' + disagree +
     '<div class="det-flex">' +
       '<div class="gauge-wrap"><div class="gauge">' + gaugeHTML(pct, verdict) + '</div>' +
         '<div class="legend">' +
@@ -4864,8 +4879,13 @@ ssRefresh();
    fetched with no-store caching: when a newer build ships, an already-open or
    home-screen copy of an older build sees the newer version number there and
    offers "Update now" (a reload onto the new build). */
-var APP_VERSION = '2.53.0';
+var APP_VERSION = '2.54.0';
 var CHANGELOG = [
+ { v:'2.54.0', date:'Nov 15, 2026', notify:true, notes:[
+  'NEW subject pack: Finance Basics — compound interest, simple interest, the 50/30/20 budget rule, credit and APR, inflation and real returns, diversification and risk, emergency fund, and avalanche vs snowball debt payoff, with which-idea, compound-interest, simple-interest, and rule-of-72 practice, never your assignment.',
+  'NEW in the detector results: when the overall verdict and the sentence view disagree — for example the overall score reads AI but the sentences mostly read human, or the other way round — the results now say so plainly in a flagbox and call the result a weak signal to check by reading the writing yourself, not proof. A score is a signal to review, never proof of authorship.',
+  'Detector V42 was trained and measured this run but HELD, not shipped: on the permanent frozen probe it caught 14 of 18 humanized texts, below the shipped V36\'s 16 — and its human false-flag rate ticked up slightly to 4.87% (from 4.66%), so V36 stays live until a round genuinely beats it. This round tested the leading idea from last time — a bigger set of Qwen-written humanized texts (80 fresh docs, 140 in the pool) — and the answer is mixed: the new Qwen probe went to 12 of 12 and neural-paraphrase detection rose to 60.9%, but the frozen probe lost two texts (beekeeping, vertical farming) and the human personal-essay false flag deepened to 99.5%. Next try: quality over quantity — a stronger generator for the humanized class — and revisiting how the stylometric specialist is combined.'
+ ]},
  { v:'2.53.0', date:'Nov 12, 2026', notify:true, notes:[
    'NEW subject pack: Sports Science Basics \u2014 energy systems, muscle fiber types, VO2max, training principles, periodization, heart-rate zones, biomechanics, and recovery & supercompensation, with which-idea, running-pace, Karvonen target-heart-rate, and energy-system practice, never your assignment.',
    'Detector V40 was trained and measured this run but HELD, not shipped: on the permanent frozen probe it caught 16 of 18 humanized texts, exactly the shipped V36\u2019s 16 \u2014 the gate needs an improvement, not a tie \u2014 and its human false-flag rate ticked up slightly to 4.71% (from 4.66%), so V36 stays live until a round genuinely beats it. This round tested the leading idea from last time \u2014 fresh real human personal and narrative writing from public-domain memoirs, plus humanizer rewrites kept labeled HUMAN \u2014 and the answer is no: the narrative false flag barely moved (the fixed-probe human essay still scores 98.9% AI) and the two probe misses (noise pollution, microplastics in the ocean) barely moved for the fifth straight round. Next try: a second generator family for the humanized class.' ]},
@@ -9495,6 +9515,66 @@ var SL_PACKS = {
         var it = slPick(bank);
         var opts = ['ATP-PC (phosphagen)', 'Glycolytic (anaerobic)', 'Mixed glycolytic + oxidative', 'Oxidative (aerobic)'];
         return { prompt: 'Which energy system dominates during ' + it.e + '?', options: opts, answer: it.a, work: it.w };
+      }
+    ]
+  },
+  finance: {
+    title: 'Finance Basics',
+    sources: 'Sources: OpenStax Principles of Finance; Kapoor, Dlabay & Hughes, Personal Finance. Explanations are textbook-level summaries.',
+    concepts: [
+      { term: 'Compound interest', explain: 'Compound interest is interest earned on both the original amount and the interest already added. Money grows faster over time because each period\'s interest itself starts earning interest — the snowball effect. That is why starting to save early matters so much, even with small amounts, and why unpaid card balances grow so fast in the other direction.' },
+      { term: 'Simple interest', explain: 'Simple interest is charged only on the original principal, never on accumulated interest: I = P x r x t. It is used for some short-term loans. Compare it with compound interest: on the same principal and rate, compounding always costs a borrower more (and pays a saver more) over time, because the base keeps growing.' },
+      { term: 'The 50/30/20 budget rule', explain: 'A simple budgeting frame: about 50% of take-home pay for needs (rent, food, transport), about 30% for wants (eating out, streaming, fun), and about 20% for saving and paying down debt. The percentages are a starting point, not a law — a tight budget may need more than 50% for needs, and then the wants slice shrinks first.' },
+      { term: 'Credit and APR', explain: 'Borrowing costs money. The APR (annual percentage rate) is the yearly cost of borrowing, including interest and most fees, so it is the fair way to compare loans and cards. Paying only the minimum on a credit card stretches a small balance into years of interest; paying the statement balance in full each month avoids interest on purchases altogether.' },
+      { term: 'Inflation and real returns', explain: 'Inflation is a rise in the general price level, so money saved at 2% while prices rise 3% loses purchasing power. The real return is roughly the nominal return minus inflation. A savings account that pays less than inflation is safe in dollars but shrinking in what those dollars buy — which is why long-term savers look for returns above inflation.' },
+      { term: 'Diversification and risk', explain: 'Risk is the chance that an investment\'s actual return differs from the expected one; higher expected returns usually come with higher risk. Diversification — spreading money across different kinds of assets — lowers the risk that one bad holding sinks the whole pot, because holdings rarely all fall at once. It does not remove risk, it spreads it.' },
+      { term: 'Emergency fund', explain: 'An emergency fund is cash set aside for surprises — a car repair, a broken phone, a gap between paychecks — so a surprise does not become debt. A common target is 3 to 6 months of essential expenses, built a little at a time in a separate savings account. Even a starter cushion of $500 to $1,000 covers most everyday emergencies.' },
+      { term: 'Avalanche vs snowball debt payoff', explain: 'Two ways to attack multiple debts. The avalanche pays the highest-interest debt first, which costs the least interest overall. The snowball pays the smallest balance first, which gives quick wins that keep motivation up. Avalanche wins on maths; snowball wins on momentum — the best one is the one you will actually stick with.' }
+    ],
+    formulas: [
+      { name: 'Compound interest (future value)', form: 'A = P(1 + r)^t', note: 'A = amount after t years, P = starting principal, r = annual rate as a decimal, t = years. Interest compounds once a year here; more frequent compounding grows slightly faster.' },
+      { name: 'Simple interest', form: 'I = P x r x t', note: 'I = interest, P = principal, r = annual rate as a decimal, t = time in years. Interest is charged on the principal only.' },
+      { name: 'Rule of 72 (doubling time)', form: 'Years to double ≈ 72 / interest rate (%)', note: 'Divide 72 by the annual rate in percent: at 6%, money doubles in about 12 years; at 8%, about 9 years. It is an approximation that works best for rates between about 4% and 12%.' }
+    ],
+    gens: [
+      function(){
+        var bank = [
+          { s: 'Maya puts $200 a month into savings and watches the balance grow faster each year because last year\'s interest earns interest too.', a: 'Compound interest', w: 'Compound interest: interest is earned on the principal AND on the interest already added, so growth speeds up over time.' },
+          { s: 'A loan charges interest only on the $1,000 borrowed, never on the interest that has already built up.', a: 'Simple interest', w: 'Simple interest: I = P x r x t — interest is charged on the original principal only.' },
+          { s: 'Jordan takes home $2,000 a month and aims for about $1,000 on needs, $600 on wants, and $400 to savings and debt.', a: 'The 50/30/20 budget rule', w: 'The 50/30/20 budget rule: roughly 50% needs, 30% wants, 20% saving and debt payoff.' },
+          { s: 'Two cards look similar, but one charges 24% a year and the other 19% — the yearly cost including fees is the number to compare.', a: 'Credit and APR', w: 'Credit and APR: the APR is the yearly cost of borrowing including interest and most fees, so it is the fair comparison.' },
+          { s: 'A savings account pays 2% a year while prices rise 3% a year, so the money buys less next year than it does today.', a: 'Inflation and real returns', w: 'Inflation and real returns: real return is roughly nominal return minus inflation — here about -1%, so purchasing power shrinks.' },
+          { s: 'Instead of putting everything in one stock, Priya spreads her money across many different investments so one bad pick cannot sink her.', a: 'Diversification and risk', w: 'Diversification and risk: spreading money across different assets lowers the chance that one bad holding sinks the whole pot.' },
+          { s: 'Alex keeps $1,000 in a separate savings account so a car repair does not have to go on a credit card.', a: 'Emergency fund', w: 'Emergency fund: cash set aside for surprises, so a surprise does not become debt — a starter cushion of $500 to $1,000 covers most everyday emergencies.' },
+          { s: 'Sam has three debts and attacks the one with the highest interest rate first, even though it is not the smallest balance.', a: 'Avalanche vs snowball debt payoff', w: 'Avalanche vs snowball debt payoff: the avalanche pays the highest-interest debt first, which costs the least interest overall.' },
+          { s: 'A $500 deposit grows to $530 after one year at 6% and then earns interest on $530, not just on the original $500.', a: 'Compound interest', w: 'Compound interest: the base grows each year because interest itself earns interest.' },
+          { s: 'Prices rise 4% in a year, so a pay rise of 2% means the worker can buy less than the year before.', a: 'Inflation and real returns', w: 'Inflation and real returns: with prices up 4% and pay up 2%, the real change is about -2% — purchasing power falls.' },
+          { s: 'A borrower compares two loans by their yearly cost including fees, not by the headline monthly payment alone.', a: 'Credit and APR', w: 'Credit and APR: the APR is the yearly cost of borrowing including interest and most fees.' },
+          { s: 'Riley pays off the smallest debt first for a quick win, then rolls that payment into the next-smallest debt.', a: 'Avalanche vs snowball debt payoff', w: 'Avalanche vs snowball debt payoff: the snowball pays the smallest balance first for quick wins that keep motivation up.' },
+          { s: 'A student splits take-home pay so that rent, food, and transport take about half, fun takes about a third, and the rest is saved.', a: 'The 50/30/20 budget rule', w: 'The 50/30/20 budget rule: roughly 50% needs, 30% wants, 20% saving and debt payoff.' },
+          { s: 'A short-term loan charges 5% a year on the amount borrowed, and the interest never gets added to the amount charged on.', a: 'Simple interest', w: 'Simple interest: interest is charged on the original principal only, I = P x r x t.' },
+          { s: 'An investor holds stocks, bonds, and a savings account together so that a fall in one is cushioned by the others.', a: 'Diversification and risk', w: 'Diversification and risk: spreading across different kinds of assets means holdings rarely all fall at once.' },
+          { s: 'Three months of rent and food money sits untouched in a separate account, only for true surprises.', a: 'Emergency fund', w: 'Emergency fund: a target of 3 to 6 months of essential expenses, kept separate so surprises do not become debt.' }
+        ];
+        var it = slPick(bank);
+        var opts = ['Compound interest', 'Simple interest', 'The 50/30/20 budget rule', 'Credit and APR', 'Inflation and real returns', 'Diversification and risk', 'Emergency fund', 'Avalanche vs snowball debt payoff'];
+        var k = slR(0, 7); opts = opts.slice(k).concat(opts.slice(0, k));
+        return { prompt: 'Which idea is this? — ' + it.s, options: opts, answer: it.a, work: it.w };
+      },
+      function(){
+        var p = slPick([100, 200, 250, 500, 1000]), r = slPick([2, 3, 4, 5, 6, 8, 10]), t = slPick([1, 2, 3, 5, 10]);
+        var a = slRound(p * Math.pow(1 + r / 100, t), 2);
+        return { prompt: 'You deposit $' + p + ' at ' + r + '% annual interest, compounded yearly. How much will you have after ' + t + ' year' + (t > 1 ? 's' : '') + '? (Round to the nearest cent.)', answer: a, unit: '$', work: 'A = P(1 + r)^t = ' + p + ' x (1 + ' + r + '/100)^' + t + ' = $' + a + '.' };
+      },
+      function(){
+        var p = slPick([200, 400, 500, 800, 1000, 2000]), r = slPick([3, 4, 5, 6, 8]), t = slPick([1, 2, 3, 4]);
+        var i = slRound(p * (r / 100) * t, 2);
+        return { prompt: 'A loan of $' + p + ' charges simple interest at ' + r + '% a year. How much interest is owed after ' + t + ' year' + (t > 1 ? 's' : '') + '? (Round to the nearest cent.)', answer: i, unit: '$', work: 'I = P x r x t = ' + p + ' x ' + (r / 100) + ' x ' + t + ' = $' + i + '.' };
+      },
+      function(){
+        var r = slPick([3, 4, 6, 8, 9, 12]);
+        var y = slRound(72 / r, 1);
+        return { prompt: 'Money invested at ' + r + '% a year grows by compound interest. About how many years will it take to double?', answer: y, unit: 'years', work: 'Rule of 72: years to double ≈ 72 / rate = 72 / ' + r + ' ≈ ' + y + ' years.' };
       }
     ]
   }
